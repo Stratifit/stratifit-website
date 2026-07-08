@@ -1,0 +1,149 @@
+"use client";
+
+import { useState, useRef, useEffect } from "react";
+import { motion } from "framer-motion";
+import { HiArrowRight } from "react-icons/hi2";
+import Link from "next/link";
+import { projects, projectCategories } from "@/data/projects";
+
+const featuredProjects = projects.slice(0, 8);
+
+export function Portfolio() {
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [activePortfolioIndex, setActivePortfolioIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const filtered =
+    activeFilter === "All"
+      ? featuredProjects
+      : featuredProjects.filter((p) => p.category === activeFilter);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const cardWidth = 320;
+      const gap = 24;
+      const padding = 24;
+      const center = el.scrollLeft + el.clientWidth / 2;
+      const idx = Math.floor((center - padding) / (cardWidth + gap));
+      setActivePortfolioIndex(Math.max(0, Math.min(idx, filtered.length - 1)));
+    };
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [filtered.length, activeFilter]);
+
+  return (
+    <section id="work" className="py-24 md:py-32 bg-surface relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <motion.div
+          initial={false}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
+            Portfolio
+          </p>
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
+            Our{" "}
+            <span className="text-amber">Work</span>
+          </h2>
+          <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
+            We craft digital experiences that define industries and elevate
+            brands through precision and creativity.
+          </p>
+        </motion.div>
+
+        {/* Filters */}
+        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-6 mb-10">
+          {projectCategories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveFilter(cat)}
+              className={`px-5 py-2.5 rounded-full font-bold text-sm shrink-0 transition-all ${
+                activeFilter === cat
+                  ? "bg-amber text-black shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                  : "bg-white/5 border border-white/10 text-white hover:border-amber/30"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Projects - Single horizontal scroll line */}
+        <div ref={scrollRef} className="flex gap-6 overflow-x-auto no-scrollbar pb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 snap-x snap-mandatory">
+          {filtered.map((project) => (
+            <motion.div
+              key={project.id}
+              initial={false}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="group bg-card-dark rounded-2xl overflow-hidden border border-white/5 hover:border-amber/20 transition-all shrink-0 w-[300px] sm:w-[340px] md:w-[380px] snap-center"
+            >
+              <div className="aspect-[4/3] relative overflow-hidden">
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                />
+                <span className="absolute top-4 left-4 bg-amber/90 text-black text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider">
+                  {project.category}
+                </span>
+              </div>
+              <div className="p-6 space-y-3">
+                <h3 className="font-heading font-bold text-xl text-white">
+                  {project.title}
+                </h3>
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  {project.description}
+                </p>
+                <Link
+                  href={`/portfolio/${project.slug}`}
+                  className="inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider hover:text-amber-light transition-colors group/link"
+                >
+                  View Case Study
+                  <HiArrowRight className="group-hover/link:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Desktop View All */}
+        <div className="hidden md:flex justify-end mt-8">
+          <Link
+            href="/portfolio"
+            className="inline-flex items-center gap-2 text-amber text-sm font-bold uppercase tracking-wider hover:text-amber-light transition-colors group"
+          >
+            View All Projects
+            <HiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+
+        {/* Dot Indicators + View All */}
+        <div className="flex items-center justify-center gap-1.5 mt-3 relative">
+          {filtered.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1 rounded-full transition-all duration-200 ease-out ${
+                i === activePortfolioIndex ? "w-1.5 h-1.5 bg-amber" : "w-1.5 h-1.5 bg-white/20"
+              }`}
+            />
+          ))}
+          <Link
+            href="/portfolio"
+            className="md:hidden absolute right-0 inline-flex items-center gap-1 text-amber text-[10px] font-bold uppercase tracking-wider hover:text-amber-light transition-colors"
+          >
+            View All
+            <HiArrowRight className="text-[10px]" />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
