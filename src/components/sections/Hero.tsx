@@ -70,8 +70,11 @@ export function Hero() {
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl lg:text-center lg:whitespace-nowrap font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
-                We Build Websites, Brands &amp; Systems
-                <br className="hidden lg:block" />
+                We Build Websites,
+                <span className="hidden lg:inline"> </span>
+                <br className="lg:hidden" />
+                Brands &amp; Systems
+                <br />
                 <span className="text-amber lg:inline-block lg:w-full lg:text-center">That Grow Businesses.</span>
               </h1>
 
@@ -137,19 +140,23 @@ export function Hero() {
           initial={false}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.6 }}
-          className="mt-3 md:mt-16 space-y-2 sm:space-y-0 pt-0 pb-3"
+          className="mt-3 md:mt-16 space-y-2 pt-0 pb-3 lg:max-w-3xl lg:mx-auto"
         >
-          {/* Mobile: label on its own line, logos below */}
-          <div className="sm:hidden flex items-center gap-3">
+          {/* Mobile: original label + horizontal rule */}
+          <div className="sm:hidden flex items-center gap-3 opacity-70">
             <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shrink-0" style={{ color: "#F59E0B" }}>
               Trusted by Growing Companies
             </span>
             <span className="flex-1 h-px bg-white/10" />
           </div>
-          <div className="flex items-center justify-between gap-2 sm:gap-6 md:gap-8 opacity-70 px-4 sm:px-0">
-            {/* Desktop: label inline with logos */}
-            <span className="hidden sm:block text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shrink-0" style={{ color: "#F59E0B" }}>
-              Trusted by Growing Companies
+          {/* Desktop: small "Trusted by" stacked label above the items row */}
+          <span className="hidden sm:block text-[9px] text-white/80 font-bold uppercase tracking-widest opacity-70">
+            Trusted by
+          </span>
+          {/* Items row - always visible (mobile: standalone, desktop: inline with "Growing Companies") */}
+          <div className="flex items-center justify-between lg:justify-start gap-2 sm:gap-6 md:gap-8 opacity-70 px-4 sm:px-0 whitespace-nowrap shrink-0">
+            <span className="hidden sm:inline text-xs md:text-sm font-bold uppercase tracking-wider" style={{ color: "#F59E0B" }}>
+              Growing Companies
             </span>
             {trustedBy.map(({ name, icon: Icon }) => (
               <span
@@ -161,15 +168,19 @@ export function Hero() {
               </span>
             ))}
           </div>
-         </motion.div>
+        </motion.div>
 
 {/* Tech Stack */}
         <div className="mt-3 md:mt-4">
-          <div className="mb-4">
-            <h3 className="text-lg sm:text-xl font-heading font-black tracking-tight mb-1">
-              <span className="text-white">Our </span>
-              <span style={{ color: "#F59E0B" }}>Tech</span>
-              <span className="text-white"> Stack</span>
+          <div className="mb-4 lg:text-center">
+            <h3 className="text-lg sm:text-xl font-heading font-black tracking-tight mb-1 lg:flex lg:items-center lg:justify-center lg:gap-4 lg:max-w-2xl lg:mx-auto">
+              <span className="hidden lg:inline-block lg:flex-1 lg:h-px lg:bg-white/20" />
+              <span>
+                <span className="text-white">Our </span>
+                <span style={{ color: "#F59E0B" }}>Tech</span>
+                <span className="text-white"> Stack</span>
+              </span>
+              <span className="hidden lg:inline-block lg:flex-1 lg:h-px lg:bg-white/20" />
             </h3>
             <p className="text-sm sm:text-base leading-relaxed" style={{ color: "#E5E7EB" }}>
               We use the best tools in the industry to build, automate, and scale your digital presence.
