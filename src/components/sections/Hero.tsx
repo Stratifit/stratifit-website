@@ -53,29 +53,29 @@ export function Hero() {
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-amber/3 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">          <div className="grid lg:grid-cols-[2fr_1fr] gap-8 md:gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">          <div className="grid lg:grid-cols-1 gap-8 md:gap-16 items-center">
           {/* Left Content */}
-          <div className="space-y-3 md:space-y-8">
+          <div className="space-y-3 md:space-y-8 lg:max-w-4xl lg:mx-auto">
             <motion.div
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="space-y-3.5 md:space-y-6"
+              className="space-y-3.5 md:space-y-6 lg:text-center"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 lg:justify-center">
                 <div className="w-2 h-2 rounded-full bg-amber animate-pulse shrink-0" />
                 <span className="text-[10px] sm:text-xs font-bold text-amber uppercase tracking-[0.2em]">
                   Premium Digital Agency
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl lg:whitespace-nowrap font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl lg:text-center lg:whitespace-nowrap font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
                 We Build Websites, Brands &amp; Systems
                 <br className="hidden lg:block" />
                 <span className="text-amber lg:inline-block lg:w-full lg:text-center">That Grow Businesses.</span>
               </h1>
 
-              <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl">
+              <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl lg:mx-auto">
                 We help startups and businesses build brands, websites, and
                 systems that turn visitors into paying customers.
               </p>
@@ -85,7 +85,7 @@ export function Hero() {
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
-              className="flex flex-col sm:flex-row gap-3 sm:gap-4"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:justify-center"
             >
               <a
                 href="#contact"
@@ -108,7 +108,7 @@ export function Hero() {
               initial={false}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="grid grid-cols-3 gap-2 sm:gap-6 md:gap-8 pt-3 pb-3 md:pt-3 md:pb-0 border-t border-white/5"
+              className="grid grid-cols-3 gap-2 sm:gap-6 md:gap-8 pt-3 pb-3 md:pt-3 md:pb-0 border-t border-white/5 lg:mx-auto lg:max-w-md"
             >
               {stats.map((stat) => (
                 <div key={stat.label[0]} className="flex flex-col items-center text-center px-2 sm:px-4 pb-0">
@@ -130,18 +130,6 @@ export function Hero() {
           </div>
 
           {/* Right Visual - Hidden on mobile */}
-          <motion.div
-            initial={false}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="hidden lg:flex items-center justify-center relative"
-          >
-            <div className="relative w-[300px] h-[300px] xl:w-[400px] xl:h-[400px]">
-              <div className="absolute top-0 right-0 w-48 xl:w-64 h-48 xl:h-64 bg-gray-900 rotate-45 border-r-4 border-b-4 border-amber/40 shadow-2xl" />
-              <div className="absolute top-16 right-16 w-32 xl:w-40 h-32 xl:h-40 bg-card-dark rotate-[30deg] border-l border-t border-white/10" />
-              <div className="absolute bottom-8 right-8 w-40 xl:w-48 h-12 xl:h-16 bg-amber/20 blur-3xl" />
-            </div>
-          </motion.div>
         </div>
 
         {/* Trust Row */}
