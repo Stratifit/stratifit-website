@@ -140,7 +140,7 @@ export function Hero() {
           initial={false}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.6 }}
-          className="mt-3 md:mt-16 space-y-2 pt-0 pb-3 lg:max-w-3xl lg:mx-auto"
+          className="mt-2 md:mt-8 space-y-2 pt-0 pb-3 lg:max-w-3xl lg:mx-auto"
         >
           {/* Mobile: original label + horizontal rule */}
           <div className="sm:hidden flex items-center gap-3 opacity-70">
