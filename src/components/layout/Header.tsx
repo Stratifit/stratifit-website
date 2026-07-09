@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AIChatbot } from "@/components/chat/AIChatbot";
 import { HiMenu, HiX } from "react-icons/hi";
 import { HiChatBubbleLeftRight, HiChevronUp, HiSparkles, HiPaintBrush, HiCommandLine, HiMegaphone, HiCpuChip } from "react-icons/hi2";
 
@@ -143,14 +144,10 @@ export function Header() {
             </a>
           </div>
 
-          {/* Mobile: Message icon on right */}
-          <a
-            href="#contact"
-            className="lg:hidden flex items-center justify-center w-10 h-10 bg-amber rounded-full shrink-0 order-3"
-            aria-label="Message us"
-          >
-            <HiChatBubbleLeftRight className="text-black text-xl" />
-          </a>
+          {/* Mobile: AI Chatbot */}
+          <div className="lg:hidden order-3">
+            <AIChatbot />
+          </div>
         </nav>
       </motion.header>
 

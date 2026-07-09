@@ -13,17 +13,17 @@ const CoreServices = dynamic(
     })),
   { ssr: true }
 );
-const WhyChooseUs = dynamic(
-  () =>
-    import("@/components/sections/WhyChooseUs").then((m) => ({
-      default: m.WhyChooseUs,
-    })),
-  { ssr: true }
-);
 const Process = dynamic(
   () =>
     import("@/components/sections/Process").then((m) => ({
       default: m.Process,
+    })),
+  { ssr: true }
+);
+const WhyChooseUs = dynamic(
+  () =>
+    import("@/components/sections/WhyChooseUs").then((m) => ({
+      default: m.WhyChooseUs,
     })),
   { ssr: true }
 );
@@ -38,6 +38,13 @@ const Portfolio = dynamic(
   () =>
     import("@/components/sections/Portfolio").then((m) => ({
       default: m.Portfolio,
+    })),
+  { ssr: true }
+);
+const BuyBusinessSection = dynamic(
+  () =>
+    import("@/components/sections/BuyBusinessSection").then((m) => ({
+      default: m.BuyBusinessSection,
     })),
   { ssr: true }
 );
@@ -73,10 +80,11 @@ export default function Home() {
     <>
       <Hero />
       <CoreServices />
-      <WhyChooseUs />
       <Process />
+      <WhyChooseUs />
       <Insights />
       <Portfolio />
+      <BuyBusinessSection />
       <Testimonials />
       <Packages />
       <FAQ />
