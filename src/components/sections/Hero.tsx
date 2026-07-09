@@ -53,8 +53,7 @@ export function Hero() {
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-amber/3 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">
-        <div className="grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">          <div className="grid lg:grid-cols-[2fr_1fr] gap-8 md:gap-16 items-center">
           {/* Left Content */}
           <div className="space-y-3 md:space-y-8">
             <motion.div
@@ -70,12 +69,10 @@ export function Hero() {
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
-                We Build Websites,
-                <br />
-                Brands &amp; Systems
-                <br />
-                <span className="text-amber">That Grow Businesses.</span>
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl lg:whitespace-nowrap font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
+                We Build Websites, Brands &amp; Systems
+                <br className="hidden lg:block" />
+                <span className="text-amber lg:inline-block lg:w-full lg:text-center">That Grow Businesses.</span>
               </h1>
 
               <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl">

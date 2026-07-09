@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { AIChatbot } from "@/components/chat/AIChatbot";
 import { HiMenu, HiX } from "react-icons/hi";
@@ -16,10 +17,9 @@ const serviceTiles = [
 
 const languages = ["EN", "FR", "DE", "ES"];
 
-const navLinks = [                  { label: "Home", href: "/" },
+const navLinks = [
+  { label: "Home", href: "/" },
   { label: "Services", href: "#services" },
-  { label: "AI & Automation", href: "#ai-automation" },
-  { label: "Growth Engine", href: "#growth-engine" },
   { label: "Insights", href: "/insights" },
   { label: "Work", href: "/portfolio" },
   { label: "About", href: "/about" },
@@ -27,6 +27,7 @@ const navLinks = [                  { label: "Home", href: "/" },
 ];
 
 export function Header() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(true);
@@ -105,16 +106,26 @@ export function Header() {
           </a>
 
           {/* Desktop: Nav links center */}
-          <div className="hidden lg:flex items-center gap-8 order-2">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-sm font-medium text-gray-300 hover:text-amber transition-colors tracking-wide"
-              >
-                {link.label}
-              </a>
-            ))}
+          <div className="hidden lg:flex items-center gap-8 order-2 lg:pl-40">
+            {navLinks.map((link) => {
+              const active =
+                !link.href.startsWith("#") &&
+                (link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href));
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative text-sm font-medium tracking-wide transition-colors duration-200 after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-1.5 after:h-[2px] after:bg-amber after:rounded-full after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out ${
+                    active ? "text-amber" : "text-gray-300 hover:text-amber"
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </div>
 
           {/* Mobile: Logo centered */}
