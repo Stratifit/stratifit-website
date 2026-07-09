@@ -293,11 +293,11 @@ export function Header() {
               {/* Footer links */}
               <div className="mb-2 text-center">
                 <p className="text-[0.7rem] text-white/70 font-medium tracking-wide">
-                  <a className="hover:text-white transition-colors" href="#">Privacy Policy</a>
+                  <a className="hover:text-white transition-colors" href="/privacy-policy">Privacy Policy</a>
                   <span className="mx-1">.</span>
-                  <a className="hover:text-white transition-colors" href="#">Terms of Service</a>
+                  <a className="hover:text-white transition-colors" href="/terms-conditions">Terms of Service</a>
                   <span className="mx-1">.</span>
-                  <a className="hover:text-white transition-colors" href="#">Cookie Policy</a>
+                  <a className="hover:text-white transition-colors" href="/cookie-policy">Cookie Policy</a>
                 </p>
               </div>
             </div>
