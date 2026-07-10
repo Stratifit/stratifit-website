@@ -11,6 +11,7 @@ import {
   HiShieldCheck,
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
+import ContactChatbot from "@/components/chat/ContactChatbot";
 
 const scrollLabels = [
   {
@@ -113,18 +114,8 @@ export default function ContactPage() {
           </div>
         </motion.div>
 
-        {/* Still have questions? */}
-        <div className="mt-10 text-center">
-          <p className="text-gray-500 text-sm mb-4">
-            Still have questions? We&apos;re here to help.
-          </p>
-          <button
-            onClick={openContactModal}
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
-          >
-            Contact Our Team
-          </button>
-        </div>
+        {/* AI Chatbot */}
+        <ContactChatbot />
       </div>
     </section>
   );
