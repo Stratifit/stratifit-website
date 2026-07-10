@@ -8,12 +8,11 @@ import {
   HiArrowRight,
   HiGlobeAlt,
   HiShieldCheck,
-  HiXMark,
-  HiPaperAirplane,
   HiCheckCircle,
   HiEnvelope,
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { ComingSoonAIChat } from "@/components/chat/ComingSoonAIChat";
 import {
   MdDiamond,
   MdDesignServices,
@@ -92,11 +91,9 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<{ role: "bot" | "user"; text: string }[]>([
-    { role: "bot", text: "👋 Hi! I'm the Stratifit AI assistant. Ask me anything about our upcoming launch, services, or how we can help you get started early." },
-  ]);
-  const [chatInput, setChatInput] = useState("");
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  // Refs used by ComingSoonAIChat to scroll the gate into the right region after a CTA
+  const notifySectionRef = useRef<HTMLElement>(null);
+  const servicesSectionRef = useRef<HTMLElement>(null);
 
   // Services carousel (mobile)
   const servicesScrollRef = useRef<HTMLDivElement>(null);
@@ -155,19 +152,6 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatMessages]);
-
-  const handleChatSend = () => {
-    if (!chatInput.trim()) return;
-    setChatMessages((prev) => [...prev, { role: "user", text: chatInput }]);
-    setChatInput("");
-    setTimeout(() => {
-      setChatMessages((prev) => [...prev, { role: "bot", text: "Thanks for your message! Our team will get back to you within 24 hours. Feel free to ask anything else in the meantime." }]);
-    }, 800);
-  };
 
   const GATE_PASSWORD = "7652";
 
@@ -272,7 +256,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         </section>
 
         {/* Services — same card design as CoreServices, scrollable carousel on mobile */}
-        <section className="mt-12 md:mt-16 mb-12 md:mb-16">
+        <section ref={servicesSectionRef} className="mt-12 md:mt-16 mb-12 md:mb-16">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center lg:text-left mb-10 md:mb-14">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading font-black leading-tight tracking-tight mb-3">Our Core <span className="text-amber">Services</span></h2>
             <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto lg:mx-0 border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
@@ -346,7 +330,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         </section>
 
         {/* Notify Me */}
-        <section className="mt-2 md:mt-4">
+        <section ref={notifySectionRef} className="mt-2 md:mt-4">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
             <p className="text-gray-400 text-sm mb-4">Get notified when we launch</p>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -385,31 +369,29 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
           <HiChatBubbleLeftRight className="text-xl" />
         </button>
 
-        {/* Chat Panel */}
+        {/* Coming Soon AI panel — replaces the inline chat panel with the dedicated pre-launch concierge */}
         <AnimatePresence>
           {chatOpen && (
-            <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setChatOpen(false)} />
-              <motion.div initial={{ y: "100%", opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: "100%", opacity: 0 }} transition={{ type: "spring", damping: 26, stiffness: 220 }} className="relative z-10 w-full sm:max-w-lg sm:rounded-2xl bg-black border-t sm:border border-white/10 rounded-t-2xl max-h-[80vh] flex flex-col">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-amber flex items-center justify-center"><HiChatBubbleLeftRight className="text-black text-sm" /></div>
-                    <span className="font-heading font-black text-white text-sm">Stratifit AI</span>
-                  </div>
-                  <button onClick={() => setChatOpen(false)} className="text-gray-400 hover:text-white"><HiXMark size={20} /></button>
-                </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {chatMessages.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${msg.role === "user" ? "bg-amber text-black" : "bg-card-dark border border-white/5 text-gray-300"}`}>{msg.text}</div>
-                    </div>
-                  ))}
-                  <div ref={chatEndRef} />
-                </div>
-                <div className="border-t border-white/10 px-4 py-3 flex items-center gap-2 shrink-0">
-                  <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleChatSend(); }} placeholder="Type your message..." className="flex-1 bg-card-dark border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none" />
-                  <button onClick={handleChatSend} disabled={!chatInput.trim()} className="w-10 h-10 rounded-xl bg-amber text-black flex items-center justify-center hover:bg-amber-light disabled:opacity-30 disabled:cursor-not-allowed shrink-0"><HiPaperAirplane className="text-base" /></button>
-                </div>
+            <div className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center p-0 sm:p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                onClick={() => setChatOpen(false)}
+              />
+              <motion.div
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 26, stiffness: 220 }}
+                className="relative z-10 w-full sm:max-w-lg flex flex-col h-[80vh] max-h-[90vh]"
+              >
+                <ComingSoonAIChat
+                  onClose={() => setChatOpen(false)}
+                  scrollToSubscribe={() => notifySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
+                  scrollToServices={() => servicesSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                />
               </motion.div>
             </div>
           )}

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiChevronDown, HiXMark } from "react-icons/hi2";
-import ContactChatbot from "@/components/chat/ContactChatbot";
+import { HiChevronDown, HiArrowRight } from "react-icons/hi2";
+import { FaqAIChat } from "@/components/chat/FaqAIChat";
+import Link from "next/link";
 
 const faqs = [
   {
@@ -50,33 +51,6 @@ const faqs = [
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const [chatbotOpen, setChatbotOpen] = useState(false);
-
-  // Lock body scroll on mobile when panel is open
-  useEffect(() => {
-    if (!chatbotOpen) return;
-    const isMobile = () => window.matchMedia("(max-width: 1023px)").matches;
-    if (!isMobile()) return;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [chatbotOpen]);
-
-  // Outside-click-to-close on desktop
-  useEffect(() => {
-    if (!chatbotOpen) return;
-    const isMobile = () => window.matchMedia("(max-width: 1023px)").matches;
-    if (isMobile()) return;
-    const handlePointerDown = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      if (target.closest("[data-chat-panel]")) return;
-      setChatbotOpen(false);
-    };
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [chatbotOpen]);
 
   return (
     <section id="faq" className="py-24 md:py-32 bg-surface relative overflow-hidden">
@@ -159,68 +133,70 @@ export function FAQ() {
           ))}
         </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-10 text-center">
-          <p className="text-gray-500 text-sm mb-4">
-            Still have questions? We&apos;re here to help.
-          </p>
-          <button
-            onClick={() => setChatbotOpen(true)}
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
-          >
-            Contact Our Team
-          </button>
-        </div>
       </div>
 
-      {/* Chatbot Panel Overlay */}
-      <AnimatePresence>
-        {chatbotOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm"
-              onClick={() => setChatbotOpen(false)}
-            />
-            {/* Panel */}
-            <motion.div
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 26, stiffness: 220 }}
-              className="fixed bottom-0 inset-x-0 z-[70] bg-black flex flex-col max-h-[92dvh] rounded-t-2xl border-t border-white/10 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-[440px] xl:w-[480px] lg:max-h-[85vh] lg:rounded-2xl lg:border lg:border-white/10 lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
-              data-chat-panel=""
-            >
-              {/* Header */}
-              <div className="flex-none px-4 py-3 flex items-center justify-between border-b border-white/10 bg-black rounded-t-2xl">
-                <div>
-                  <span className="font-heading font-black text-white text-sm">
-                    Still have questions?
-                  </span>
-                  <p className="text-[10px] text-gray-500">We&apos;re here to help.</p>
-                </div>
-                <button
-                  onClick={() => setChatbotOpen(false)}
-                  className="p-2 -mr-2 text-gray-400 hover:text-white transition-colors"
-                  aria-label="Close"
-                >
-                  <HiXMark size={22} />
-                </button>
-              </div>
+      {/* FAQ AI — inline Q&A panel that uses the same knowledge base */}
+      <div className="max-w-6xl mx-auto px-6 mt-16 md:mt-20 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center mb-10"
+        >
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.25em] mb-3">
+            Instant Answers
+          </p>
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-heading font-black tracking-tight">
+            Ask Our <span className="text-amber">FAQ AI</span>
+          </h3>
+          <p className="text-gray-400 text-sm sm:text-base mt-3 max-w-xl mx-auto">
+            Type a question or tap a popular topic below. We&apos;ll match it against our knowledge base, or hand you over to a human.
+          </p>
+        </motion.div>
 
-              {/* Chatbot content */}
-              <div className="flex-1 overflow-y-auto overscroll-contain">
-                <div className="px-0">
-                  <ContactChatbot />
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <FaqAIChat variant="card" />
+          </div>
+          <aside className="lg:col-span-1 bg-card-dark rounded-2xl border border-white/10 p-6 space-y-5 h-fit">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-amber mb-2">
+                Why this works
+              </p>
+              <h4 className="font-heading font-bold text-white text-lg mb-2">
+                Instant, sourced answers
+              </h4>
+              <p className="text-xs text-gray-400 leading-relaxed">
+                Our FAQ AI is grounded in our real knowledge base — pricing, timelines, process, tech stack, support. Answers link to related questions so you can dig deeper without leaving the page.
+              </p>
+            </div>
+            <div className="h-px bg-white/5" />
+            <ul className="space-y-2 text-xs text-gray-300">
+              <li className="flex items-start gap-2">
+                <span className="text-amber mt-0.5">✓</span>
+                12 curated FAQs across pricing, process, tech &amp; support
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber mt-0.5">✓</span>
+                Related-question chips after every answer
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber mt-0.5">✓</span>
+                Falls back to a human when no match is found
+              </li>
+            </ul>
+            <div className="h-px bg-white/5" />
+            <Link
+              href="/services"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
+            >
+              Browse Services
+              <HiArrowRight className="text-base" />
+            </Link>
+          </aside>
+        </div>
+      </div>
     </section>
   );
 }
