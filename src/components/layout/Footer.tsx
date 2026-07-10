@@ -1,18 +1,19 @@
 "use client";
 
 import { FaLinkedinIn, FaInstagram, FaXTwitter } from "react-icons/fa6";
+import { openContactModal } from "@/components/contact/ContactModal";
 
-const footerLinks = {
+const footerLinks: Record<string, { label: string; href?: string; action?: string }[]> = {
   Platform: [
-    { label: "Home", href: "#home" },
-    { label: "Services", href: "#services" },
+    { label: "Home", href: "/" },
+    { label: "Services", href: "/#services" },
     { label: "Work", href: "/portfolio" },
     { label: "Insights", href: "/insights" },
   ],
   Company: [
-    { label: "About", href: "#about" },
-    { label: "Careers", href: "#" },
-    { label: "Contact", href: "#contact" },
+    { label: "About", href: "/about" },
+    { label: "Careers", href: "/about" },
+    { label: "Contact", action: "contact" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "/privacy-policy" },
@@ -48,15 +49,25 @@ export function Footer() {
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-1">
                   {title}
                 </h4>
-                {links.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="text-xs text-gray-400 hover:text-amber transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+                {links.map((link) =>
+                  link.action === "contact" ? (
+                    <button
+                      key={link.label}
+                      onClick={openContactModal}
+                      className="text-xs text-gray-400 hover:text-amber transition-colors text-left"
+                    >
+                      {link.label}
+                    </button>
+                  ) : (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      className="text-xs text-gray-400 hover:text-amber transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ),
+                )}
               </div>
             ))}
           </div>
@@ -86,12 +97,12 @@ export function Footer() {
               <p className="text-[10px] text-gray-500 font-medium">
                 &copy; {new Date().getFullYear()} Stratifit. All rights reserved.
               </p>
-              <a
-                href="#home"
+              <button
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 className="text-[10px] text-amber font-bold hover:text-white transition-colors uppercase tracking-wider"
               >
                 Back to Top
-              </a>
+              </button>
             </div>
           </div>
         </div>

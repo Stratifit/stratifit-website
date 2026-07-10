@@ -25,6 +25,7 @@ import {
   HiCodeBracket,
   HiGlobeAlt,
 } from "react-icons/hi2";
+import { openContactModal } from "@/components/contact/ContactModal";
 import { projects } from "@/data/projects";
 
 const expertiseItems = [
@@ -223,13 +224,13 @@ export function GrowthMarketing() {
                   transition={{ delay: 0.2, duration: 0.6 }}
                   className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:justify-center"
                 >
-                  <a
-                    href="#contact"
+                  <button
+                    onClick={openContactModal}
                     className="group px-6 sm:px-8 py-3.5 sm:py-4 bg-amber text-black font-bold rounded-xl flex items-center justify-center gap-2 sm:gap-3 hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.3)] active:scale-95 text-sm sm:text-base"
                   >
                     Start Your Growth Plan
                     <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  </button>
                   <a
                     href="#how-it-works"
                     className="px-6 sm:px-8 py-3.5 sm:py-4 border border-white/15 text-white font-semibold rounded-xl flex items-center justify-center gap-2 sm:gap-3 hover:border-amber/50 hover:text-amber transition-all active:scale-95 text-sm sm:text-base"
@@ -670,9 +671,8 @@ export function GrowthMarketing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden bg-card-dark rounded-2xl border border-white/5 p-8 sm:p-12 lg:p-16 text-center"
+          className="relative overflow-hidden bg-black rounded-2xl border border-white/5 px-6 pt-6 pb-10 sm:p-8 lg:p-10 text-center"
         >
-          {/* Brand-matched visual layer: animated shimmer hairline + ambient amber gradient orbs */}
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber/60 to-transparent bg-[length:200%_100%] animate-[shimmer_3s_ease-in-out_infinite]" />
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[500px] h-[260px] bg-amber/10 rounded-full blur-[120px]" />
@@ -680,57 +680,28 @@ export function GrowthMarketing() {
             <div className="absolute top-1/2 right-1/4 w-[200px] h-[200px] bg-amber/4 rounded-full blur-[100px]" />
           </div>
 
-          {/* Eyebrow with HiSparkles — matches the "Why It Matters" eyebrow */}
-          <div className="flex items-center justify-center gap-2 mb-6 relative z-10">
+          <div className="flex items-center justify-center gap-2 mb-4 relative z-10">
             <HiSparkles className="text-amber text-sm" />
             <p className="text-[10px] font-bold tracking-[0.3em] text-amber uppercase">
               Ready When You Are
             </p>
           </div>
 
-          {/* Headline */}
-          <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-[0.95] mb-5 text-white max-w-3xl mx-auto relative z-10">
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-heading font-black leading-[0.95] mb-3 text-white max-w-xl mx-auto relative z-10">
             Let’s scale your <span className="text-amber">growth</span>.
           </h3>
 
-          {/* Microcopy */}
-          <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-8 max-w-xl mx-auto relative z-10">
-            30-minute strategy call. No commitment. Response within 24 hours.
-          </p>
-
-          {/* Trust badges */}
-          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 sm:gap-x-8 mb-10 relative z-10">
-            {[
-              { icon: HiSparkles, label: "30-Min Call" },
-              { icon: HiRocketLaunch, label: "24-Hour Response" },
-              { icon: HiCheckBadge, label: "Zero Commitment" },
-            ].map((t) => (
-              <div
-                key={t.label}
-                className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-gray-400"
-              >
-                <t.icon className="text-amber text-base sm:text-lg" />
-                <span>{t.label}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Primary CTA */}
-          <a
-            href="#contact"
-            className="group relative z-10 overflow-hidden inline-flex whitespace-nowrap px-10 sm:px-14 py-5 sm:py-6 bg-gradient-to-b from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-bold rounded-xl items-center justify-center gap-3 transition-all duration-300 shadow-[0_8px_30px_-8px_rgba(245,158,11,0.55),0_0_40px_rgba(245,158,11,0.35)] hover:shadow-[0_18px_45px_-10px_rgba(245,158,11,0.75),0_0_70px_rgba(245,158,11,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] text-base sm:text-lg tracking-tight border border-amber-300/40"
+          <button
+            onClick={openContactModal}
+            className="group relative z-10 inline-flex px-6 sm:px-8 py-3.5 sm:py-4 bg-amber text-black font-bold rounded-xl items-center justify-center gap-2 sm:gap-3 hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.3)] active:scale-95 text-sm sm:text-base"
           >
-            <span
-              aria-hidden
-              className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent"
-            />
-            <span
-              aria-hidden
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none"
-            />
-            Book a Free Strategy Call
-            <HiArrowRight className="group-hover:translate-x-1.5 transition-transform duration-300 text-xl" />
-          </a>
+            Start Your Growth Plan
+            <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
+          </button>
+
+          <p className="text-xs text-gray-500 mt-5 relative z-10">
+            🔒 No spam. Your data stays private.
+          </p>
         </motion.div>
       </div>
 

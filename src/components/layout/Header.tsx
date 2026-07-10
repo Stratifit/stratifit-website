@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { AIChatbot } from "@/components/chat/AIChatbot";
+import { openContactModal } from "@/components/contact/ContactModal";
 import { HiMenu, HiX } from "react-icons/hi";
 import {
   HiChatBubbleLeftRight,
@@ -29,7 +30,7 @@ const navLinks = [
   { label: "Insights", href: "/insights" },
   { label: "Work", href: "/portfolio" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "#contact" },
+  { label: "Contact", action: "contact" },
 ];
 
 export function Header() {
@@ -114,13 +115,25 @@ export function Header() {
           {/* Desktop: Nav links center */}
           <div className="hidden lg:flex items-center gap-8 order-2 lg:pl-40">
             {navLinks.map((link) => {
+              if (link.action === "contact") {
+                return (
+                  <button
+                    key={link.label}
+                    onClick={openContactModal}
+                    className="relative text-sm font-medium tracking-wide transition-colors duration-200 after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-1.5 after:h-[2px] after:bg-amber after:rounded-full after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out text-gray-300 hover:text-amber"
+                  >
+                    {link.label}
+                  </button>
+                );
+              }
               const active =
+                link.href &&
                 !link.href.startsWith("#") &&
                 (link.href === "/" ? pathname === "/" : pathname.startsWith(link.href));
               return (
                 <a
                   key={link.label}
-                  href={link.href}
+                  href={link.href ?? "#"}
                   aria-current={active ? "page" : undefined}
                   className={`relative text-sm font-medium tracking-wide transition-colors duration-200 after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-1.5 after:h-[2px] after:bg-amber after:rounded-full after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out ${
                     active ? "text-amber" : "text-gray-300 hover:text-amber"
@@ -149,12 +162,12 @@ export function Header() {
 
           {/* Desktop: CTA right */}
           <div className="hidden lg:block order-3">
-            <a
-              href="#contact"
+            <button
+              onClick={openContactModal}
               className="px-6 py-2.5 bg-amber text-black font-bold text-sm rounded-full hover:bg-amber-light transition-all active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
             >
               Start Your Project
-            </a>
+            </button>
           </div>
 
           {/* Mobile: AI Chatbot */}
@@ -284,14 +297,16 @@ export function Header() {
 
               {/* Bottom CTAs */}
               <div className="flex flex-col gap-3 mb-2 mt-3">
-                <a
-                  href="#contact"
-                  onClick={() => setIsOpen(false)}
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    openContactModal();
+                  }}
                   className="w-full bg-amber hover:bg-amber-light text-black font-bold text-base py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-transform transform active:scale-95"
                 >
                   <HiChatBubbleLeftRight className="text-xl" />
                   <span>Message Us</span>
-                </a>
+                </button>
               </div>
 
               {/* Language switcher - segmented control */}

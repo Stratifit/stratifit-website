@@ -5,6 +5,7 @@ import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookiePopup } from "@/components/layout/CookiePopup";
+import { ContactModal } from "@/components/contact/ContactModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -44,6 +45,7 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
           <CookiePopup />
+          <ContactModal />
         </SmoothScroll>
         <script
           dangerouslySetInnerHTML={{

@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion } from "framer-motion";
+import { openContactModal } from "@/components/contact/ContactModal";
 import {
   HiArrowRight,
   HiSparkles,
@@ -112,20 +113,20 @@ export function Hero() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:justify-center"
             >
-              <a
-                href="#contact"
+              <button
+                onClick={openContactModal}
                 className="group px-6 sm:px-8 py-3.5 sm:py-4 bg-amber text-black font-bold rounded-xl flex items-center justify-center gap-2 sm:gap-3 hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.3)] active:scale-95 text-sm sm:text-base"
               >
                 Start Your Project
                 <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
-              </a>
-              <a
-                href="#contact"
+              </button>
+              <button
+                onClick={openContactModal}
                 className="px-6 sm:px-8 py-3.5 sm:py-4 border border-white/15 text-white font-semibold rounded-xl flex items-center justify-center gap-2 sm:gap-3 hover:border-amber/50 hover:text-amber transition-all active:scale-95 text-sm sm:text-base"
               >
                 <HiSparkles className="shrink-0" />
                 Book a Strategy Call
-              </a>
+              </button>
             </motion.div>
 
             {/* Stats with Counters (data-target animation) */}
