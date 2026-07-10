@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -161,10 +162,34 @@ export function AIAutomationService() {
 
   const caseStudies = projects.filter((p) => p.category === "AI & Automation");
   const useCarousel = caseStudies.length >= 3;
+
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const scrollCarousel = (direction: "left" | "right") => {
+    const el = carouselRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction === "left" ? -350 : 350, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (useCarousel && carouselRef.current) {
+      const el = carouselRef.current;
+      setCanScrollRight(el.scrollWidth > el.clientWidth);
+    }
+  }, [useCarousel]);
+
+  const handleCarouselScroll = () => {
+    const el = carouselRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  };
   return (
     <section className="pt-2 pb-24 md:pt-4 md:pb-32">
       <div className="max-w-7xl mx-auto px-6 space-y-20 md:space-y-28">
-        <section className="relative min-h-[85vh] flex items-center pt-24 pb-8 md:pt-28">
+        <section className="relative min-h-[60vh] flex items-center pt-24 pb-0 md:pt-20 md:pb-0">
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className="absolute top-1/4 -right-20 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-amber/5 rounded-full blur-[120px]" />
             <div className="absolute bottom-0 left-0 w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-amber/3 rounded-full blur-[100px]" />
@@ -179,13 +204,13 @@ export function AIAutomationService() {
                   transition={{ duration: 0.6 }}
                   className="space-y-4 md:space-y-6"
                 >
-                  <div className="flex items-center gap-2 lg:justify-center">
+                  <div className="flex items-center justify-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-amber animate-pulse shrink-0" />
                     <span className="text-[10px] sm:text-xs font-bold text-amber uppercase tracking-[0.2em]">
                       AI & Automation Services
                     </span>
                   </div>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight text-center">
                     Automate your <span className="text-amber">business</span> with
                     <br />
                     <span className="text-amber">intelligent</span> AI.
@@ -514,96 +539,122 @@ export function AIAutomationService() {
               business.
             </p>
           </div>
-          <div
-            className={
-              useCarousel
-                ? "flex gap-6 overflow-x-auto no-scrollbar pb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 snap-x snap-mandatory"
-                : "grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-14 max-w-4xl mx-auto pb-20"
-            }
-          >
-            {caseStudies.map((project) => (
-              <a
-                key={project.id}
-                href={`/portfolio/${project.slug}`}
-                className={
-                  useCarousel
-                    ? "group bg-card-dark rounded-2xl overflow-hidden border border-white/5 hover:border-amber/20 transition-all shrink-0 w-[300px] sm:w-[340px] md:w-[380px] snap-center block"
-                    : "group bg-[#151515] rounded-xl overflow-hidden border border-white/[0.06] hover:border-white/15 transition-colors block"
-                }
-              >
-                <div className="aspect-[4/3] relative overflow-hidden">
-                  <img
-                    alt={project.title}
-                    className={
-                      useCarousel
-                        ? "w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        : "w-full h-full object-cover"
-                    }
-                    loading="lazy"
-                    src={project.image}
-                  />
-                  <span
-                    className={
-                      useCarousel
-                        ? "absolute top-4 left-4 bg-amber/90 text-black text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider"
-                        : "absolute top-4 left-4 text-[10px] font-bold tracking-[0.25em] uppercase text-amber/80"
-                    }
-                  >
-                    {project.category}
-                  </span>
-                </div>
-                <div className={useCarousel ? "p-6 space-y-3" : "p-8 sm:p-10 space-y-5"}>
-                  <div className="flex items-baseline gap-2 sm:gap-3 mb-1.5">
+          <div className="relative">
+            {useCarousel && (
+              <>
+                <button
+                  type="button"
+                  aria-label="Scroll portfolio left"
+                  disabled={!canScrollLeft}
+                  onClick={() => scrollCarousel("left")}
+                  className="hidden md:flex absolute -left-20 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-black/70 hover:bg-amber hover:text-black text-white border border-white/10 backdrop-blur-sm transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-black/70 disabled:hover:text-white z-10"
+                >
+                  <HiArrowLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Scroll portfolio right"
+                  disabled={!canScrollRight}
+                  onClick={() => scrollCarousel("right")}
+                  className="hidden md:flex absolute -right-20 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-black/70 hover:bg-amber hover:text-black text-white border border-white/10 backdrop-blur-sm transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-black/70 disabled:hover:text-white z-10"
+                >
+                  <HiArrowRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+            <div
+              ref={carouselRef}
+              onScroll={handleCarouselScroll}
+              className={
+                useCarousel
+                  ? "flex gap-6 overflow-x-auto no-scrollbar pb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 snap-x snap-mandatory"
+                  : "grid grid-cols-1 sm:grid-cols-2 gap-10 sm:gap-14 max-w-4xl mx-auto pb-20"
+              }
+            >
+              {caseStudies.map((project) => (
+                <a
+                  key={project.id}
+                  href={`/portfolio/${project.slug}`}
+                  className={
+                    useCarousel
+                      ? "group bg-card-dark rounded-2xl overflow-hidden border border-white/5 hover:border-amber/20 transition-all shrink-0 w-[300px] sm:w-[340px] md:w-[380px] snap-center block"
+                      : "group bg-[#151515] rounded-xl overflow-hidden border border-white/[0.06] hover:border-white/15 transition-colors block"
+                  }
+                >
+                  <div className="aspect-[4/3] relative overflow-hidden">
+                    <img
+                      alt={project.title}
+                      className={
+                        useCarousel
+                          ? "w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          : "w-full h-full object-cover"
+                      }
+                      loading="lazy"
+                      src={project.image}
+                    />
                     <span
                       className={
                         useCarousel
-                          ? "text-amber text-2xl sm:text-3xl font-heading font-black tabular-nums tracking-tight shrink-0"
-                          : "text-amber text-xl sm:text-2xl font-heading font-semibold tabular-nums tracking-tight shrink-0"
+                          ? "absolute top-4 left-4 bg-amber/90 text-black text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider"
+                          : "absolute top-4 left-4 text-[10px] font-bold tracking-[0.25em] uppercase text-amber/80"
                       }
                     >
-                      {project.shortMetric}
-                    </span>
-                    <span
-                      className={
-                        useCarousel
-                          ? "min-w-0 flex-1 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-gray-500 font-bold truncate"
-                          : "min-w-0 flex-1 text-[10px] uppercase tracking-[0.2em] text-gray-500 font-medium truncate"
-                      }
-                    >
-                      {project.shortLabel}
+                      {project.category}
                     </span>
                   </div>
-                  <h3
-                    className={
-                      useCarousel
-                        ? "font-heading font-bold text-xl text-white"
-                        : "font-heading font-semibold text-xl sm:text-2xl tracking-tight text-white"
-                    }
-                  >
-                    {project.title}
-                  </h3>
-                  <p
-                    className={
-                      useCarousel
-                        ? "text-gray-400 text-sm leading-relaxed"
-                        : "text-gray-500 text-[13px] leading-relaxed line-clamp-3"
-                    }
-                  >
-                    {project.description}
-                  </p>
-                  <span
-                    className={
-                      useCarousel
-                        ? "inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider group/link"
-                        : "inline-flex items-center gap-2 pt-5 border-t border-white/[0.06] text-amber text-xs font-bold uppercase tracking-wider group/link"
-                    }
-                  >
-                    View Case Study
-                    <HiArrowRight className="group-hover/link:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </a>
-            ))}
+                  <div className={useCarousel ? "p-6 space-y-3" : "p-8 sm:p-10 space-y-5"}>
+                    <div className="flex items-baseline gap-2 sm:gap-3 mb-1.5">
+                      <span
+                        className={
+                          useCarousel
+                            ? "text-amber text-2xl sm:text-3xl font-heading font-black tabular-nums tracking-tight shrink-0"
+                            : "text-amber text-xl sm:text-2xl font-heading font-semibold tabular-nums tracking-tight shrink-0"
+                        }
+                      >
+                        {project.shortMetric}
+                      </span>
+                      <span
+                        className={
+                          useCarousel
+                            ? "min-w-0 flex-1 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-gray-500 font-bold truncate"
+                            : "min-w-0 flex-1 text-[10px] uppercase tracking-[0.2em] text-gray-500 font-medium truncate"
+                        }
+                      >
+                        {project.shortLabel}
+                      </span>
+                    </div>
+                    <h3
+                      className={
+                        useCarousel
+                          ? "font-heading font-bold text-xl text-white"
+                          : "font-heading font-semibold text-xl sm:text-2xl tracking-tight text-white"
+                      }
+                    >
+                      {project.title}
+                    </h3>
+                    <p
+                      className={
+                        useCarousel
+                          ? "text-gray-400 text-sm leading-relaxed"
+                          : "text-gray-500 text-[13px] leading-relaxed line-clamp-3"
+                      }
+                    >
+                      {project.description}
+                    </p>
+                    <span
+                      className={
+                        useCarousel
+                          ? "inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider group/link"
+                          : "inline-flex items-center gap-2 pt-5 border-t border-white/[0.06] text-amber text-xs font-bold uppercase tracking-wider group/link"
+                      }
+                    >
+                      View Case Study
+                      <HiArrowRight className="group-hover/link:translate-x-1 transition-transform" />
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
           </div>
           <div className="hidden md:flex justify-end mt-8">
             <a
