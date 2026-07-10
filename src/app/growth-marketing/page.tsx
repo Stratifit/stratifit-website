@@ -1,1 +1,4 @@
-import { GrowthMarketing } from '@/components/sections/GrowthMarketing'; export default function Page() { return <GrowthMarketing />; }
+import { GrowthMarketing } from "@/components/sections/GrowthMarketing";
+export default function Page() {
+  return <GrowthMarketing />;
+}

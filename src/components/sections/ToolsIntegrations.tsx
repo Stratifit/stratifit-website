@@ -39,16 +39,13 @@ export function ToolsIntegrations() {
           transition={{ duration: 0.5 }}
           className="mb-16 text-center"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-            Our Stack
-          </p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Our Stack</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Tools &amp;{" "}
-            <span className="text-amber">Integrations</span>
+            Tools &amp; <span className="text-amber">Integrations</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-            We use the best tools in the industry to build, automate, and scale
-            your digital presence.
+            We use the best tools in the industry to build, automate, and scale your digital
+            presence.
           </p>
         </motion.div>
 

@@ -38,16 +38,12 @@ export function Insights() {
           transition={{ duration: 0.5 }}
           className="mb-10 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-            Knowledge
-          </p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Knowledge</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Insights &amp;{" "}
-            <span className="text-amber">Expertise</span>
+            Insights &amp; <span className="text-amber">Expertise</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Thought leadership and industry perspectives from our team of
-            strategists and engineers.
+            Thought leadership and industry perspectives from our team of strategists and engineers.
           </p>
         </motion.div>
 
@@ -107,7 +103,10 @@ export function Insights() {
 
         {/* Mobile Horizontal Scroll */}
         <div className="md:hidden">
-          <div ref={insightRef} className="flex overflow-x-auto gap-4 pb-4 -mx-6 px-6 snap-x snap-mandatory menu-scroll">
+          <div
+            ref={insightRef}
+            className="flex overflow-x-auto gap-4 pb-4 -mx-6 px-6 snap-x snap-mandatory menu-scroll"
+          >
             {featuredInsights.map((insight, i) => (
               <motion.article
                 key={insight.slug}

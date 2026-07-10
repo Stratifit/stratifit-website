@@ -2,7 +2,25 @@
 
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { HiArrowRight, HiSparkles, HiSun, HiCubeTransparent, HiHeart, HiArrowPath, HiBolt, HiCommandLine, HiPaintBrush, HiBolt as HiBoltIcon, HiServer, HiCpuChip, HiCircleStack, HiChatBubbleLeftRight, HiChartBar, HiGlobeAlt, HiShieldCheck } from "react-icons/hi2";
+import {
+  HiArrowRight,
+  HiSparkles,
+  HiSun,
+  HiCubeTransparent,
+  HiHeart,
+  HiArrowPath,
+  HiBolt,
+  HiCommandLine,
+  HiPaintBrush,
+  HiBolt as HiBoltIcon,
+  HiServer,
+  HiCpuChip,
+  HiCircleStack,
+  HiChatBubbleLeftRight,
+  HiChartBar,
+  HiGlobeAlt,
+  HiShieldCheck,
+} from "react-icons/hi2";
 
 const stats = [
   { target: "59", suffix: "+", label: ["Projects", "Delivered"] },
@@ -53,7 +71,9 @@ export function Hero() {
         <div className="absolute bottom-0 left-0 w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-amber/3 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">          <div className="grid lg:grid-cols-1 gap-8 md:gap-16 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10">
+        {" "}
+        <div className="grid lg:grid-cols-1 gap-8 md:gap-16 items-center">
           {/* Left Content */}
           <div className="space-y-3 md:space-y-8 lg:max-w-4xl lg:mx-auto">
             <motion.div
@@ -62,25 +82,27 @@ export function Hero() {
               transition={{ duration: 0.6 }}
               className="space-y-3.5 md:space-y-6 lg:text-center"
             >
-              <div className="flex items-center gap-2 lg:justify-center">
+              <div className="flex items-center justify-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-amber animate-pulse shrink-0" />
                 <span className="text-[10px] sm:text-xs font-bold text-amber uppercase tracking-[0.2em]">
                   Premium Digital Agency
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl lg:text-center lg:whitespace-nowrap font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl text-center lg:whitespace-nowrap font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
                 We Build Websites,
                 <span className="hidden lg:inline"> </span>
                 <br className="lg:hidden" />
                 Brands &amp; Systems
                 <br />
-                <span className="text-amber lg:inline-block lg:w-full lg:text-center">That Grow Businesses.</span>
+                <span className="text-amber lg:inline-block lg:w-full lg:text-center">
+                  That Grow Businesses.
+                </span>
               </h1>
 
-              <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl lg:mx-auto">
-                We help startups and businesses build brands, websites, and
-                systems that turn visitors into paying customers.
+              <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto text-center">
+                We help startups and businesses build brands, websites, and systems that turn
+                visitors into paying customers.
               </p>
             </motion.div>
 
@@ -111,20 +133,24 @@ export function Hero() {
               initial={false}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="grid grid-cols-3 gap-2 sm:gap-6 md:gap-8 pt-3 pb-3 md:pt-3 md:pb-0 border-t border-white/5 lg:mx-auto lg:max-w-md"
+              className="grid grid-cols-3 gap-3 sm:gap-6 md:gap-6 lg:gap-6 pt-3 pb-3 md:pt-3 md:pb-0 border-t border-white/5 lg:border-t-0 place-items-center text-center"
             >
               {stats.map((stat) => (
-                <div key={stat.label[0]} className="flex flex-col items-center text-center px-2 sm:px-4 pb-0">
+                <div
+                  key={stat.label[0]}
+                  className="flex flex-col lg:flex-row items-center lg:justify-center text-center px-2 sm:px-4 lg:px-0.5 lg:whitespace-nowrap pb-0 gap-1"
+                >
                   <div
                     data-target={stat.target}
                     data-suffix={stat.suffix}
-                    className="text-2xl sm:text-3xl font-heading font-black text-amber mb-0.5"
+                    className="text-2xl sm:text-3xl font-heading font-black text-amber mb-0.5 lg:mb-0 leading-none"
                   >
                     0
                   </div>
-                  <div className="text-[9px] sm:text-[10px] font-bold text-gray-500 uppercase tracking-wider leading-tight">
+                  <div className="text-[9px] sm:text-[10px] lg:text-sm font-bold text-gray-500 uppercase tracking-wider leading-tight">
                     {stat.label[0]}
-                    <br />
+                    <br className="lg:hidden" />
+                    <span className="hidden lg:inline"> </span>
                     {stat.label[1]}
                   </div>
                 </div>
@@ -134,7 +160,6 @@ export function Hero() {
 
           {/* Right Visual - Hidden on mobile */}
         </div>
-
         {/* Trust Row */}
         <motion.div
           initial={false}
@@ -142,21 +167,18 @@ export function Hero() {
           transition={{ delay: 0.6, duration: 0.6 }}
           className="mt-2 md:mt-8 space-y-2 pt-0 pb-3 lg:max-w-3xl lg:mx-auto"
         >
-          {/* Mobile: original label + horizontal rule */}
+          {/* Mobile: centered label with horizontal lines */}
           <div className="sm:hidden flex items-center gap-3 opacity-70">
-            <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shrink-0" style={{ color: "#F59E0B" }}>
-              Trusted by Growing Companies
+            <span className="flex-1 h-px bg-white/10" />
+            <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shrink-0 text-white">
+              Trusted by <span style={{ color: "#F59E0B" }}>Growing</span> Companies
             </span>
             <span className="flex-1 h-px bg-white/10" />
           </div>
-          {/* Desktop: small "Trusted by" stacked label above the items row */}
-          <span className="hidden sm:block text-[9px] text-white/80 font-bold uppercase tracking-widest opacity-70">
-            Trusted by
-          </span>
-          {/* Items row - always visible (mobile: standalone, desktop: inline with "Growing Companies") */}
+          {/* Items row */}
           <div className="flex items-center justify-between lg:justify-start gap-2 sm:gap-6 md:gap-8 opacity-70 px-4 sm:px-0 whitespace-nowrap shrink-0">
-            <span className="hidden sm:inline text-xs md:text-sm font-bold uppercase tracking-wider" style={{ color: "#F59E0B" }}>
-              Growing Companies
+            <span className="hidden sm:inline text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest text-white shrink-0">
+              Trusted by <span style={{ color: "#F59E0B" }}>Growing</span> Companies
             </span>
             {trustedBy.map(({ name, icon: Icon }) => (
               <span
@@ -169,32 +191,40 @@ export function Hero() {
             ))}
           </div>
         </motion.div>
-
-{/* Tech Stack */}
+        {/* Tech Stack */}
         <div className="mt-3 md:mt-4">
           <div className="mb-4 lg:text-center">
-            <h3 className="text-lg sm:text-xl font-heading font-black tracking-tight mb-1 lg:flex lg:items-center lg:justify-center lg:gap-4 lg:max-w-2xl lg:mx-auto">
-              <span className="hidden lg:inline-block lg:flex-1 lg:h-px lg:bg-white/20" />
+            <h3 className="text-base sm:text-lg font-heading font-black tracking-tight mb-1 flex items-center justify-center gap-4 max-w-2xl mx-auto">
+              <span className="inline-block flex-1 h-px bg-white/10" />
               <span>
-                <span className="text-white">Our </span>
+                <span className="text-white/70">Our </span>
                 <span style={{ color: "#F59E0B" }}>Tech</span>
-                <span className="text-white"> Stack</span>
+                <span className="text-white/70"> Stack</span>
               </span>
-              <span className="hidden lg:inline-block lg:flex-1 lg:h-px lg:bg-white/20" />
+              <span className="inline-block flex-1 h-px bg-white/10" />
             </h3>
-            <p className="text-sm sm:text-base leading-relaxed" style={{ color: "#E5E7EB" }}>
-              We use the best tools in the industry to build, automate, and scale your digital presence.
+            <p
+              className="text-sm sm:text-base leading-relaxed text-center"
+              style={{ color: "#E5E7EB" }}
+            >
+              We use the best tools in the industry to build, automate, and scale your digital
+              presence.
             </p>
           </div>
-          <div className="overflow-hidden border-y border-white/10 py-4 md:py-6">
+          <div className="overflow-hidden py-4 md:py-6">
             <div className="flex animate-ticker-tech">
               {[...techStack, ...techStack].map((tech, i) => (
                 <div
                   key={i}
                   className="flex items-center gap-1.5 sm:gap-2 shrink-0 px-3 sm:px-8 text-sm sm:text-lg whitespace-nowrap"
                 >
-                  <tech.icon className="text-xl sm:text-2xl shrink-0" style={{ color: "#6B7280" }} />
-                  <span className="font-medium" style={{ color: "#9CA3AF" }}>{tech.name}</span>
+                  <tech.icon
+                    className="text-xl sm:text-2xl shrink-0"
+                    style={{ color: "#6B7280" }}
+                  />
+                  <span className="font-medium" style={{ color: "#9CA3AF" }}>
+                    {tech.name}
+                  </span>
                 </div>
               ))}
             </div>

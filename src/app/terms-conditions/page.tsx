@@ -1,7 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HiArrowLeft, HiScale, HiDocumentCheck, HiCreditCard, HiExclamationTriangle, HiShieldCheck } from "react-icons/hi2";
+import {
+  HiArrowLeft,
+  HiScale,
+  HiDocumentCheck,
+  HiCreditCard,
+  HiExclamationTriangle,
+  HiShieldCheck,
+} from "react-icons/hi2";
 import { useRouter } from "next/navigation";
 
 export default function TermsConditionsPage() {
@@ -19,19 +26,15 @@ export default function TermsConditionsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-              Legal
-            </p>
+            <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Legal</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              Terms &{" "}
-              <span className="text-amber">Conditions</span>
+              Terms & <span className="text-amber">Conditions</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              The terms governing your use of Stratifit&apos;s website and digital services. Please read these carefully before engaging with our platform.
+              The terms governing your use of Stratifit&apos;s website and digital services. Please
+              read these carefully before engaging with our platform.
             </p>
-            <p className="text-gray-500 text-xs mt-4 ml-4 sm:ml-6">
-              Last updated: July 9, 2026
-            </p>
+            <p className="text-gray-500 text-xs mt-4 ml-4 sm:ml-6">Last updated: July 9, 2026</p>
           </motion.div>
         </div>
       </section>
@@ -53,7 +56,12 @@ export default function TermsConditionsPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              By accessing or using the Stratifit website (<span className="text-amber">stratifit.com</span>) and any associated services, you agree to be bound by these Terms & Conditions. If you do not agree with any part of these terms, you must discontinue use of our website and services immediately. These terms apply to all visitors, users, clients, and others who access or use our services.
+              By accessing or using the Stratifit website (
+              <span className="text-amber">stratifit.com</span>) and any associated services, you
+              agree to be bound by these Terms & Conditions. If you do not agree with any part of
+              these terms, you must discontinue use of our website and services immediately. These
+              terms apply to all visitors, users, clients, and others who access or use our
+              services.
             </p>
           </motion.div>
 
@@ -89,7 +97,8 @@ export default function TermsConditionsPage() {
               ))}
             </ul>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mt-4">
-              Specific deliverables, timelines, and pricing for any project will be outlined in a separate service agreement or statement of work signed by both parties.
+              Specific deliverables, timelines, and pricing for any project will be outlined in a
+              separate service agreement or statement of work signed by both parties.
             </p>
           </motion.div>
 
@@ -112,7 +121,9 @@ export default function TermsConditionsPage() {
                   Our Content
                 </h3>
                 <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  All content on this website — including text, graphics, logos, icons, images, audio clips, digital downloads, data compilations, and software — is the property of Stratifit and is protected by international copyright laws.
+                  All content on this website — including text, graphics, logos, icons, images,
+                  audio clips, digital downloads, data compilations, and software — is the property
+                  of Stratifit and is protected by international copyright laws.
                 </p>
               </div>
               <div>
@@ -120,7 +131,10 @@ export default function TermsConditionsPage() {
                   Client Deliverables
                 </h3>
                 <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  Upon full payment for services, Stratifit transfers ownership of final deliverables to the client as specified in the service agreement. Stratifit retains the right to display completed work in our portfolio, case studies, and marketing materials unless otherwise agreed in writing.
+                  Upon full payment for services, Stratifit transfers ownership of final
+                  deliverables to the client as specified in the service agreement. Stratifit
+                  retains the right to display completed work in our portfolio, case studies, and
+                  marketing materials unless otherwise agreed in writing.
                 </p>
               </div>
               <div>
@@ -128,7 +142,10 @@ export default function TermsConditionsPage() {
                   Third-Party Materials
                 </h3>
                 <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  Fonts, stock photography, licensed software, and other third-party assets used in deliverables remain subject to their respective licenses. Clients are responsible for acquiring proper licenses for any third-party materials they wish to use beyond the scope of our services.
+                  Fonts, stock photography, licensed software, and other third-party assets used in
+                  deliverables remain subject to their respective licenses. Clients are responsible
+                  for acquiring proper licenses for any third-party materials they wish to use
+                  beyond the scope of our services.
                 </p>
               </div>
             </div>
@@ -178,7 +195,10 @@ export default function TermsConditionsPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-4">
-              To the fullest extent permitted by applicable law, Stratifit shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, use, goodwill, or other intangible losses resulting from:
+              To the fullest extent permitted by applicable law, Stratifit shall not be liable for
+              any indirect, incidental, special, consequential, or punitive damages, including but
+              not limited to loss of profits, data, use, goodwill, or other intangible losses
+              resulting from:
             </p>
             <ul className="space-y-3">
               {[
@@ -238,7 +258,8 @@ export default function TermsConditionsPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-4">
-              Either party may terminate a services agreement in accordance with the termination provisions outlined in the specific project agreement. Upon termination:
+              Either party may terminate a services agreement in accordance with the termination
+              provisions outlined in the specific project agreement. Upon termination:
             </p>
             <ul className="space-y-3">
               {[
@@ -269,7 +290,10 @@ export default function TermsConditionsPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-6">
-              We reserve the right to modify or replace these Terms & Conditions at any time. Changes will be effective immediately upon posting to this page. It is your responsibility to review these terms periodically. Continued use of our website and services after any changes constitutes acceptance of the new terms.
+              We reserve the right to modify or replace these Terms & Conditions at any time.
+              Changes will be effective immediately upon posting to this page. It is your
+              responsibility to review these terms periodically. Continued use of our website and
+              services after any changes constitutes acceptance of the new terms.
             </p>
             <div className="border-t border-white/10 pt-6">
               <h3 className="text-amber font-heading font-bold text-sm uppercase tracking-wider mb-2">
@@ -277,9 +301,13 @@ export default function TermsConditionsPage() {
               </h3>
               <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 If you have any questions about these Terms & Conditions, please contact us at{" "}
-                <a href="mailto:legal@stratifit.com" className="text-amber hover:text-amber-light underline transition-colors">
+                <a
+                  href="mailto:legal@stratifit.com"
+                  className="text-amber hover:text-amber-light underline transition-colors"
+                >
                   legal@stratifit.com
-                </a>.
+                </a>
+                .
               </p>
             </div>
           </motion.div>

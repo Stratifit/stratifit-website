@@ -11,12 +11,7 @@ const services = [
     href: "/brand-design",
     description:
       "Crafting unique identities that resonate and leave a lasting impression on your market.",
-    deliverables: [
-      "Brand Strategy",
-      "Logo Design",
-      "Visual Identity",
-      "Brand Guidelines",
-    ],
+    deliverables: ["Brand Strategy", "Logo Design", "Visual Identity", "Brand Guidelines"],
   },
   {
     icon: MdDesignServices,
@@ -24,12 +19,7 @@ const services = [
     href: "/website-development",
     description:
       "High-performance websites and web apps engineered for speed, scale, and conversion.",
-    deliverables: [
-      "Custom Websites",
-      "E‑commerce",
-      "Web Applications",
-      "CMS Integration",
-    ],
+    deliverables: ["Custom Websites", "E‑commerce", "Web Applications", "CMS Integration"],
   },
   {
     icon: MdCode,
@@ -37,12 +27,7 @@ const services = [
     href: "/ai-automation",
     description:
       "Intelligent automation that streamlines operations, qualifies leads, and scales support 24/7.",
-    deliverables: [
-      "AI Lead Qualification",
-      "AI Chatbots",
-      "Workflow Automation",
-      "Custom APIs",
-    ],
+    deliverables: ["AI Lead Qualification", "AI Chatbots", "Workflow Automation", "Custom APIs"],
   },
   {
     icon: MdRocketLaunch,
@@ -50,12 +35,7 @@ const services = [
     href: "/growth-marketing",
     description:
       "Data-driven campaigns that amplify your brand and drive measurable revenue growth.",
-    deliverables: [
-      "Performance Marketing",
-      "SEO & SEM",
-      "Content Strategy",
-      "Social Media",
-    ],
+    deliverables: ["Performance Marketing", "SEO & SEM", "Content Strategy", "Social Media"],
   },
 ];
 
@@ -88,12 +68,10 @@ export function CoreServices() {
         >
           <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Services</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Our Core{" "}
-            <span className="text-amber">Services</span>
+            Our Core <span className="text-amber">Services</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Strategic solutions engineered to scale your digital presence with
-            precision and luxury.
+            Strategic solutions engineered to scale your digital presence with precision and luxury.
           </p>
         </motion.div>
 

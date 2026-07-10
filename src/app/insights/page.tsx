@@ -12,9 +12,7 @@ export default function InsightsPage() {
   const router = useRouter();
 
   const filtered =
-    activeFilter === "All"
-      ? insights
-      : insights.filter((i) => i.category === activeFilter);
+    activeFilter === "All" ? insights : insights.filter((i) => i.category === activeFilter);
 
   return (
     <main className="min-h-screen bg-black">
@@ -32,12 +30,11 @@ export default function InsightsPage() {
               Knowledge
             </p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              Insights &amp;{" "}
-              <span className="text-amber">Expertise</span>
+              Insights &amp; <span className="text-amber">Expertise</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              Thought leadership, industry perspectives, and actionable
-              strategies from our team of strategists, designers, and engineers.
+              Thought leadership, industry perspectives, and actionable strategies from our team of
+              strategists, designers, and engineers.
             </p>
           </motion.div>
         </div>
@@ -121,8 +118,7 @@ export default function InsightsPage() {
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-2 bg-card-dark border border-white/5 rounded-2xl px-8 py-6">
                 <p className="text-gray-400 text-base font-medium">
-                  No articles found in{" "}
-                  <span className="text-amber font-bold">{activeFilter}</span>
+                  No articles found in <span className="text-amber font-bold">{activeFilter}</span>
                 </p>
               </div>
             </div>

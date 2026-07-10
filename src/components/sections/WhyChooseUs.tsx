@@ -2,12 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import {
-  HiBolt,
-  HiShieldCheck,
-  HiChartBar,
-  HiCpuChip,
-} from "react-icons/hi2";
+import { HiBolt, HiShieldCheck, HiChartBar, HiCpuChip } from "react-icons/hi2";
 
 const benefits = [
   {
@@ -97,17 +92,13 @@ export function WhyChooseUs() {
         >
           <div className="flex items-center gap-2 mb-2">
             <div className="w-2 h-2 rounded-full bg-amber animate-pulse shrink-0" />
-            <span className="text-xs font-bold text-amber uppercase tracking-[0.2em]">
-              Why Us
-            </span>
+            <span className="text-xs font-bold text-amber uppercase tracking-[0.2em]">Why Us</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Not Just Another{" "}
-            <span className="text-amber">Agency</span>
+            Not Just Another <span className="text-amber">Agency</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            We build digital assets that drive valuation and market authority
-            — not just websites.
+            We build digital assets that drive valuation and market authority — not just websites.
           </p>
         </motion.div>
 
@@ -128,12 +119,18 @@ export function WhyChooseUs() {
                     <benefit.icon className="text-amber text-2xl" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-heading font-bold text-lg text-white mb-1.5 tracking-tight">{benefit.title}</h3>
-                    <p className="text-sm text-gray-400 leading-relaxed font-medium">{benefit.description}</p>
+                    <h3 className="font-heading font-bold text-lg text-white mb-1.5 tracking-tight">
+                      {benefit.title}
+                    </h3>
+                    <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                      {benefit.description}
+                    </p>
                   </div>
                   <div className="pt-3 border-t border-white/5">
                     <div className="text-xl font-heading font-black text-amber">{benefit.stat}</div>
-                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{benefit.statLabel}</div>
+                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      {benefit.statLabel}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -172,19 +169,23 @@ export function WhyChooseUs() {
                   <benefit.icon className="text-amber text-3xl drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-heading font-bold text-xl text-white mb-2 tracking-tight">{benefit.title}</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed font-medium">{benefit.description}</p>
+                  <h3 className="font-heading font-bold text-xl text-white mb-2 tracking-tight">
+                    {benefit.title}
+                  </h3>
+                  <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                    {benefit.description}
+                  </p>
                 </div>
                 <div className="pt-3 border-t border-white/5">
                   <div className="text-2xl font-heading font-black text-amber">{benefit.stat}</div>
-                  <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{benefit.statLabel}</div>
+                  <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                    {benefit.statLabel}
+                  </div>
                 </div>
               </div>
             </motion.div>
           ))}
         </motion.div>
-
-
       </div>
     </section>
   );

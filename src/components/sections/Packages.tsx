@@ -79,7 +79,10 @@ export function Packages() {
     const cardWidth = 280;
     const gap = 16;
     const padding = 24;
-    el.scrollTo({ left: padding + mostPopularIndex * (cardWidth + gap) - el.clientWidth / 2 + cardWidth / 2, behavior: "instant" });
+    el.scrollTo({
+      left: padding + mostPopularIndex * (cardWidth + gap) - el.clientWidth / 2 + cardWidth / 2,
+      behavior: "instant",
+    });
 
     const handleScroll = () => {
       const center = el.scrollLeft + el.clientWidth / 2;
@@ -101,16 +104,13 @@ export function Packages() {
           transition={{ duration: 0.5 }}
           className="mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-            Pricing
-          </p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Pricing</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Service{" "}
-            <span className="text-amber">Packages</span>
+            Service <span className="text-amber">Packages</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Transparent pricing for every stage of growth. Start where you are
-            and scale with confidence.
+            Transparent pricing for every stage of growth. Start where you are and scale with
+            confidence.
           </p>
         </motion.div>
 
@@ -135,18 +135,12 @@ export function Packages() {
                 </div>
               )}
 
-              <h3 className="font-heading font-bold text-2xl text-white mb-2">
-                {pkg.name}
-              </h3>
+              <h3 className="font-heading font-bold text-2xl text-white mb-2">{pkg.name}</h3>
 
               <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-heading font-black text-amber">
-                  {pkg.price}
-                </span>
+                <span className="text-3xl font-heading font-black text-amber">{pkg.price}</span>
                 {pkg.period && (
-                  <span className="text-xs font-bold text-gray-500 uppercase">
-                    {pkg.period}
-                  </span>
+                  <span className="text-xs font-bold text-gray-500 uppercase">{pkg.period}</span>
                 )}
               </div>
 
@@ -156,10 +150,7 @@ export function Packages() {
 
               <ul className="space-y-3 mb-8 flex-1">
                 {pkg.features.map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-start gap-3 text-sm text-gray-300"
-                  >
+                  <li key={feature} className="flex items-start gap-3 text-sm text-gray-300">
                     <HiCheck className="text-amber shrink-0 mt-0.5" />
                     {feature}
                   </li>
@@ -182,7 +173,10 @@ export function Packages() {
 
         {/* Mobile Horizontal Scroll */}
         <div className="md:hidden">
-          <div ref={scrollRef} className="flex overflow-x-auto gap-4 pt-5 pb-4 -mx-6 px-6 snap-x snap-mandatory menu-scroll">
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-auto gap-4 pt-5 pb-4 -mx-6 px-6 snap-x snap-mandatory menu-scroll"
+          >
             {packages.map((pkg, i) => (
               <motion.div
                 key={pkg.name}
@@ -202,18 +196,12 @@ export function Packages() {
                   </div>
                 )}
 
-                <h3 className="font-heading font-bold text-xl text-white mb-2">
-                  {pkg.name}
-                </h3>
+                <h3 className="font-heading font-bold text-xl text-white mb-2">{pkg.name}</h3>
 
                 <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-2xl font-heading font-black text-amber">
-                    {pkg.price}
-                  </span>
+                  <span className="text-2xl font-heading font-black text-amber">{pkg.price}</span>
                   {pkg.period && (
-                    <span className="text-xs font-bold text-gray-500 uppercase">
-                      {pkg.period}
-                    </span>
+                    <span className="text-xs font-bold text-gray-500 uppercase">{pkg.period}</span>
                   )}
                 </div>
 
@@ -223,10 +211,7 @@ export function Packages() {
 
                 <ul className="space-y-2.5 mb-6 flex-1">
                   {pkg.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2.5 text-sm text-gray-300"
-                    >
+                    <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-300">
                       <HiCheck className="text-amber shrink-0 mt-0.5" />
                       {feature}
                     </li>

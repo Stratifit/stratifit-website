@@ -11,9 +11,13 @@ export default function NotFound() {
           Page Not <span className="text-amber">Found</span>
         </h1>
         <p className="text-gray-400 text-base sm:text-lg leading-relaxed mb-8 border-l-2 border-amber/50 pl-4 sm:pl-6 mx-auto max-w-md">
-          The page you&apos;re looking for doesn&apos;t exist or has been moved. Let&apos;s get you back on track.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved. Let&apos;s get you
+          back on track.
         </p>
-        <Link href="/" className="inline-flex items-center gap-2 bg-amber hover:bg-amber-light text-black font-bold text-sm px-6 py-3 rounded-full transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 bg-amber hover:bg-amber-light text-black font-bold text-sm px-6 py-3 rounded-full transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)]"
+        >
           <HiArrowLeft className="text-lg" />
           Back to Home
         </Link>

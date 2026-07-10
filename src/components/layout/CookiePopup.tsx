@@ -55,7 +55,9 @@ export function CookiePopup() {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[81] w-[calc(100%-2rem)] max-w-lg"
           >
-            <div className="bg-[#111111] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">                  {!showSettings ? (
+            <div className="bg-[#111111] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">
+              {" "}
+              {!showSettings ? (
                 /* Simple View */
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-4">
@@ -67,13 +69,16 @@ export function CookiePopup() {
                         Cookie Preferences
                       </h3>
                       <p className="text-gray-400 text-xs leading-relaxed">
-                        We use cookies to enhance your browsing experience, analyze site traffic, and deliver personalized content. By clicking &ldquo;Accept All&rdquo;, you consent to our use of cookies. You can learn more in our{" "}
+                        We use cookies to enhance your browsing experience, analyze site traffic,
+                        and deliver personalized content. By clicking &ldquo;Accept All&rdquo;, you
+                        consent to our use of cookies. You can learn more in our{" "}
                         <a
                           href="/cookie-policy"
                           className="text-amber hover:text-amber-light underline transition-colors"
                         >
                           Cookie Policy
-                        </a>.
+                        </a>
+                        .
                       </p>
                     </div>
                   </div>
@@ -122,7 +127,8 @@ export function CookiePopup() {
                   </div>
 
                   <p className="text-gray-400 text-xs leading-relaxed mb-4">
-                    Select your cookie preferences below. Essential cookies are always enabled as they are required for the website to function properly.
+                    Select your cookie preferences below. Essential cookies are always enabled as
+                    they are required for the website to function properly.
                   </p>
 
                   <div className="space-y-3 mb-5">
@@ -156,7 +162,6 @@ export function CookiePopup() {
                   </div>
                 </div>
               )}
-
               {/* Footer link */}
               <div className="border-t border-white/5 px-6 py-3 flex items-center justify-between">
                 <a
@@ -180,13 +185,7 @@ export function CookiePopup() {
   );
 }
 
-function CookieInfo({
-  label,
-  description,
-}: {
-  label: string;
-  description: string;
-}) {
+function CookieInfo({ label, description }: { label: string; description: string }) {
   return (
     <div className="flex items-start gap-3 bg-white/[0.03] rounded-xl p-3 border border-white/5">
       <HiCheck className="text-amber text-sm mt-0.5 shrink-0" />

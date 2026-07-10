@@ -10,14 +10,14 @@ const CoreServices = dynamic(
     import("@/components/sections/CoreServices").then((m) => ({
       default: m.CoreServices,
     })),
-  { ssr: true }
+  { ssr: true },
 );
 const Process = dynamic(
   () =>
     import("@/components/sections/Process").then((m) => ({
       default: m.Process,
     })),
-  { ssr: true }
+  { ssr: true },
 );
 
 export default function ServicesPage() {
@@ -38,7 +38,8 @@ export default function ServicesPage() {
               Our <span className="text-amber">Services</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              Strategic solutions engineered to scale your digital presence with precision and luxury. From strategy to launch, we handle every detail.
+              Strategic solutions engineered to scale your digital presence with precision and
+              luxury. From strategy to launch, we handle every detail.
             </p>
           </motion.div>
         </div>
@@ -50,10 +51,23 @@ export default function ServicesPage() {
 
       <section className="pb-24 md:pb-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2, duration: 0.5 }} className="text-center py-12 bg-card-dark rounded-2xl border border-white/5">
-            <h2 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-4">Ready to Start Your Project?</h2>
-            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto mb-8">Let&apos;s discuss your goals and build a tailored plan that fits your business.</p>
-            <a href="#contact" className="group inline-flex items-center gap-2 px-8 py-4 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-center py-12 bg-card-dark rounded-2xl border border-white/5"
+          >
+            <h2 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-4">
+              Ready to Start Your Project?
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto mb-8">
+              Let&apos;s discuss your goals and build a tailored plan that fits your business.
+            </p>
+            <a
+              href="#contact"
+              className="group inline-flex items-center gap-2 px-8 py-4 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
+            >
               Schedule a Consultation
               <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </a>
@@ -65,7 +79,13 @@ export default function ServicesPage() {
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.4, duration: 0.35, ease: "easeOut" }}
-        onClick={() => { if (window.history.length > 1) { router.back(); } else { router.push("/"); } }}
+        onClick={() => {
+          if (window.history.length > 1) {
+            router.back();
+          } else {
+            router.push("/");
+          }
+        }}
         className="fixed top-16 lg:top-20 left-1 z-50 p-2 rounded-full bg-white/5 backdrop-blur-sm transition-colors"
         aria-label="Go back"
       >

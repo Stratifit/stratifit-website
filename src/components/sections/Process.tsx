@@ -2,7 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { HiMagnifyingGlass, HiLightBulb, HiWrenchScrewdriver, HiRocketLaunch } from "react-icons/hi2";
+import {
+  HiMagnifyingGlass,
+  HiLightBulb,
+  HiWrenchScrewdriver,
+  HiRocketLaunch,
+} from "react-icons/hi2";
 
 const steps = [
   {
@@ -66,16 +71,12 @@ export function Process() {
           transition={{ duration: 0.5 }}
           className="mb-10 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-            Process
-          </p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Process</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            How We{" "}
-            <span className="text-amber">Work</span>
+            How We <span className="text-amber">Work</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            A proven framework that takes you from idea to scale — predictably
-            and efficiently.
+            A proven framework that takes you from idea to scale — predictably and efficiently.
           </p>
         </motion.div>
 
@@ -101,12 +102,8 @@ export function Process() {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/30 flex items-center justify-center mb-5 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
                   <step.icon className="text-amber text-3xl" />
                 </div>
-                <h3 className="font-heading font-bold text-xl text-white mb-3">
-                  {step.title}
-                </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {step.description}
-                </p>
+                <h3 className="font-heading font-bold text-xl text-white mb-3">{step.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
               </div>
 
               {/* Connector arrow (desktop only) */}
@@ -121,7 +118,10 @@ export function Process() {
 
         {/* Mobile Horizontal Scroll */}
         <div className="md:hidden">
-          <div ref={processRef} className="flex overflow-x-auto gap-4 pb-4 -mx-6 px-6 snap-x snap-mandatory menu-scroll">
+          <div
+            ref={processRef}
+            className="flex overflow-x-auto gap-4 pb-4 -mx-6 px-6 snap-x snap-mandatory menu-scroll"
+          >
             {steps.map((step, i) => (
               <motion.div
                 key={step.number}
@@ -141,12 +141,8 @@ export function Process() {
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/30 flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
                   <step.icon className="text-amber text-2xl" />
                 </div>
-                <h3 className="font-heading font-bold text-lg text-white mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {step.description}
-                </p>
+                <h3 className="font-heading font-bold text-lg text-white mb-2">{step.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
               </motion.div>
             ))}
           </div>

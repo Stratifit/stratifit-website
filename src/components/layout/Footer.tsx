@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  FaLinkedinIn,
-  FaInstagram,
-  FaXTwitter,
-} from "react-icons/fa6";
+import { FaLinkedinIn, FaInstagram, FaXTwitter } from "react-icons/fa6";
 
 const footerLinks = {
   Platform: [
@@ -30,7 +26,6 @@ export function Footer() {
     <footer className="bg-[#0a0a0a] border-t border-white/5 relative">
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-8">
         <div className="flex flex-col gap-10">
-
           {/* Logo + tagline */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -99,7 +94,6 @@ export function Footer() {
               </a>
             </div>
           </div>
-
         </div>
       </div>
     </footer>

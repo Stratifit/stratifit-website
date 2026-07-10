@@ -58,7 +58,7 @@ export function FAQ() {
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber/2 rounded-full blur-[100px]" />
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-6 relative z-10">
         {/* Heading */}
         <motion.div
           initial={false}
@@ -67,10 +67,11 @@ export function FAQ() {
           transition={{ duration: 0.5 }}
           className="mb-12 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4 text-center">Support</p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4 text-center">
+            Support
+          </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3 text-center">
-            Frequently Asked{" "}
-            <span className="text-amber">Questions</span>
+            Frequently Asked <span className="text-amber">Questions</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto text-center mt-3">
             Clear answers to the most common questions we hear from clients.
@@ -78,7 +79,7 @@ export function FAQ() {
         </motion.div>
 
         {/* FAQ Items */}
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {faqs.map((faq, i) => (
             <motion.div
               key={i}
@@ -86,7 +87,7 @@ export function FAQ() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4 }}
-              className={`bg-card-dark rounded-2xl border transition-all duration-300 ${
+              className={`bg-card-dark rounded-2xl border transition-all duration-300 h-full ${
                 openIndex === i
                   ? "border-amber/30 shadow-[0_0_20px_rgba(245,158,11,0.05)]"
                   : "border-white/5 hover:border-white/10"
@@ -98,9 +99,7 @@ export function FAQ() {
               >
                 <span
                   className={`font-heading font-bold text-sm sm:text-base text-left transition-colors duration-300 ${
-                    openIndex === i
-                      ? "text-amber"
-                      : "text-white group-hover:text-amber/80"
+                    openIndex === i ? "text-amber" : "text-white group-hover:text-amber/80"
                   }`}
                 >
                   {faq.question}
@@ -124,9 +123,7 @@ export function FAQ() {
                     transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                     className="overflow-hidden"
                   >
-                    <p className="px-6 pb-5 text-gray-400 text-sm leading-relaxed">
-                      {faq.answer}
-                    </p>
+                    <p className="px-6 pb-5 text-gray-400 text-sm leading-relaxed">{faq.answer}</p>
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -9,6 +9,19 @@ export interface Project {
   challenge: string;
   solution: string;
   results: string[];
+  /** Single big-number metric shown on the portfolio card (e.g., "+69%"). */
+  shortMetric: string;
+  /** Short descriptor next to the metric (e.g., "conversion lift"). */
+  shortLabel: string;
+  /** Client name or "Confidential" / category placeholder for the case study page. */
+  client: string;
+  industry: string;
+  /** Human-readable timeline (e.g., "14 weeks"). */
+  timeline: string;
+  /** List of services delivered on the engagement. */
+  services: string[];
+  /** Gallery of additional image URLs for the case study page (3–6 per project). */
+  gallery: string[];
 }
 
 import { slugify } from "@/lib/slugify";
@@ -18,11 +31,21 @@ export const projects: Project[] = [
     id: 1,
     title: "Luxe Retail App",
     category: "Brand Design",
-    description:
-      "A seamless mobile shopping experience designed for the modern luxury consumer.",
+    description: "A seamless mobile shopping experience designed for the modern luxury consumer.",
     image:
       "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=600&fit=crop&auto=format",
     tags: ["UX Design", "Mobile", "Luxury"],
+    shortMetric: "+69%",
+    shortLabel: "conversion rate",
+    client: "Luxe (confidential)",
+    industry: "Luxury E-commerce",
+    timeline: "14 weeks",
+    services: ["UX Design", "Visual Identity", "Photography Direction"],
+    gallery: [
+      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "A premium fashion retailer was losing market share to digital-native competitors. Their existing app felt dated, with a clunky checkout flow and a 4.2% conversion rate — well below the luxury e-commerce benchmark of 6.5%. The challenge was to reimagine the entire mobile experience while preserving the brand's heritage and exclusivity.",
     solution:
@@ -39,11 +62,21 @@ export const projects: Project[] = [
     id: 2,
     title: "Aura Cosmetics",
     category: "Brand Design",
-    description:
-      "Redefining natural beauty with a minimalist identity and sustainable packaging.",
+    description: "Redefining natural beauty with a minimalist identity and sustainable packaging.",
     image:
       "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200&h=600&fit=crop&auto=format",
     tags: ["Brand Identity", "Packaging", "Sustainability"],
+    shortMetric: "4×",
+    shortLabel: "social engagement",
+    client: "Aura Cosmetics",
+    industry: "DTC Beauty",
+    timeline: "10 weeks",
+    services: ["Brand Identity", "Packaging", "Social Kit"],
+    gallery: [
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1561070791-2526d30994b8?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1556228852-80b6e5eeff06?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "Aura Cosmetics had exceptional products but struggled to communicate their premium positioning. Their existing brand identity was inconsistent across touchpoints, their packaging didn't reflect their sustainability commitment, and their digital presence lacked the aspirational quality that drives luxury beauty purchases.",
     solution:
@@ -65,6 +98,17 @@ export const projects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=600&fit=crop&auto=format",
     tags: ["Rebrand", "Finance", "Strategy"],
+    shortMetric: "+42%",
+    shortLabel: "new accounts (25–34)",
+    client: "Zenith Bank",
+    industry: "Finance",
+    timeline: "16 weeks",
+    services: ["Logo Refresh", "Visual System", "Brand Voice"],
+    gallery: [
+      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1551836022-deb498c7d128?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "Zenith Bank, a 120-year-old institution, was perceived as outdated and bureaucratic. They were losing younger customers to fintech challengers while struggling to justify premium fees to their existing client base. The brand needed to convey both heritage trust and modern capability — a difficult balance.",
     solution:
@@ -81,11 +125,21 @@ export const projects: Project[] = [
     id: 4,
     title: "Nova Fintech Platform",
     category: "Website Development",
-    description:
-      "A blazing-fast fintech dashboard built with Next.js and real-time data.",
+    description: "A blazing-fast fintech dashboard built with Next.js and real-time data.",
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop&auto=format",
     tags: ["Next.js", "Fintech", "Dashboard"],
+    shortMetric: "-89%",
+    shortLabel: "page load time",
+    client: "Nova Fintech",
+    industry: "B2B SaaS",
+    timeline: "16 weeks",
+    services: ["Trading Dashboard", "Real-time Data Pipeline", "Auth & KYC"],
+    gallery: [
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "Nova needed a trading dashboard capable of displaying real-time market data with sub-100ms latency while serving 50,000+ concurrent users. Their existing React SPA couldn't handle the load, with page loads exceeding 8 seconds and frequent crashes during market volatility.",
     solution:
@@ -102,11 +156,21 @@ export const projects: Project[] = [
     id: 5,
     title: "Atlas E-commerce",
     category: "Website Development",
-    description:
-      "Headless commerce solution that scaled from 100 to 100,000 daily orders.",
+    description: "Headless commerce solution that scaled from 100 to 100,000 daily orders.",
     image:
       "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=600&fit=crop&auto=format",
     tags: ["Headless", "E-commerce", "Scale"],
+    shortMetric: "1000×",
+    shortLabel: "daily order volume",
+    client: "Atlas DTC",
+    industry: "DTC E-commerce",
+    timeline: "20 weeks",
+    services: ["Headless Commerce", "Checkout Flow", "Internationalization"],
+    gallery: [
+      "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1556742111-a301076d9d18?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1555529669-2269763671c0?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "Atlas was a rapidly growing DTC brand that had outgrown Shopify's standard architecture. Their monolithic setup couldn't handle flash sale traffic, international expansion was cumbersome, and performance degraded significantly during marketing campaigns. They needed an architecture that could scale 1000x without a proportional cost increase.",
     solution:
@@ -123,11 +187,21 @@ export const projects: Project[] = [
     id: 6,
     title: "SmartFlow AI Pipeline",
     category: "AI & Automation",
-    description:
-      "End-to-end lead qualification system that reduced manual work by 85%.",
+    description: "End-to-end lead qualification system that reduced manual work by 85%.",
     image:
       "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=600&fit=crop&auto=format",
     tags: ["AI", "Automation", "Lead Gen"],
+    shortMetric: "-85%",
+    shortLabel: "manual qualification",
+    client: "B2B SaaS Co. (confidential)",
+    industry: "B2B SaaS",
+    timeline: "8 weeks",
+    services: ["AI Lead Qualification", "CRM Integration", "Lead Routing"],
+    gallery: [
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "A B2B SaaS company was drowning in leads. Their sales team of 40 reps spent over 3,000 hours per month manually qualifying inbound inquiries — reading emails, scoring prospects, and routing opportunities. Conversion from lead to qualified opportunity was just 8%, and top-performing reps were burning out.",
     solution:
@@ -144,11 +218,21 @@ export const projects: Project[] = [
     id: 7,
     title: "GrowthStack Campaign",
     category: "Growth & Marketing",
-    description:
-      "Multi-channel campaign generating 340% ROAS across Meta, Google, and TikTok.",
+    description: "Multi-channel campaign generating 340% ROAS across Meta, Google, and TikTok.",
     image:
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=600&fit=crop&auto=format",
     tags: ["Paid Media", "ROAS", "Multi-channel"],
+    shortMetric: "+89%",
+    shortLabel: "ROAS lift",
+    client: "Wellness Brand Co. (confidential)",
+    industry: "DTC Wellness",
+    timeline: "Ongoing retainer",
+    services: ["Paid Media", "Creative Production", "Attribution Modeling"],
+    gallery: [
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "A DTC wellness brand was spending $150K/month on paid media with a declining ROAS of 1.8x. Ad fatigue was setting in across all channels, creative production couldn't keep pace, and attribution was a black box — they couldn't tell which channels were actually driving revenue.",
     solution:
@@ -165,11 +249,21 @@ export const projects: Project[] = [
     id: 8,
     title: "Vertex SaaS Landing",
     category: "Website Development",
-    description:
-      "Conversion-optimized landing page that achieved 12% demo request rate.",
+    description: "Conversion-optimized landing page that achieved 12% demo request rate.",
     image:
       "https://images.unsplash.com/photo-1467232004584-a241de8a7c0d?w=1200&h=600&fit=crop&auto=format",
     tags: ["Landing Page", "CRO", "SaaS"],
+    shortMetric: "12.3%",
+    shortLabel: "demo conversion",
+    client: "Vertex",
+    industry: "B2B SaaS",
+    timeline: "6 weeks",
+    services: ["Landing Page", "Conversion Rate Optimization", "A/B Testing"],
+    gallery: [
+      "https://images.unsplash.com/photo-1467232004584-a241de8a7c0d?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1551434678-e076c223a692?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "Vertex had a powerful SaaS product but their landing page converted at just 2.1%. Heatmaps showed visitors scrolling but not converting, and qualitative feedback revealed confusion about what the product actually did. With a high CPC in their category, every unconverted click was eroding their unit economics.",
     solution:
@@ -191,6 +285,17 @@ export const projects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=600&fit=crop&auto=format",
     tags: ["AI", "Health Tech", "Real-time"],
+    shortMetric: "-94%",
+    shortLabel: "false alerts",
+    client: "Regional Hospital Network",
+    industry: "Health Tech",
+    timeline: "5 months",
+    services: ["Real-time Monitoring", "ML Classification", "Unified Dashboard"],
+    gallery: [
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "A hospital network needed to centralize patient monitoring across 12 facilities. Existing systems were siloed — each ICU had its own monitoring stack with no cross-facility visibility. Critical events were missed due to alert fatigue (nurses receiving 150+ alerts per shift, most false positives).",
     solution:
@@ -212,6 +317,17 @@ export const projects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=1200&h=600&fit=crop&auto=format",
     tags: ["Brand Launch", "DTC", "Strategy"],
+    shortMetric: "$850K",
+    shortLabel: "month-1 revenue",
+    client: "Meridian Wellness",
+    industry: "DTC Wellness",
+    timeline: "12 weeks",
+    services: ["Brand Strategy", "Visual Identity", "Packaging", "E-commerce"],
+    gallery: [
+      "https://images.unsplash.com/photo-1542744094-3a31f272c490?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1561070791-32626249fac9?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "Meridian was entering one of the most saturated categories in DTC: wellness supplements. With thousands of established brands and customer acquisition costs exceeding $80 in the category, they needed a brand that could command attention and justify premium pricing from day one.",
     solution:
@@ -233,6 +349,17 @@ export const projects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=600&fit=crop&auto=format",
     tags: ["Analytics", "Enterprise", "Performance"],
+    shortMetric: "156×",
+    shortLabel: "query speed",
+    client: "Circuit",
+    industry: "Enterprise Analytics",
+    timeline: "4 months",
+    services: ["Data Architecture", "Backend Engineering", "Dashboard UI"],
+    gallery: [
+      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1543286386-713bdd548da4?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "Circuit's legacy analytics platform, built on a monolithic Rails application, couldn't handle their growing data volumes. Queries that used to take seconds now took minutes. Dashboard refreshes were measured in tens of seconds. Enterprise clients were threatening to churn to competitors with more modern architectures.",
     solution:
@@ -254,6 +381,17 @@ export const projects: Project[] = [
     image:
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=600&fit=crop&auto=format",
     tags: ["Automation", "Retention", "LTV"],
+    shortMetric: "2.75×",
+    shortLabel: "customer LTV",
+    client: "Subscription SaaS Co. (confidential)",
+    industry: "B2B SaaS",
+    timeline: "Ongoing retainer",
+    services: ["Lifecycle Automation", "Re-engagement", "Win-back Campaigns"],
+    gallery: [
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1551836022-deb498c7d128?w=1600&h=1000&fit=crop&auto=format",
+      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1600&h=1000&fit=crop&auto=format",
+    ],
     challenge:
       "A subscription-based SaaS company had a leaky bucket: they were acquiring customers at a healthy rate but losing 60% within the first 90 days. Their onboarding was a one-size-fits-all email sequence, and there was no re-engagement strategy for at-risk accounts. LTV was stagnating at 8 months.",
     solution:

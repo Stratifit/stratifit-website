@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { HiArrowRight } from "react-icons/hi2";
+import { HiArrowRight, HiArrowLeft } from "react-icons/hi2";
 import Link from "next/link";
 import { projects, projectCategories } from "@/data/projects";
 
@@ -11,7 +11,20 @@ const featuredProjects = projects.slice(0, 8);
 export function Portfolio() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [activePortfolioIndex, setActivePortfolioIndex] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollBy = (direction: "left" | "right") => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = window.innerWidth >= 768 ? 380 : window.innerWidth >= 640 ? 340 : 300;
+    const gap = 24;
+    el.scrollBy({
+      left: direction === "left" ? -(cardWidth + gap) : cardWidth + gap,
+      behavior: "smooth",
+    });
+  };
 
   const filtered =
     activeFilter === "All"
@@ -28,6 +41,8 @@ export function Portfolio() {
       const center = el.scrollLeft + el.clientWidth / 2;
       const idx = Math.floor((center - padding) / (cardWidth + gap));
       setActivePortfolioIndex(Math.max(0, Math.min(idx, filtered.length - 1)));
+      setCanScrollLeft(el.scrollLeft > 0);
+      setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
     };
     el.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
@@ -35,7 +50,7 @@ export function Portfolio() {
   }, [filtered.length, activeFilter]);
 
   return (
-    <section id="work" className="py-24 md:py-32 bg-surface relative overflow-hidden">
+    <section id="work" className="py-24 md:py-32 bg-surface relative overflow-x-clip">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={false}
@@ -44,16 +59,13 @@ export function Portfolio() {
           transition={{ duration: 0.5 }}
           className="mb-12"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-            Portfolio
-          </p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Portfolio</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Our{" "}
-            <span className="text-amber">Work</span>
+            Our <span className="text-amber">Work</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            We craft digital experiences that define industries and elevate
-            brands through precision and creativity.
+            We craft digital experiences that define industries and elevate brands through precision
+            and creativity.
           </p>
         </motion.div>
 
@@ -75,43 +87,64 @@ export function Portfolio() {
         </div>
 
         {/* Projects - Single horizontal scroll line */}
-        <div ref={scrollRef} className="flex gap-6 overflow-x-auto no-scrollbar pb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 snap-x snap-mandatory">
-          {filtered.map((project) => (
-            <motion.div
-              key={project.id}
-              initial={false}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-              className="group bg-card-dark rounded-2xl overflow-hidden border border-white/5 hover:border-amber/20 transition-all shrink-0 w-[300px] sm:w-[340px] md:w-[380px] snap-center"
-            >
-              <div className="aspect-[4/3] relative overflow-hidden">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <span className="absolute top-4 left-4 bg-amber/90 text-black text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider">
-                  {project.category}
-                </span>
-              </div>
-              <div className="p-6 space-y-3">
-                <h3 className="font-heading font-bold text-xl text-white">
-                  {project.title}
-                </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
-                  {project.description}
-                </p>
-                <Link
-                  href={`/portfolio/${project.slug}`}
-                  className="inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider hover:text-amber-light transition-colors group/link"
-                >
-                  View Case Study
-                  <HiArrowRight className="group-hover/link:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+        <div className="relative">
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto no-scrollbar pb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 snap-x snap-mandatory"
+          >
+            {filtered.map((project) => (
+              <motion.div
+                key={project.id}
+                initial={false}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="group bg-card-dark rounded-2xl overflow-hidden border border-white/5 hover:border-amber/20 transition-all shrink-0 w-[300px] sm:w-[340px] md:w-[380px] snap-center"
+              >
+                <div className="aspect-[4/3] relative overflow-hidden">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  <span className="absolute top-4 left-4 bg-amber/90 text-black text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider">
+                    {project.category}
+                  </span>
+                </div>
+                <div className="p-6 space-y-3">
+                  <h3 className="font-heading font-bold text-xl text-white">{project.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{project.description}</p>
+                  <Link
+                    href={`/portfolio/${project.slug}`}
+                    className="inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider hover:text-amber-light transition-colors group/link"
+                  >
+                    View Case Study
+                    <HiArrowRight className="group-hover/link:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Desktop: Left/Right Scroll Arrows */}
+          <button
+            type="button"
+            onClick={() => scrollBy("left")}
+            disabled={!canScrollLeft}
+            aria-label="Scroll portfolio left"
+            className="hidden md:flex absolute -left-20 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-black/70 hover:bg-amber hover:text-black text-white border border-white/10 backdrop-blur-sm transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-black/70 disabled:hover:text-white z-10"
+          >
+            <HiArrowLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollBy("right")}
+            disabled={!canScrollRight}
+            aria-label="Scroll portfolio right"
+            className="hidden md:flex absolute -right-20 top-1/2 -translate-y-1/2 w-12 h-12 items-center justify-center rounded-full bg-black/70 hover:bg-amber hover:text-black text-white border border-white/10 backdrop-blur-sm transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-black/70 disabled:hover:text-white z-10"
+          >
+            <HiArrowRight className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Desktop View All */}

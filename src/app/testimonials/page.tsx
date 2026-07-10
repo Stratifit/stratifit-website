@@ -24,12 +24,10 @@ export default function TestimonialsPage() {
               Testimonials
             </p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              What Our Clients{" "}
-              <span className="text-amber">Say</span>
+              What Our Clients <span className="text-amber">Say</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              Don&apos;t take our word for it — hear from the brands we&apos;ve
-              helped scale.
+              Don&apos;t take our word for it — hear from the brands we&apos;ve helped scale.
             </p>
           </motion.div>
         </div>
@@ -52,9 +50,7 @@ export default function TestimonialsPage() {
                     {t.initials}
                   </div>
                   <div>
-                    <div className="font-heading font-bold text-white">
-                      {t.name}
-                    </div>
+                    <div className="font-heading font-bold text-white">{t.name}</div>
                     <div className="text-xs text-gray-500 uppercase tracking-wide mt-0.5">
                       {t.role}
                     </div>
@@ -67,9 +63,7 @@ export default function TestimonialsPage() {
                   ))}
                 </div>
 
-                <p className="text-gray-300 leading-relaxed text-sm">
-                  &ldquo;{t.text}&rdquo;
-                </p>
+                <p className="text-gray-300 leading-relaxed text-sm">&ldquo;{t.text}&rdquo;</p>
               </motion.div>
             ))}
           </motion.div>

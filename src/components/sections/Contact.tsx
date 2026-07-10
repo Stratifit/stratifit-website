@@ -60,9 +60,7 @@ export function Contact() {
 
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
-      prev.includes(service)
-        ? prev.filter((s) => s !== service)
-        : [...prev, service]
+      prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service],
     );
   };
 
@@ -71,9 +69,7 @@ export function Contact() {
     setSubmitted(true);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormState((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -91,16 +87,13 @@ export function Contact() {
           transition={{ duration: 0.5 }}
           className="mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-            Contact
-          </p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Contact</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Let&apos;s{" "}
-            <span className="text-amber">Talk</span>
+            Let&apos;s <span className="text-amber">Talk</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Ready to start your project? Fill out the form and we&apos;ll get
-            back to you within 24 hours.
+            Ready to start your project? Fill out the form and we&apos;ll get back to you within 24
+            hours.
           </p>
         </motion.div>
 
@@ -123,9 +116,7 @@ export function Contact() {
                 <div className="w-16 h-16 rounded-full bg-amber/10 flex items-center justify-center mx-auto mb-6 border border-amber/20">
                   <HiEnvelope className="text-amber text-2xl" />
                 </div>
-                <h3 className="font-heading font-bold text-2xl text-white mb-3">
-                  Message Sent!
-                </h3>
+                <h3 className="font-heading font-bold text-2xl text-white mb-3">Message Sent!</h3>
                 <p className="text-gray-400">
                   Thanks for reaching out. We&apos;ll get back to you within 24 hours.
                 </p>
@@ -178,7 +169,11 @@ export function Contact() {
                     onClick={() => setServicesOpen(!servicesOpen)}
                     className="w-full flex items-center justify-between bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-left transition-colors hover:border-white/20 focus:border-amber/50 focus:outline-none"
                   >
-                    <span className={selectedServices.length > 0 ? "text-white text-sm" : "text-gray-600 text-sm"}>
+                    <span
+                      className={
+                        selectedServices.length > 0 ? "text-white text-sm" : "text-gray-600 text-sm"
+                      }
+                    >
                       {selectedServices.length > 0
                         ? `${selectedServices.length} service${selectedServices.length > 1 ? "s" : ""} selected`
                         : "Select services you're interested in"}
@@ -202,9 +197,7 @@ export function Contact() {
                           >
                             <div
                               className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-all ${
-                                checked
-                                  ? "bg-amber border-amber"
-                                  : "border-white/20"
+                                checked ? "bg-amber border-amber" : "border-white/20"
                               }`}
                             >
                               {checked && (
@@ -251,7 +244,11 @@ export function Contact() {
                         onClick={() => setBudgetOpen(!budgetOpen)}
                         className="w-full flex items-center justify-between bg-card-dark border border-white/10 rounded-xl px-3 py-3 text-left transition-colors hover:border-white/20 focus:border-amber/50 focus:outline-none"
                       >
-                        <span className={selectedBudget ? "text-white text-xs truncate" : "text-gray-600 text-xs"}>
+                        <span
+                          className={
+                            selectedBudget ? "text-white text-xs truncate" : "text-gray-600 text-xs"
+                          }
+                        >
                           {selectedBudget
                             ? budgetRanges.find((r) => r.value === selectedBudget)?.label
                             : "Select range"}

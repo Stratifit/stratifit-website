@@ -36,8 +36,7 @@ export const insights: Insight[] = [
   makeInsight({
     category: "Design",
     title: "Mastering Minimalist UX for Luxury Brands",
-    excerpt:
-      "Why simplicity drives premium perception and how to execute it flawlessly.",
+    excerpt: "Why simplicity drives premium perception and how to execute it flawlessly.",
     image:
       "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=1200&h=600&fit=crop&auto=format",
     readTime: "8 min read",
@@ -52,8 +51,7 @@ export const insights: Insight[] = [
   makeInsight({
     category: "Tech",
     title: "How AI is Revolutionizing Custom Automation",
-    excerpt:
-      "Practical applications of AI that deliver immediate ROI for growing businesses.",
+    excerpt: "Practical applications of AI that deliver immediate ROI for growing businesses.",
     image:
       "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=1200&h=600&fit=crop&auto=format",
     readTime: "5 min read",
@@ -68,8 +66,7 @@ export const insights: Insight[] = [
   makeInsight({
     category: "Growth",
     title: "Building Funnels That Convert at 3x Industry Average",
-    excerpt:
-      "The data-backed framework we use to design high-conversion marketing systems.",
+    excerpt: "The data-backed framework we use to design high-conversion marketing systems.",
     image:
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=600&fit=crop&auto=format",
     readTime: "7 min read",
@@ -132,8 +129,7 @@ export const insights: Insight[] = [
   makeInsight({
     category: "Growth",
     title: "Retention Over Acquisition: The New Growth Playbook",
-    excerpt:
-      "Why keeping customers is the most underrated strategy — and how to do it at scale.",
+    excerpt: "Why keeping customers is the most underrated strategy — and how to do it at scale.",
     image:
       "https://images.unsplash.com/photo-1434626881859-194d67b2b86f?w=1200&h=600&fit=crop&auto=format",
     readTime: "7 min read",
@@ -196,8 +192,7 @@ export const insights: Insight[] = [
   makeInsight({
     category: "Growth",
     title: "SEO in the Age of AI: What Actually Works Now",
-    excerpt:
-      "Adapting your organic strategy for AI-powered search engines and zero-click results.",
+    excerpt: "Adapting your organic strategy for AI-powered search engines and zero-click results.",
     image:
       "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2?w=1200&h=600&fit=crop&auto=format",
     readTime: "5 min read",

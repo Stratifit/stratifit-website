@@ -2,7 +2,16 @@
 
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiChatBubbleLeftRight, HiXMark, HiPaperAirplane, HiQuestionMarkCircle, HiBriefcase, HiCurrencyDollar, HiLifebuoy, HiBuildingOffice2 } from "react-icons/hi2";
+import {
+  HiChatBubbleLeftRight,
+  HiXMark,
+  HiPaperAirplane,
+  HiQuestionMarkCircle,
+  HiBriefcase,
+  HiCurrencyDollar,
+  HiLifebuoy,
+  HiBuildingOffice2,
+} from "react-icons/hi2";
 
 type Category = {
   id: string;
@@ -108,19 +117,54 @@ export function AIChatbot() {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (!isOpen) return;
+    // Only lock body scroll on mobile-sized viewports where the bottom-sheet covers the screen.
+    // On desktop (lg+) the panel is a corner widget — background page scroll must remain free.
+    const isMobileViewport = () => window.matchMedia("(max-width: 1023px)").matches;
+    if (!isMobileViewport()) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  // Desktop-only outside-click-to-close: backdrop is `lg:hidden` so on desktop the user
+  // must be able to dismiss the corner widget by clicking anywhere else on the page.
+  useEffect(() => {
+    if (!isOpen) return;
+    const isMobileViewport = () => window.matchMedia("(max-width: 1023px)").matches;
+    if (isMobileViewport()) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest("[data-chat-panel]")) return;
+      if (target.closest("[data-chat-trigger]")) return;
+      setIsOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
   }, [isOpen]);
 
   const handleSend = (text: string) => {
     // Check for contact form navigation
     const lower = text.toLowerCase();
-    if (lower === "contact" || lower.trim() === "contact me" || lower.trim() === "help" || lower.includes("open contact form") || lower.includes("speak to team") || lower.includes("get a quote") || lower.includes("contact form")) {
+    if (
+      lower === "contact" ||
+      lower.trim() === "contact me" ||
+      lower.trim() === "help" ||
+      lower.includes("open contact form") ||
+      lower.includes("speak to team") ||
+      lower.includes("get a quote") ||
+      lower.includes("contact form")
+    ) {
       const userMsg: Message = { role: "user", text };
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
       // Add bot message then navigate after a short delay
-      const botMsg = lower.includes("get a quote") || lower.includes("open contact form") ? responses.quote : responses.team;
+      const botMsg =
+        lower.includes("get a quote") || lower.includes("open contact form")
+          ? responses.quote
+          : responses.team;
       setTimeout(() => {
         setIsTyping(false);
         setMessages((prev) => [...prev, botMsg]);
@@ -145,11 +189,14 @@ export function AIChatbot() {
     let botResponse: Message;
     if (lower.includes("faq") || lower.includes("question")) botResponse = responses.faq;
     else if (lower.includes("service") || lower.includes("offer")) botResponse = responses.services;
-    else if (lower.includes("pric") || lower.includes("cost") || lower.includes("budget")) botResponse = responses.pricing;
-    else if (lower.includes("support") || lower.includes("contact")) botResponse = responses.support;
+    else if (lower.includes("pric") || lower.includes("cost") || lower.includes("budget"))
+      botResponse = responses.pricing;
+    else if (lower.includes("support") || lower.includes("contact"))
+      botResponse = responses.support;
     else if (lower.includes("about") || lower.includes("who")) botResponse = responses.about;
     else if (lower.includes("brand")) botResponse = responses.branding;
-    else if (lower.includes("develop") || lower.includes("web") || lower.includes("site")) botResponse = responses.development;
+    else if (lower.includes("develop") || lower.includes("web") || lower.includes("site"))
+      botResponse = responses.development;
     else if (lower.includes("ai") || lower.includes("auto")) botResponse = responses.ai;
     else if (lower.includes("quote")) botResponse = responses.quote;
     else if (lower.includes("team") || lower.includes("speak")) botResponse = responses.team;
@@ -178,11 +225,15 @@ export function AIChatbot() {
 
   return (
     <>
-      {/* Chat Button — mobile only */}
+      {/* Chat Button — sits in the Header as before; panel slides up from the bottom on click */}
       <button
-        onClick={() => { setIsOpen(true); setShowBadge(false); }}
-        className="lg:hidden relative w-10 h-10 rounded-full bg-amber flex items-center justify-center hover:scale-110 active:scale-95 transition-transform shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+        onClick={() => {
+          setIsOpen(true);
+          setShowBadge(false);
+        }}
+        className="relative w-10 h-10 rounded-full bg-amber flex items-center justify-center hover:scale-110 active:scale-95 transition-transform shadow-[0_0_15px_rgba(245,158,11,0.3)]"
         aria-label="Open chat"
+        data-chat-trigger=""
       >
         <HiChatBubbleLeftRight className="text-black text-lg" />
         {showBadge && (
@@ -202,13 +253,14 @@ export function AIChatbot() {
               className="lg:hidden fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm"
               onClick={() => setIsOpen(false)}
             />
-            {/* Panel */}
+            {/* Panel — mobile = full-width bottom sheet; desktop (lg+) = 400px corner widget anchored bottom-right. Both slide up from the bottom via the same y: 100% → 0 animation. */}
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 26, stiffness: 220 }}
-              className="lg:hidden fixed bottom-0 left-0 right-0 z-[70] bg-black flex flex-col max-h-[92dvh] rounded-t-2xl border-t border-white/10"
+              className="fixed bottom-0 inset-x-0 z-[70] bg-black flex flex-col max-h-[92dvh] rounded-t-2xl border-t border-white/10 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-[400px] xl:w-[440px] lg:max-h-[80vh] lg:rounded-2xl lg:border lg:border-white/10 lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
+              data-chat-panel=""
             >
               {/* Header */}
               <div className="flex-none px-4 py-3 flex items-center justify-between border-b border-white/10 bg-black/95 rounded-t-2xl">
@@ -250,54 +302,61 @@ export function AIChatbot() {
               </div>
 
               {/* Messages — spacer div pins to bottom naturally, no JS scroll needed on open */}
-              <div ref={messagesContainerRef} className="flex-1 overflow-y-auto flex flex-col px-4 py-4 menu-scroll overscroll-contain">
+              <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto flex flex-col px-4 py-4 menu-scroll overscroll-contain"
+              >
                 <div className="flex-1 min-h-0" />
                 <div className="space-y-4">
-                {messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
+                  {messages.map((msg, i) => (
                     <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-3 ${
-                        msg.role === "user"
-                          ? "bg-amber text-black"
-                          : "bg-card-dark border border-white/5"
-                      }`}
+                      key={i}
+                      className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      <p className={`text-sm leading-relaxed whitespace-pre-line ${msg.role === "user" ? "text-black font-medium" : "text-gray-300"}`}>
-                        {msg.text}
-                      </p>
-                      {msg.quickReplies && msg.quickReplies.length > 0 && i === messages.length - 1 && !isTyping && (
-                        <div className="flex flex-wrap gap-1.5 mt-3">
-                          {msg.quickReplies.map((qr) => (
-                            <button
-                              key={qr}
-                              onClick={() => handleQuickReply(qr)}
-                              className="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-white text-[11px] font-medium hover:bg-amber/20 hover:border-amber/30 transition-all"
-                            >
-                              {qr}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Typing Indicator */}
-                {isTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-card-dark border border-white/5 rounded-2xl px-4 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce [animation-delay:0ms]" />
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce [animation-delay:150ms]" />
-                        <span className="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce [animation-delay:300ms]" />
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+                          msg.role === "user"
+                            ? "bg-amber text-black"
+                            : "bg-card-dark border border-white/5"
+                        }`}
+                      >
+                        <p
+                          className={`text-sm leading-relaxed whitespace-pre-line ${msg.role === "user" ? "text-black font-medium" : "text-gray-300"}`}
+                        >
+                          {msg.text}
+                        </p>
+                        {msg.quickReplies &&
+                          msg.quickReplies.length > 0 &&
+                          i === messages.length - 1 &&
+                          !isTyping && (
+                            <div className="flex flex-wrap gap-1.5 mt-3">
+                              {msg.quickReplies.map((qr) => (
+                                <button
+                                  key={qr}
+                                  onClick={() => handleQuickReply(qr)}
+                                  className="px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-white text-[11px] font-medium hover:bg-amber/20 hover:border-amber/30 transition-all"
+                                >
+                                  {qr}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     </div>
-                  </div>
-                )}
+                  ))}
 
+                  {/* Typing Indicator */}
+                  {isTyping && (
+                    <div className="flex justify-start">
+                      <div className="bg-card-dark border border-white/5 rounded-2xl px-4 py-3">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce [animation-delay:0ms]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce [animation-delay:150ms]" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber/40 animate-bounce [animation-delay:300ms]" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

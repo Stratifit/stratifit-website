@@ -12,9 +12,7 @@ export default function PortfolioPage() {
   const router = useRouter();
 
   const filtered =
-    activeFilter === "All"
-      ? projects
-      : projects.filter((p) => p.category === activeFilter);
+    activeFilter === "All" ? projects : projects.filter((p) => p.category === activeFilter);
 
   return (
     <main className="min-h-screen bg-black">
@@ -32,12 +30,11 @@ export default function PortfolioPage() {
               Portfolio
             </p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              Our{" "}
-              <span className="text-amber">Work</span>
+              Our <span className="text-amber">Work</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              We craft digital experiences that define industries and elevate
-              brands through precision and creativity.
+              We craft digital experiences that define industries and elevate brands through
+              precision and creativity.
             </p>
           </motion.div>
         </div>
@@ -88,12 +85,16 @@ export default function PortfolioPage() {
                   </div>
 
                   <div className="p-6 space-y-3">
-                    <h3 className="font-heading font-bold text-xl text-white">
-                      {project.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">
-                      {project.description}
-                    </p>
+                    <div className="flex items-baseline gap-2 sm:gap-3 mb-1">
+                      <span className="text-amber text-2xl font-heading font-black tabular-nums tracking-tight shrink-0">
+                        {project.shortMetric}
+                      </span>
+                      <span className="min-w-0 flex-1 text-xs uppercase tracking-[0.2em] text-gray-500 font-bold truncate">
+                        {project.shortLabel}
+                      </span>
+                    </div>
+                    <h3 className="font-heading font-bold text-xl text-white">{project.title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed">{project.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {project.tags.map((tag) => (
                         <span
@@ -121,8 +122,7 @@ export default function PortfolioPage() {
             <div className="text-center py-20">
               <div className="inline-flex items-center gap-2 bg-card-dark border border-white/5 rounded-2xl px-8 py-6">
                 <p className="text-gray-400 text-base font-medium">
-                  No projects found in{" "}
-                  <span className="text-amber font-bold">{activeFilter}</span>
+                  No projects found in <span className="text-amber font-bold">{activeFilter}</span>
                 </p>
               </div>
             </div>

@@ -26,8 +26,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Stratifit | Premium Digital Agency",
-    description:
-      "Brand, web, AI, and growth — engineered for scale.",
+    description: "Brand, web, AI, and growth — engineered for scale.",
     type: "website",
   },
 };
@@ -46,7 +45,9 @@ export default function RootLayout({
           <Footer />
           <CookiePopup />
         </SmoothScroll>
-        <script dangerouslySetInnerHTML={{ __html: `
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
 (function() {
   var DURATION = 1800;
   var STAGGER = 400;
@@ -156,7 +157,9 @@ export default function RootLayout({
     init();
   }
 })();
-` }} />
+`,
+          }}
+        />
       </body>
     </html>
   );

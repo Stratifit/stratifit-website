@@ -20,12 +20,15 @@ export default function BuyBusinessPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Acquisition</p>
+            <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
+              Acquisition
+            </p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
               Buy a <span className="text-amber">Business</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              Skip the startup grind. Browse our curated marketplace of profitable, turnkey businesses across seven high-demand niches.
+              Skip the startup grind. Browse our curated marketplace of profitable, turnkey
+              businesses across seven high-demand niches.
             </p>
           </motion.div>
         </div>
@@ -34,9 +37,18 @@ export default function BuyBusinessPage() {
       {/* Niches Grid */}
       <section className="pb-24 md:pb-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.2 }} className="mb-10">
-            <h2 className="text-xl sm:text-2xl font-heading font-bold text-white mb-2">Explore by <span className="text-amber">Niche</span></h2>
-            <p className="text-gray-400 text-sm">Select a niche to see available businesses for acquisition.</p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mb-10"
+          >
+            <h2 className="text-xl sm:text-2xl font-heading font-bold text-white mb-2">
+              Explore by <span className="text-amber">Niche</span>
+            </h2>
+            <p className="text-gray-400 text-sm">
+              Select a niche to see available businesses for acquisition.
+            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -57,12 +69,19 @@ export default function BuyBusinessPage() {
                   </div>
                   <div className="flex-1 mx-2 bg-[#0d0d0d] rounded px-2 py-1 flex items-center gap-1 border border-white/5">
                     <HiGlobeAlt className="text-gray-600 text-[8px] shrink-0" />
-                    <span className="text-[8px] text-gray-600 truncate">stratifit.com/buy/{niche.slug}</span>
+                    <span className="text-[8px] text-gray-600 truncate">
+                      stratifit.com/buy/{niche.slug}
+                    </span>
                   </div>
                 </div>
 
                 {/* Website Preview */}
-                <div className="relative overflow-hidden flex-1 flex flex-col py-10 md:py-14 px-6 items-center text-center" style={{ background: "linear-gradient(135deg, #111 0%, #1a1a1a 50%, #0d0d0d 100%)" }}>
+                <div
+                  className="relative overflow-hidden flex-1 flex flex-col py-10 md:py-14 px-6 items-center text-center"
+                  style={{
+                    background: "linear-gradient(135deg, #111 0%, #1a1a1a 50%, #0d0d0d 100%)",
+                  }}
+                >
                   {/* Icon/Logo */}
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/30 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(245,158,11,0.1)] group-hover:shadow-[0_0_40px_rgba(245,158,11,0.2)] transition-all duration-500">
                     <span className="text-3xl">{niche.icon}</span>
@@ -115,9 +134,20 @@ export default function BuyBusinessPage() {
           </div>
 
           {/* CTA */}
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.5 }} className="mt-16 text-center py-12 bg-card-dark rounded-2xl border border-white/5">
-            <h2 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-4">Ready to Own a Business?</h2>
-            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto mb-8">Our team will guide you through every step of the acquisition process — from due diligence to transition.</p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="mt-16 text-center py-12 bg-card-dark rounded-2xl border border-white/5"
+          >
+            <h2 className="text-2xl sm:text-3xl font-heading font-bold text-white mb-4">
+              Ready to Own a Business?
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto mb-8">
+              Our team will guide you through every step of the acquisition process — from due
+              diligence to transition.
+            </p>
             <a
               href="#contact"
               className="group inline-flex items-center gap-2 px-8 py-4 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
@@ -134,7 +164,13 @@ export default function BuyBusinessPage() {
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.4, duration: 0.35, ease: "easeOut" }}
-        onClick={() => { if (window.history.length > 1) { router.back(); } else { router.push("/"); } }}
+        onClick={() => {
+          if (window.history.length > 1) {
+            router.back();
+          } else {
+            router.push("/");
+          }
+        }}
         className="fixed top-16 lg:top-20 left-1 z-50 p-2 rounded-full bg-white/5 backdrop-blur-sm transition-colors"
         aria-label="Go back"
       >

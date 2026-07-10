@@ -19,19 +19,15 @@ export default function PrivacyPolicyPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-              Legal
-            </p>
+            <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Legal</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              Privacy{" "}
-              <span className="text-amber">Policy</span>
+              Privacy <span className="text-amber">Policy</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              Your privacy matters to us. This policy explains how Stratifit collects, uses, and protects your personal information.
+              Your privacy matters to us. This policy explains how Stratifit collects, uses, and
+              protects your personal information.
             </p>
-            <p className="text-gray-500 text-xs mt-4 ml-4 sm:ml-6">
-              Last updated: July 9, 2026
-            </p>
+            <p className="text-gray-500 text-xs mt-4 ml-4 sm:ml-6">Last updated: July 9, 2026</p>
           </motion.div>
         </div>
       </section>
@@ -53,8 +49,12 @@ export default function PrivacyPolicyPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              Stratifit (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website{" "}
-              <span className="text-amber">stratifit.com</span> or use any of our digital services. Please read this policy carefully. By accessing or using our services, you acknowledge that you have read, understood, and agree to the terms of this Privacy Policy.
+              Stratifit (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) is committed to
+              protecting your privacy. This Privacy Policy explains how we collect, use, disclose,
+              and safeguard your information when you visit our website{" "}
+              <span className="text-amber">stratifit.com</span> or use any of our digital services.
+              Please read this policy carefully. By accessing or using our services, you acknowledge
+              that you have read, understood, and agree to the terms of this Privacy Policy.
             </p>
           </motion.div>
 
@@ -77,7 +77,9 @@ export default function PrivacyPolicyPage() {
                   Personal Information
                 </h3>
                 <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  When you contact us through our website forms, we may collect your name, email address, phone number, company name, and any other information you voluntarily provide in your message.
+                  When you contact us through our website forms, we may collect your name, email
+                  address, phone number, company name, and any other information you voluntarily
+                  provide in your message.
                 </p>
               </div>
               <div>
@@ -85,7 +87,10 @@ export default function PrivacyPolicyPage() {
                   Automatically Collected Information
                 </h3>
                 <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  When you visit our website, we automatically collect certain information including your IP address, browser type, operating system, referring URLs, device information, and browsing behavior. This is collected through cookies and similar tracking technologies.
+                  When you visit our website, we automatically collect certain information including
+                  your IP address, browser type, operating system, referring URLs, device
+                  information, and browsing behavior. This is collected through cookies and similar
+                  tracking technologies.
                 </p>
               </div>
               <div>
@@ -93,7 +98,9 @@ export default function PrivacyPolicyPage() {
                   Analytics Data
                 </h3>
                 <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  We use analytics tools to understand how visitors interact with our website. This includes page views, time spent on pages, click patterns, and navigation paths. This data is anonymized and aggregated.
+                  We use analytics tools to understand how visitors interact with our website. This
+                  includes page views, time spent on pages, click patterns, and navigation paths.
+                  This data is anonymized and aggregated.
                 </p>
               </div>
             </div>
@@ -146,7 +153,12 @@ export default function PrivacyPolicyPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              We implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. These measures include encryption, firewalls, secure server infrastructure, and regular security assessments. However, no method of transmission over the Internet or electronic storage is 100% secure, and we cannot guarantee absolute security.
+              We implement appropriate technical and organizational security measures to protect
+              your personal information against unauthorized access, alteration, disclosure, or
+              destruction. These measures include encryption, firewalls, secure server
+              infrastructure, and regular security assessments. However, no method of transmission
+              over the Internet or electronic storage is 100% secure, and we cannot guarantee
+              absolute security.
             </p>
           </motion.div>
 
@@ -164,10 +176,17 @@ export default function PrivacyPolicyPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-              Our website uses cookies and similar tracking technologies to enhance your browsing experience, analyze site traffic, and deliver personalized content. For detailed information about the cookies we use and how you can manage your preferences, please see our{" "}
-              <a href="/cookie-policy" className="text-amber hover:text-amber-light underline transition-colors">
+              Our website uses cookies and similar tracking technologies to enhance your browsing
+              experience, analyze site traffic, and deliver personalized content. For detailed
+              information about the cookies we use and how you can manage your preferences, please
+              see our{" "}
+              <a
+                href="/cookie-policy"
+                className="text-amber hover:text-amber-light underline transition-colors"
+              >
                 Cookie Policy
-              </a>.
+              </a>
+              .
             </p>
           </motion.div>
 
@@ -185,7 +204,11 @@ export default function PrivacyPolicyPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-4">
-              We do not sell, trade, or rent your personal information to third parties. We may share information with trusted service providers who assist us in operating our website and conducting our business, provided they agree to keep this information confidential. We may also disclose information when required by law or to protect our rights.
+              We do not sell, trade, or rent your personal information to third parties. We may
+              share information with trusted service providers who assist us in operating our
+              website and conducting our business, provided they agree to keep this information
+              confidential. We may also disclose information when required by law or to protect our
+              rights.
             </p>
           </motion.div>
 
@@ -203,7 +226,8 @@ export default function PrivacyPolicyPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-4">
-              Depending on your location, you may have the following rights regarding your personal data:
+              Depending on your location, you may have the following rights regarding your personal
+              data:
             </p>
             <ul className="space-y-3">
               {[
@@ -222,9 +246,13 @@ export default function PrivacyPolicyPage() {
             </ul>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mt-4">
               To exercise any of these rights, please contact us at{" "}
-              <a href="mailto:privacy@stratifit.com" className="text-amber hover:text-amber-light underline transition-colors">
+              <a
+                href="mailto:privacy@stratifit.com"
+                className="text-amber hover:text-amber-light underline transition-colors"
+              >
                 privacy@stratifit.com
-              </a>.
+              </a>
+              .
             </p>
           </motion.div>
 
@@ -242,7 +270,10 @@ export default function PrivacyPolicyPage() {
               </h2>
             </div>
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-6">
-              We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated revision date. We encourage you to review this policy periodically. Continued use of our services after changes constitutes acceptance of the updated policy.
+              We may update this Privacy Policy from time to time. Changes will be posted on this
+              page with an updated revision date. We encourage you to review this policy
+              periodically. Continued use of our services after changes constitutes acceptance of
+              the updated policy.
             </p>
             <div className="border-t border-white/10 pt-6">
               <h3 className="text-amber font-heading font-bold text-sm uppercase tracking-wider mb-2">
@@ -250,9 +281,13 @@ export default function PrivacyPolicyPage() {
               </h3>
               <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 If you have any questions about this Privacy Policy, please contact us at{" "}
-                <a href="mailto:privacy@stratifit.com" className="text-amber hover:text-amber-light underline transition-colors">
+                <a
+                  href="mailto:privacy@stratifit.com"
+                  className="text-amber hover:text-amber-light underline transition-colors"
+                >
                   privacy@stratifit.com
-                </a>.
+                </a>
+                .
               </p>
             </div>
           </motion.div>

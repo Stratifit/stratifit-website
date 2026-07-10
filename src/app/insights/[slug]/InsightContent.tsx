@@ -14,7 +14,9 @@ export function InsightContent({ insight }: { insight: Insight }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
           <div className="max-w-3xl mx-auto">
-            <span className="inline-block bg-amber/90 text-black text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider mb-3">{insight.category}</span>
+            <span className="inline-block bg-amber/90 text-black text-[10px] font-bold px-3 py-1 rounded uppercase tracking-wider mb-3">
+              {insight.category}
+            </span>
             <div className="flex items-center gap-3 text-xs text-gray-400 font-medium uppercase tracking-wider">
               <span>{insight.date}</span>
               <span className="w-1 h-1 rounded-full bg-gray-500" />
@@ -25,11 +27,24 @@ export function InsightContent({ insight }: { insight: Insight }) {
       </section>
       <section className="pb-4 -mt-3 relative z-10">
         <div className="max-w-3xl mx-auto px-4 sm:px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black leading-tight md:leading-none tracking-tight mb-8">{insight.title}</h1>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black leading-tight md:leading-none tracking-tight mb-8">
+              {insight.title}
+            </h1>
             <div className="prose prose-invert prose-lg max-w-none">
               {insight.content.map((paragraph, i) => (
-                <motion.p key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.5 }} className="text-gray-300 text-base md:text-lg leading-relaxed mb-6">
+                <motion.p
+                  key={i}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  className="text-gray-300 text-base md:text-lg leading-relaxed mb-6"
+                >
                   {paragraph}
                 </motion.p>
               ))}
