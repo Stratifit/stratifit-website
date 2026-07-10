@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { motion, animate } from "framer-motion";
 import { openContactModal } from "@/components/contact/ContactModal";
 import {
   HiArrowRight,
@@ -56,6 +56,35 @@ const trustedBy = [
   { name: "PULSE", icon: HiHeart },
   { name: "VERTEX", icon: HiArrowPath },
 ];
+
+function Counter({ target, suffix }: { target: string; suffix: string }) {
+  const nodeRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = nodeRef.current;
+    if (!node) return;
+
+    const targetValue = parseInt(target, 10);
+
+    const controls = animate(0, targetValue, {
+      duration: 2,
+      ease: "easeOut",
+      onUpdate(value) {
+        node.textContent = Math.round(value) + suffix;
+      },
+    });
+
+    return () => controls.stop();
+  }, [target, suffix]);
+
+  return (
+    <div
+      ref={nodeRef}
+      className="text-2xl sm:text-3xl font-heading font-black text-amber mb-0.5 lg:mb-0 leading-none"    >
+      --
+    </div>
+  );
+}
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -141,13 +170,7 @@ export function Hero() {
                   key={stat.label[0]}
                   className="flex flex-col lg:flex-row items-center lg:justify-center text-center px-2 sm:px-4 lg:px-0.5 lg:whitespace-nowrap pb-0 gap-1"
                 >
-                  <div
-                    data-target={stat.target}
-                    data-suffix={stat.suffix}
-                    className="text-2xl sm:text-3xl font-heading font-black text-amber mb-0.5 lg:mb-0 leading-none"
-                  >
-                    0
-                  </div>
+                  <Counter target={stat.target} suffix={stat.suffix} />
                   <div className="text-[9px] sm:text-[10px] lg:text-sm font-bold text-gray-500 uppercase tracking-wider leading-tight">
                     {stat.label[0]}
                     <br className="lg:hidden" />

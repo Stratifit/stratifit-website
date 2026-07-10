@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiChevronDown } from "react-icons/hi2";
+import { HiChevronDown, HiXMark } from "react-icons/hi2";
+import ContactChatbot from "@/components/chat/ContactChatbot";
 
 const faqs = [
   {
@@ -49,6 +50,33 @@ const faqs = [
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
+
+  // Lock body scroll on mobile when panel is open
+  useEffect(() => {
+    if (!chatbotOpen) return;
+    const isMobile = () => window.matchMedia("(max-width: 1023px)").matches;
+    if (!isMobile()) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [chatbotOpen]);
+
+  // Outside-click-to-close on desktop
+  useEffect(() => {
+    if (!chatbotOpen) return;
+    const isMobile = () => window.matchMedia("(max-width: 1023px)").matches;
+    if (isMobile()) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      if (target.closest("[data-chat-panel]")) return;
+      setChatbotOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [chatbotOpen]);
 
   return (
     <section id="faq" className="py-24 md:py-32 bg-surface relative overflow-hidden">
@@ -132,24 +160,67 @@ export function FAQ() {
         </div>
 
         {/* Bottom CTA */}
-        <motion.div
-          initial={false}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-10 text-center"
-        >
+        <div className="mt-10 text-center">
           <p className="text-gray-500 text-sm mb-4">
             Still have questions? We&apos;re here to help.
           </p>
-          <a
-            href="#contact"
+          <button
+            onClick={() => setChatbotOpen(true)}
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
           >
             Contact Our Team
-          </a>
-        </motion.div>
+          </button>
+        </div>
       </div>
+
+      {/* Chatbot Panel Overlay */}
+      <AnimatePresence>
+        {chatbotOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="lg:hidden fixed inset-0 z-[65] bg-black/60 backdrop-blur-sm"
+              onClick={() => setChatbotOpen(false)}
+            />
+            {/* Panel */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 26, stiffness: 220 }}
+              className="fixed bottom-0 inset-x-0 z-[70] bg-black flex flex-col max-h-[92dvh] rounded-t-2xl border-t border-white/10 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-[440px] xl:w-[480px] lg:max-h-[85vh] lg:rounded-2xl lg:border lg:border-white/10 lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]"
+              data-chat-panel=""
+            >
+              {/* Header */}
+              <div className="flex-none px-4 py-3 flex items-center justify-between border-b border-white/10 bg-black rounded-t-2xl">
+                <div>
+                  <span className="font-heading font-black text-white text-sm">
+                    Still have questions?
+                  </span>
+                  <p className="text-[10px] text-gray-500">We&apos;re here to help.</p>
+                </div>
+                <button
+                  onClick={() => setChatbotOpen(false)}
+                  className="p-2 -mr-2 text-gray-400 hover:text-white transition-colors"
+                  aria-label="Close"
+                >
+                  <HiXMark size={22} />
+                </button>
+              </div>
+
+              {/* Chatbot content */}
+              <div className="flex-1 overflow-y-auto overscroll-contain">
+                <div className="px-0">
+                  <ContactChatbot />
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

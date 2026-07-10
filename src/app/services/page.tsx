@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { HiArrowRight, HiArrowLeft } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { openContactModal } from "@/components/contact/ContactModal";
 
 const CoreServices = dynamic(
   () =>
@@ -64,13 +65,13 @@ export default function ServicesPage() {
             <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto mb-8">
               Let&apos;s discuss your goals and build a tailored plan that fits your business.
             </p>
-            <a
-              href="#contact"
+            <button
+              onClick={openContactModal}
               className="group inline-flex items-center gap-2 px-8 py-4 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
             >
               Schedule a Consultation
               <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
           </motion.div>
         </div>
       </section>

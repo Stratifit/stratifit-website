@@ -13,6 +13,7 @@ import {
   getBrandBadge,
 } from "@/data/buy-business";
 import { slugify } from "@/lib/slugify";
+import { openContactModal } from "@/components/contact/ContactModal";
 
 const nicheFilters = ["All", ...niches.map((n) => n.title)];
 
@@ -248,12 +249,12 @@ export function BuyBusinessSection() {
               <HiGlobeAlt className="text-sm sm:text-base" />
               Visit Site
             </a>
-            <a
-              href="#contact"
+            <button
+              onClick={openContactModal}
               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-amber/30 text-amber font-bold rounded-lg hover:bg-amber/10 transition-all active:scale-95 text-xs sm:text-sm"
             >
               Buy Business
-            </a>
+            </button>
           </div>
         </div>
       </motion.div>

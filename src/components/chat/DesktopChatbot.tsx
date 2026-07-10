@@ -1,0 +1,19 @@
+"use client";
+
+import { AIChatbot } from "@/components/chat/AIChatbot";
+import { HiChatBubbleLeftRight } from "react-icons/hi2";
+
+export function DesktopChatbot() {
+  return (
+    <div
+      className="hidden lg:flex items-center gap-3 fixed bottom-6 right-6 z-40 bg-card-dark rounded-full pl-4 pr-2 py-2 border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
+      data-chat-trigger=""
+    >
+      <span className="text-white text-xs font-medium whitespace-nowrap">
+        <HiChatBubbleLeftRight className="inline text-amber text-sm mr-1.5" />
+        Chat with us
+      </span>
+      <AIChatbot />
+    </div>
+  );
+}

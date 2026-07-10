@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getNicheBySlug, getBrandBySlug, niches } from "@/data/buy-business";
 import { slugify } from "@/lib/slugify";
+import { openContactModal } from "@/components/contact/ContactModal";
 
 export default function BrandDetailPage({
   params,
@@ -320,13 +321,13 @@ export default function BrandDetailPage({
             smooth transition.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="#contact"
+            <button
+              onClick={openContactModal}
               className="group inline-flex sm:w-auto px-8 py-4 bg-amber hover:bg-amber-light text-black text-base font-bold rounded-full shadow-[0_0_30px_-5px_rgba(245,158,11,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] items-center justify-center gap-2"
             >
               Start Acquisition
               <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
             <a
               href={brand.websiteUrl}
               target="_blank"

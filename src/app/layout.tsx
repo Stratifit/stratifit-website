@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookiePopup } from "@/components/layout/CookiePopup";
 import { ContactModal } from "@/components/contact/ContactModal";
+import { DesktopChatbot } from "@/components/chat/DesktopChatbot";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,6 +48,8 @@ export default function RootLayout({
           <CookiePopup />
           <ContactModal />
         </SmoothScroll>
+        {/* Desktop floating chat — outside SmoothScroll so positioning is correct */}
+        <DesktopChatbot />
         <script
           dangerouslySetInnerHTML={{
             __html: `

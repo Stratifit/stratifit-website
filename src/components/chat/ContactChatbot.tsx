@@ -12,6 +12,10 @@ import {
   HiLifebuoy,
   HiSparkles,
   HiUserGroup,
+  HiEye,
+  HiUsers,
+  HiPencilSquare,
+  HiCreditCard,
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
 
@@ -33,14 +37,18 @@ const chips: Chip[] = [
   { id: "stack", label: "Tech Stack", icon: HiCog },
   { id: "process", label: "Our Process", icon: HiLightBulb },
   { id: "services", label: "Services", icon: HiBriefcase },
+  { id: "portfolio", label: "Portfolio", icon: HiEye },
+  { id: "team", label: "Our Team", icon: HiUsers },
+  { id: "revisions", label: "Revisions", icon: HiPencilSquare },
+  { id: "payment", label: "Payment Terms", icon: HiCreditCard },
   { id: "support", label: "Support", icon: HiLifebuoy },
 ];
 
 const botResponses: Record<string, Message> = {
   greeting: {
     role: "bot",
-    text: "Hey! I'm Stratifit AI — your instant project advisor. Tap a topic below or type your question and I'll help you out.",
-    quickReplies: ["Pricing", "Timeline", "Tech Stack", "Our Process"],
+    text: "Hey! I'm Stratifit AI — your instant project advisor. Tap a topic below or type your question. I can help with pricing, timelines, portfolio, revisions, payments, and more.",
+    quickReplies: ["Pricing", "Timeline", "Portfolio", "Our Process"],
   },
   pricing: {
     role: "bot",
@@ -67,6 +75,26 @@ const botResponses: Record<string, Message> = {
     text: "We cover the full digital spectrum:\n\nBrand Design — Strategy, identity, guidelines\nWeb Development — Custom sites, apps, ecommerce\nAI & Automation — Chatbots, workflows, integrations\nGrowth Marketing — SEO, ads, content, analytics\nBuy a Business — Acquire ready-made online businesses\n\nWhich area fits your needs?",
     quickReplies: ["Pricing", "Timeline", "Get a Quote"],
   },
+  portfolio: {
+    role: "bot",
+    text: "We've delivered for startups, scale-ups, and enterprises across industries:\n\nFintech — Brand + web platform for a Series A startup\nEcommerce — Full Shopify build for a DTC brand\nSaaS — AI dashboard + growth engine for a B2B tool\nHealth — Brand identity + patient portal for a clinic\n\nCheck out our full portfolio at /portfolio for case studies, metrics, and visuals.",
+    quickReplies: ["Pricing", "Our Process", "Services"],
+  },
+  team: {
+    role: "bot",
+    text: "We're strategists, designers, engineers, and marketers — all under one roof:\n\nStrategists — Brand positioning & go-to-market\nDesigners — UI/UX, visual identity, motion\nEngineers — Full-stack, AI, DevOps\nMarketers — SEO, paid ads, content, analytics\n\nNo outsourcing. No freelancer roulette. Just a tight, senior team obsessed with quality.",
+    quickReplies: ["Our Process", "Portfolio", "Services"],
+  },
+  revisions: {
+    role: "bot",
+    text: "Our revision policy is built around collaboration, not endless rounds:\n\nBranding — Up to 3 rounds of revisions included\nWeb Development — 2 rounds during design, 2 during build\nAI & Automation — Iterative testing included in scope\n\nAdditional rounds available at our hourly rate. We work fast and get it right — most clients approve within 2 rounds.",
+    quickReplies: ["Pricing", "Our Process", "Timeline"],
+  },
+  payment: {
+    role: "bot",
+    text: "Simple, transparent payment terms:\n\n50% deposit to kick off\n50% on completion, before launch\nMilestone billing available for projects $10K+\nMonthly retainer options for ongoing work\n\nWe accept bank transfer, credit card, and PayPal. Invoices are sent via email with clear breakdowns.",
+    quickReplies: ["Pricing", "Get a Quote", "Revisions"],
+  },
   support: {
     role: "bot",
     text: "Post-launch we've got your back:\n\n30 days of free support after launch\nPriority email support — response within 24h\nMaintenance retainers available\nMonthly performance reports included\n\nYour success doesn't end at launch.",
@@ -77,15 +105,15 @@ const botResponses: Record<string, Message> = {
     text: "Great choice! Let's get you a custom proposal. Our team will scope your project, prep a detailed estimate, and get back to you within 24 hours. Opening the contact form now...",
     quickReplies: [],
   },
-  team: {
+  contactTeam: {
     role: "bot",
     text: "Absolutely — our team would love to chat! Opening the contact form so you can tell us about your project. We'll respond within 24 hours.",
     quickReplies: [],
   },
   fallback: {
     role: "bot",
-    text: "Good question! I can help with pricing, timelines, tech stack, our process, services, or post-launch support. Tap a topic above or try rephrasing!",
-    quickReplies: ["Pricing", "Timeline", "Our Process", "Services"],
+    text: "Good question! I can help with pricing, timelines, tech stack, portfolio, revisions, payment terms, our process, services, or support. Tap a topic above or try rephrasing!",
+    quickReplies: ["Pricing", "Portfolio", "Our Process", "Services"],
   },
 };
 
@@ -123,7 +151,7 @@ export default function ContactChatbot() {
       setIsTyping(true);
       setExpanded(true);
 
-      const botMsg = lower.includes("quote") ? botResponses.quote : botResponses.team;
+      const botMsg = lower.includes("quote") ? botResponses.quote : botResponses.contactTeam;
       setTimeout(() => {
         setIsTyping(false);
         setMessages((prev) => [...prev, botMsg]);
@@ -157,6 +185,24 @@ export default function ContactChatbot() {
     else if (lower.includes("process") || lower.includes("step") || lower.includes("method"))
       response = botResponses.process;
     else if (lower.includes("service") || lower.includes("offer")) response = botResponses.services;
+    else if (
+      lower.includes("portfolio") ||
+      lower.includes("past work") ||
+      lower.includes("case study") ||
+      lower.includes("examples")
+    )
+      response = botResponses.portfolio;
+    else if (lower.includes("team") || lower.includes("who") || lower.includes("people"))
+      response = botResponses.team;
+    else if (lower.includes("revision") || lower.includes("change") || lower.includes("edit"))
+      response = botResponses.revisions;
+    else if (
+      lower.includes("payment") ||
+      lower.includes("deposit") ||
+      lower.includes("invoice") ||
+      lower.includes("pay")
+    )
+      response = botResponses.payment;
     else if (lower.includes("support") || lower.includes("maintain") || lower.includes("after"))
       response = botResponses.support;
     else response = botResponses.fallback;
@@ -303,7 +349,7 @@ export default function ContactChatbot() {
               aria-label="Send message"
               className="w-10 h-10 rounded-xl bg-amber text-black flex items-center justify-center hover:bg-amber-light transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
             >
-              <HiPaperAirplane className="text-base rotate-90" />
+              <HiPaperAirplane className="text-base" />
             </button>
           </div>
         </div>

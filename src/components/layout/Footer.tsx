@@ -24,7 +24,7 @@ const footerLinks: Record<string, { label: string; href?: string; action?: strin
 
 export function Footer() {
   return (
-    <footer className="bg-[#0a0a0a] border-t border-white/5 relative">
+    <footer id="site-footer" className="bg-[#0a0a0a] border-t border-white/5 relative">
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-8">
         <div className="flex flex-col gap-10">
           {/* Logo + tagline */}

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HiCheck } from "react-icons/hi2";
+import { openContactModal } from "@/components/contact/ContactModal";
 
 const packages = [
   {
@@ -157,8 +158,8 @@ export function Packages() {
                 ))}
               </ul>
 
-              <a
-                href="#contact"
+              <button
+                onClick={openContactModal}
                 className={`block w-full py-3.5 rounded-xl font-bold text-sm text-center transition-all uppercase tracking-wide ${
                   pkg.popular
                     ? "bg-amber text-black hover:bg-amber-light shadow-lg shadow-amber/20"
@@ -166,7 +167,7 @@ export function Packages() {
                 }`}
               >
                 {pkg.cta}
-              </a>
+              </button>
             </motion.div>
           ))}
         </div>
@@ -218,8 +219,8 @@ export function Packages() {
                   ))}
                 </ul>
 
-                <a
-                  href="#contact"
+                <button
+                  onClick={openContactModal}
                   className={`block w-full py-3 rounded-xl font-bold text-sm text-center transition-all uppercase tracking-wide ${
                     pkg.popular
                       ? "bg-amber text-black hover:bg-amber-light shadow-lg shadow-amber/20"
@@ -227,7 +228,7 @@ export function Packages() {
                   }`}
                 >
                   {pkg.cta}
-                </a>
+                </button>
               </motion.div>
             ))}
           </div>

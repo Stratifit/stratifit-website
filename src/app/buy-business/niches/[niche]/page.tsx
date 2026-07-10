@@ -20,6 +20,7 @@ import {
   getBrandAccent,
   getBrandBadge,
 } from "@/data/buy-business";
+import { openContactModal } from "@/components/contact/ContactModal";
 
 export default function NichePage({ params }: { params: Promise<{ niche: string }> }) {
   const { niche: nicheSlug } = use(params);
@@ -377,12 +378,12 @@ export default function NichePage({ params }: { params: Promise<{ niche: string 
                         <HiGlobeAlt className="text-lg sm:text-xl" />
                         Visit Site
                       </a>
-                      <a
-                        href="#contact"
+                      <button
+                        onClick={openContactModal}
                         className="flex-1 flex items-center justify-center gap-2 py-3.5 border border-amber/30 text-amber font-bold text-sm sm:text-base rounded-xl hover:bg-amber/10 transition-all active:scale-95"
                       >
                         Buy Business
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -400,13 +401,13 @@ export default function NichePage({ params }: { params: Promise<{ niche: string 
             Our acquisition specialists will guide you through due diligence, valuation, and a
             smooth transition.
           </p>
-          <a
-            href="#contact"
+          <button
+            onClick={openContactModal}
             className="group inline-flex w-full sm:w-auto px-8 sm:px-12 py-4 bg-amber hover:bg-amber-light text-black text-lg font-bold rounded-full shadow-[0_0_30px_-5px_rgba(245,158,11,0.4)] transition-all hover:scale-[1.02] active:scale-[0.98] items-center justify-center gap-2"
           >
             Start the Acquisition Process
             <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
-          </a>
+          </button>
           <p className="text-gray-500 text-xs mt-4 font-medium">
             Limited availability — new listings added weekly
           </p>
