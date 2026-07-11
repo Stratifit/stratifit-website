@@ -3,16 +3,19 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 /* ------------------------------------------------------------------ */
 /*  Language list - single source of truth for the entire header.    */
+/*  `labelKey` is resolved via tLabel() so dropdown labels change    */
+/*  with the active language (e.g. "Anglais" when French is active). */
 /* ------------------------------------------------------------------ */
 
 export const languages = [
-  { code: "EN", flag: "🇺🇸", label: "English" },
-  { code: "FR", flag: "🇫🇷", label: "Français" },
-  { code: "DE", flag: "🇩🇪", label: "Deutsch" },
-  { code: "ES", flag: "🇪🇸", label: "Español" },
+  { code: "EN", flag: "🇺🇸", labelKey: "lang_english" },
+  { code: "FR", flag: "🇫🇷", labelKey: "lang_french" },
+  { code: "DE", flag: "🇩🇪", labelKey: "lang_german" },
+  { code: "ES", flag: "🇪🇸", labelKey: "lang_spanish" },
 ];
 
 interface LanguageDropdownProps {
@@ -20,7 +23,7 @@ interface LanguageDropdownProps {
 }
 
 export function LanguageDropdown({ size = "md" }: LanguageDropdownProps) {
-  const { langCode, setLangCode } = useLanguage();
+  const { langCode, setLangCode, lang } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -83,7 +86,7 @@ export function LanguageDropdown({ size = "md" }: LanguageDropdownProps) {
               >
                 <span className="text-base leading-none">{l.flag}</span>
                 <span className={`font-medium ${isSm ? "text-xs" : ""}`}>
-                  {isSm ? l.code : l.label}
+                  {isSm ? l.code : tLabel(l.labelKey, lang)}
                 </span>
               </button>
             ))}

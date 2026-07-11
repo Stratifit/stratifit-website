@@ -49,6 +49,12 @@ const labelTranslations: Record<string, Record<Language, string>> = {
   toggle_menu: { en: "Open menu", fr: "Ouvrir le menu", de: "Menü öffnen", es: "Abrir menú" },
   close_menu: { en: "Close menu", fr: "Fermer le menu", de: "Menü schließen", es: "Cerrar menú" },
 
+  // Language names (used by LanguageDropdown component — change with active lang)
+  lang_english: { en: "English", fr: "Anglais", de: "Englisch", es: "Inglés" },
+  lang_french: { en: "French", fr: "Français", de: "Französisch", es: "Francés" },
+  lang_german: { en: "German", fr: "Allemand", de: "Deutsch", es: "Alemán" },
+  lang_spanish: { en: "Spanish", fr: "Espagnol", de: "Spanisch", es: "Español" },
+
   /* ============================================================
      Section content (home page)
      Used as the language-aware fallback for the 10 page sections
