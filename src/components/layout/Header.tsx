@@ -12,7 +12,6 @@ import { t, type HeaderNavLink, type SiteSettings } from "@/lib/cms-types";
 import { tLabel } from "@/lib/stratifit-i18n";
 import { HiMenu, HiX } from "react-icons/hi";
 import {
-  HiChatBubbleLeftRight,
   HiChevronUp,
   HiSparkles,
   HiCommandLine,
@@ -38,7 +37,12 @@ const serviceTiles = [
   { icon: HiCpuChip, labelKey: "automation", href: "/ai-automation" },
 ];
 
-const languages = ["EN", "FR", "DE", "ES"];
+const languages = [
+  { code: "EN", flag: "\uD83C\uDDFA\uD83C\uDDF8", label: "English" },
+  { code: "FR", flag: "\uD83C\uDDEB\uD83C\uDDF7", label: "Français" },
+  { code: "DE", flag: "\uD83C\uDDE9\uD83C\uDDEA", label: "Deutsch" },
+  { code: "ES", flag: "\uD83C\uDDEA\uD83C\uDDF8", label: "Español" },
+];
 
 interface NavLink {
   label: string;
@@ -120,6 +124,8 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(true);
   const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const langDropdownRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -152,6 +158,21 @@ export function Header() {
     handleScroll();
     return () => scrollContainer.removeEventListener("scroll", handleScroll);
   }, [servicesOpen, isOpen]);
+
+  // Close desktop language dropdown on outside click
+  useEffect(() => {
+    if (!langDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (
+        langDropdownRef.current &&
+        !langDropdownRef.current.contains(e.target as Node)
+      ) {
+        setLangDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [langDropdownOpen]);
 
   return (
     <>
@@ -240,8 +261,59 @@ export function Header() {
               </div>
             </Link>
 
-          {/* Desktop: CTA right */}
-          <div className="hidden lg:block order-3">
+          {/* Desktop: Language dropdown + CTA right */}
+          <div className="hidden lg:flex items-center gap-3 order-3">
+            <div ref={langDropdownRef} className="relative">
+              <button
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                aria-label="Select language"
+                aria-expanded={langDropdownOpen}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-amber/30 transition-all text-sm font-medium text-white"
+              >
+                <span className="text-base leading-none">
+                  {languages.find((l) => l.code === langCode)?.flag}
+                </span>
+                <span>{langCode}</span>
+                <svg
+                  className={`w-3 h-3 transition-transform duration-200 ${langDropdownOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <AnimatePresence>
+                {langDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-full mt-2 bg-card-dark border border-white/10 rounded-xl py-1 shadow-2xl min-w-[160px] z-50 overflow-hidden"
+                  >
+                    {languages.map((l) => (
+                      <button
+                        key={l.code}
+                        onClick={() => {
+                          setLangCode(l.code);
+                          setLangDropdownOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                          langCode === l.code
+                            ? "text-amber bg-amber/5"
+                            : "text-gray-300 hover:text-white hover:bg-white/5"
+                        }`}
+                      >
+                        <span className="text-base leading-none">{l.flag}</span>
+                        <span className="font-medium">{l.label}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
             <button
               onClick={openContactModal}
               className="px-6 py-2.5 bg-amber text-black font-bold text-sm rounded-full hover:bg-amber-light transition-all active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
@@ -289,6 +361,25 @@ export function Header() {
               >
                 <HiX size={24} />
               </button>
+            </div>
+
+            {/* Language switcher - flags at TOP for easy access */}
+            <div className="flex-none px-6 py-3 border-b border-white/10 flex items-center justify-center gap-2">
+              {languages.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => setLangCode(l.code)}
+                  aria-label={l.label}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all ${
+                    langCode === l.code
+                      ? "bg-amber text-black shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                      : "bg-white/5 border border-white/10 text-gray-300 hover:border-amber/30 hover:text-white"
+                  }`}
+                >
+                  <span className="text-base leading-none">{l.flag}</span>
+                  <span>{l.code}</span>
+                </button>
+              ))}
             </div>
 
             {/* Main */}
@@ -381,37 +472,6 @@ export function Header() {
                   </a>
                 ))}
               </nav>
-
-              {/* Bottom CTAs */}
-              <div className="flex flex-col gap-3 mb-2 mt-3">
-                <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    openContactModal();
-                  }}
-                  className="w-full bg-amber hover:bg-amber-light text-black font-bold text-base py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-transform transform active:scale-95"
-                >
-                  <HiChatBubbleLeftRight className="text-xl" />
-                  <span>{ctaText}</span>
-                </button>
-              </div>
-
-              {/* Language switcher - segmented control */}
-              <div className="flex justify-center mb-4">
-                <div className="inline-flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5">
-                  {languages.map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => setLangCode(l)}
-                      className={`px-3.5 py-1 rounded-full text-xs font-bold tracking-wide transition-all ${
-                        langCode === l ? "bg-amber text-black" : "text-gray-400 hover:text-white"
-                      }`}
-                    >
-                      {l}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Footer links */}
               <div className="mb-2 text-center">
