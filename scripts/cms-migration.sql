@@ -30,6 +30,22 @@ CREATE TABLE IF NOT EXISTS header_nav_links (
   is_active BOOLEAN DEFAULT TRUE
 );
 
+/* Seed: add Buy a Business to the nav (idempotent; only inserts if no
+   row with href = '/buy-business' already exists). Sits between About
+   and Contact at sort_order 5. If the user already has another row at
+   sort_order 5, reorder via /admin/content after running.
+   To add this single row without re-running the full migration, run
+   scripts/seed-buy-business-nav.sql in the Supabase SQL editor. */
+INSERT INTO header_nav_links (sort_order, label, href, is_cta, cta_text)
+SELECT 5,
+       '{"en":"Buy a Business","de":"Unternehmen kaufen","fr":"Acheter une entreprise","es":"Comprar un negocio"}'::jsonb,
+       '/buy-business',
+       FALSE,
+       '{}'::jsonb
+WHERE NOT EXISTS (
+  SELECT 1 FROM header_nav_links WHERE href = '/buy-business'
+);
+
 /* ============================================================
    3.  footer_content (single row; columns + social_links as JSONB)
    ============================================================ */
