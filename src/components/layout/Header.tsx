@@ -424,15 +424,27 @@ export function Header() {
               {/* Footer links */}
               <div className="mb-2 text-center">
                 <p className="text-[0.7rem] text-white/70 font-medium tracking-wide">
-                  <Link className="hover:text-white transition-colors" href="/privacy-policy">
+                  <Link
+                    className="hover:text-white transition-colors"
+                    href="/privacy-policy"
+                    onClick={() => setIsOpen(false)}
+                  >
                     {tLabel("privacy", lang)}
                   </Link>
                   <span className="mx-1">.</span>
-                  <Link className="hover:text-white transition-colors" href="/terms-conditions">
+                  <Link
+                    className="hover:text-white transition-colors"
+                    href="/terms-conditions"
+                    onClick={() => setIsOpen(false)}
+                  >
                     {tLabel("terms", lang)}
                   </Link>
                   <span className="mx-1">.</span>
-                  <Link className="hover:text-white transition-colors" href="/cookie-policy">
+                  <Link
+                    className="hover:text-white transition-colors"
+                    href="/cookie-policy"
+                    onClick={() => setIsOpen(false)}
+                  >
                     {tLabel("cookies", lang)}
                   </Link>
                 </p>
