@@ -64,6 +64,34 @@ const FALLBACK_NAV: FallbackNavItem[] = [
   { labelKey: "contact", action: "contact" },
 ];
 
+/**
+ * Built once from FALLBACK_NAV: maps href (or action) to the tLabel() key.
+ * Used as a defensive fallback when a CMS row exists but its `label` JSONB
+ * is empty (e.g. inserted via SQL seed without filling the admin editor).
+ * Keeping this derived from FALLBACK_NAV means new links only need to be
+ * added in one place.
+ */
+const DEFAULT_LABEL_BY_HREF: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const item of FALLBACK_NAV) {
+    if (item.href) map[item.href] = item.labelKey;
+    if (item.action) map[`action:${item.action}`] = item.labelKey;
+  }
+  return map;
+})();
+
+function getDefaultLabelKey(href: string | undefined, action: string | null | undefined): string | null {
+  if (action) {
+    const byAction = DEFAULT_LABEL_BY_HREF[`action:${action}`];
+    if (byAction) return byAction;
+  }
+  if (href) {
+    const byHref = DEFAULT_LABEL_BY_HREF[href];
+    if (byHref) return byHref;
+  }
+  return null;
+}
+
 const FALLBACK_SITE_NAME_KEY = "stratifit";
 const FALLBACK_TAGLINE_KEY = "digital_excellence";
 const FALLBACK_CTA_KEY = "start_project";
@@ -86,18 +114,29 @@ export function Header() {
   // Merge CMS nav with fallback. Fallback items are translated via tLabel()
   // so the same code path serves both the unconfigured-Supabase case AND the
   // active-language switcher on the static data.
+  //
+  // Defensive fallback: if the CMS row exists but its `label` JSONB is empty
+  // (e.g. a row was inserted by the seed but the admin hasn't filled labels
+  // yet, or the migration's default `'{}'` was used), fall back to the
+  // tLabel() key derived from the href/action. This guarantees the menu
+  // always renders a visible label for known links.
   const navLinks: NavLink[] =
     cmsNavLinks && cmsNavLinks.length > 0
       ? [...cmsNavLinks]
           .sort((a, b) => a.sort_order - b.sort_order)
           .filter((l) => l.is_active)
-          .map((l) => ({
-            label: t(l.label, lang),
-            href: l.action != null ? undefined : l.href,
-            action: l.action || undefined,
-            isCta: l.is_cta,
-            ctaText: t(l.cta_text, lang),
-          }))
+          .map((l) => {
+            const translated = t(l.label, lang);
+            const fallbackKey = getDefaultLabelKey(l.href, l.action);
+            const label = translated || (fallbackKey ? tLabel(fallbackKey, lang) : l.href || "");
+            return {
+              label,
+              href: l.action != null ? undefined : l.href,
+              action: l.action || undefined,
+              isCta: l.is_cta,
+              ctaText: t(l.cta_text, lang),
+            };
+          })
       : FALLBACK_NAV.map((item) => ({
           label: tLabel(item.labelKey, lang),
           href: item.href,
