@@ -274,7 +274,7 @@ export function BuyBusinessSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-12"
+          className="mb-10 md:mb-16"
         >
           <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
             Acquisition

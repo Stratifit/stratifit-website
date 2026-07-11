@@ -145,8 +145,8 @@ export function BrandDesign() {
   };
 
   return (
-    <section className="pt-2 pb-24 md:pt-4 md:pb-32">
-      <div className="max-w-7xl mx-auto px-6 space-y-20 md:space-y-28">
+    <section className="py-24 md:py-32">
+      <div className="max-w-7xl mx-auto px-6 space-y-24 md:space-y-32">
         {/* Hero */}
         <section className="relative min-h-[60vh] flex items-center pt-24 pb-0 md:pt-20 md:pb-0">
           {/* Background Effects */}
@@ -407,7 +407,7 @@ export function BrandDesign() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-[#1E1E1E] rounded-xl p-5 sm:p-6 flex flex-col items-center text-center gap-3 border border-white/5 hover:border-amber/30 transition-all duration-300 shadow-lg group/card"
+                className="bg-[#1E1E1E] rounded-xl p-6 sm:p-8 flex flex-col items-center text-center gap-3 border border-white/5 hover:border-amber/30 transition-all duration-300 shadow-lg group/card"
               >
                 <div className="w-12 h-12 rounded-full bg-amber/10 flex items-center justify-center shrink-0 border border-amber/20 shadow-[0_0_15px_rgba(245,158,11,0.1)] group-hover/card:shadow-[0_0_25px_rgba(245,158,11,0.2)] transition-shadow">
                   <item.icon className="text-amber text-2xl group-hover/card:scale-110 transition-transform duration-300" />
@@ -446,7 +446,7 @@ export function BrandDesign() {
                     <HiArrowRight />
                   </div>
                 )}
-                <div className="bg-[#1E1E1E] rounded-xl border border-white/5 p-5 sm:p-6 hover:border-amber/30 transition-all duration-300 shadow-lg group/card h-full">
+                <div className="bg-[#1E1E1E] rounded-xl border border-white/5 p-6 sm:p-8 hover:border-amber/30 transition-all duration-300 shadow-lg group/card h-full">
                   <div className="flex items-start gap-4">
                     <div className="text-amber font-heading font-black text-2xl sm:text-3xl leading-none opacity-30 shrink-0 mt-0.5">
                       {String(idx + 1).padStart(2, "0")}
@@ -505,7 +505,7 @@ export function BrandDesign() {
 
         {/* Portfolio */}
         <div>
-          <div className="mb-12">
+          <div className="mb-10 md:mb-16">
             <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
               Case Studies
             </p>
@@ -651,7 +651,7 @@ export function BrandDesign() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden bg-black rounded-2xl border border-white/5 px-6 pt-6 pb-10 sm:p-8 lg:p-10 text-center"
+          className="relative overflow-hidden bg-black rounded-2xl border border-white/5 p-6 sm:p-8 lg:p-10 text-center"
         >
           <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber/60 to-transparent bg-[length:200%_100%] animate-[shimmer_3s_ease-in-out_infinite]" />
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
