@@ -3,20 +3,46 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { HiArrowRight, HiShieldCheck, HiSparkles } from "react-icons/hi2";
+import {
+  HiArrowRight,
+  HiShieldCheck,
+  HiSparkles,
+  HiExclamationCircle,
+} from "react-icons/hi2";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
-    // STUB: replace with Supabase auth.signInWithPassword call
-    setTimeout(() => {
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!res.ok) {
+        const data: { error?: string } = await res
+          .json()
+          .catch(() => ({ error: "Sign in failed" }));
+        setError(data.error || "Sign in failed");
+        setLoading(false);
+        return;
+      }
+      // Hard navigation so the server-side AdminGuard picks up the new cookie
+      // on the very first request to /admin (avoids a flash of the
+      // "unauthed" state).
       window.location.href = "/admin";
-    }, 600);
+    } catch {
+      setError("Network error — please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,11 +71,6 @@ export default function LoginPage() {
           </h1>
           <p className="text-sm text-gray-400">
             Sign in to manage the Stratifit dashboard.
-            <br />
-            {/* {{admin_auth_guard}} */}
-            <span className="font-mono text-[9px] text-gray-600">
-              {"{{admin_auth_guard}}"}
-            </span>
           </p>
         </div>
 
@@ -68,6 +89,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@stratifit.com"
+                autoComplete="email"
                 className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none"
               />
             </div>
@@ -81,9 +103,23 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                autoComplete="current-password"
                 className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none"
               />
             </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                role="alert"
+                className="flex items-start gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2.5 text-xs text-red-300"
+              >
+                <HiExclamationCircle className="text-red-400 text-base shrink-0 mt-0.5" />
+                <span>{error}</span>
+              </motion.div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
@@ -96,7 +132,7 @@ export default function LoginPage() {
 
           <div className="mt-5 flex items-center gap-2 text-[10px] text-gray-500 font-mono">
             <HiShieldCheck className="text-amber text-sm" />
-            Protected by Supabase Auth · stub
+            Protected by signed-cookie session
           </div>
         </form>
 

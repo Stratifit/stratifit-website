@@ -61,6 +61,19 @@ export function AdminTopBar() {
     return () => document.removeEventListener("mousedown", handler);
   }, [profileOpen]);
 
+  /* Sign out — calls the logout endpoint to clear the session cookie,
+     then hard-navigates to /login so server-side guards see the new
+     unauthed state on first paint. */
+  const handleSignOut = async (closeProfile: boolean) => {
+    if (closeProfile) setProfileOpen(false);
+    try {
+      await fetch("/api/admin/login", { method: "DELETE", credentials: "same-origin" });
+    } catch {
+      /* ignore — still redirect so the user is logged out client-side */
+    }
+    window.location.href = "/login";
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-xl border-b border-white/10 h-14">
@@ -163,15 +176,15 @@ export function AdminTopBar() {
                         View Live Site
                       </Link>
                       <div className="h-px bg-white/5 my-0.5" />
-                      <Link
-                        href="/login"
-                        onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-bold text-gray-300 hover:bg-amber/10 hover:text-amber transition-colors"
+                      <button
+                        type="button"
+                        onClick={() => void handleSignOut(true)}
+                        className="flex w-full items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] font-bold text-gray-300 hover:bg-amber/10 hover:text-amber transition-colors text-left"
                         role="menuitem"
                       >
                         <HiArrowRightOnRectangle className="text-base" />
                         Sign out
-                      </Link>
+                      </button>
                     </nav>
                   </motion.div>
                 )}
@@ -179,13 +192,14 @@ export function AdminTopBar() {
             </div>
 
             {/* Desktop-only: inline Sign out button (mobile users go via profile popover) */}
-            <Link
-              href="/login"
+            <button
+              type="button"
+              onClick={() => void handleSignOut(false)}
               className="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-[11px] font-bold text-gray-300 hover:text-white hover:border-white/20 transition-all active:scale-95"
             >
               <HiArrowRightOnRectangle className="text-xs" />
               Sign out
-            </Link>
+            </button>
           </div>
         </div>
       </header>

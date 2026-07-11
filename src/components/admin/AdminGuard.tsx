@@ -10,10 +10,11 @@ import { HiShieldCheck, HiArrowRight } from "react-icons/hi2";
  *
  *   {{admin_auth_guard}}
  *
- * Currently STUBBED — always resolves as authenticated so the layout /
- * structure can be inspected while Supabase is not yet wired up.
- * TODO: replace the `resolveStubSession` call with a Supabase auth
- * lookup (e.g. `supabase.auth.getSession()`) and re-enable the redirect.
+ * On mount, calls GET /api/admin/session which reads the signed
+ * httpOnly cookie server-side. If the cookie is present and valid, the
+ * dashboard is shown; otherwise the "Admin Access Required" prompt is
+ * shown with a button to /login. (We deliberately do not auto-redirect
+ * so the user can see why they are blocked.)
  */
 export function AdminGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -23,19 +24,23 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    async function resolveStubSession() {
-      // STUB: replace with actual Supabase auth call
-      // const { data } = await supabase.auth.getSession();
-      // if (!data.session) router.replace("/login");
-      const stubAuthed = true;
-      await new Promise((r) => setTimeout(r, 200));
-      if (!cancelled) setState(stubAuthed ? "authed" : "unauthed");
+    async function checkSession() {
+      try {
+        const res = await fetch("/api/admin/session", {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        if (cancelled) return;
+        setState(res.ok ? "authed" : "unauthed");
+      } catch {
+        if (!cancelled) setState("unauthed");
+      }
     }
-    resolveStubSession();
+    checkSession();
     return () => {
       cancelled = true;
     };
-  }, [router]);
+  }, []);
 
   if (state === "loading") {
     return (
@@ -45,10 +50,10 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
           animate={{ opacity: 1 }}
           className="flex flex-col items-center gap-4"
         >
-          <div className="w-10 h-10 rounded-full border-2 border-amber/30 border-t-amber animate-spin" />              <p className="text-xs font-mono text-gray-500">
-                {/* {{admin_auth_guard}} verifying session */}
-                {"{{admin_auth_guard}}"}
-              </p>
+          <div className="w-10 h-10 rounded-full border-2 border-amber/30 border-t-amber animate-spin" />
+          <p className="text-xs font-mono text-gray-500">
+            {"{{admin_auth_guard}} verifying session"}
+          </p>
         </motion.div>
       </div>
     );

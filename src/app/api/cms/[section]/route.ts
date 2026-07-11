@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin, hasSupabase } from "@/lib/supabase";
+import { getAdminSession } from "@/lib/admin-auth";
 
 // Tables that are safe to query (whitelist)
 const ALLOWED_TABLES = [
@@ -33,6 +34,21 @@ type AllowedTable = (typeof ALLOWED_TABLES)[number];
 
 function isValidTable(table: string): table is AllowedTable {
   return ALLOWED_TABLES.includes(table as AllowedTable);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Auth guard for write methods                                       */
+/*  GET stays public so the public site can read CMS content.         */
+/* ------------------------------------------------------------------ */
+async function requireAdmin(): Promise<NextResponse | null> {
+  const session = await getAdminSession();
+  if (!session) {
+    return NextResponse.json(
+      { error: "Unauthorized \u2014 admin login required" },
+      { status: 401 },
+    );
+  }
+  return null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -106,11 +122,15 @@ export async function GET(
 /* ------------------------------------------------------------------ */
 /*  PUT /api/cms/[section]                                            */
 /*  Upserts a single row (for single-row tables) or updates by id.    */
+/*  Requires an admin session cookie.                                  */
 /* ------------------------------------------------------------------ */
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ section: string }> },
 ) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   const { section } = await params;
 
   if (!isValidTable(section)) {
@@ -169,12 +189,15 @@ export async function PUT(
 
 /* ------------------------------------------------------------------ */
 /*  POST /api/cms/[section]                                           */
-/*  Creates a new item in list tables.                                 */
+/*  Creates a new item in list tables. Requires an admin session.      */
 /* ------------------------------------------------------------------ */
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ section: string }> },
 ) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   const { section } = await params;
 
   if (!isValidTable(section)) {
@@ -198,11 +221,15 @@ export async function POST(
 
 /* ------------------------------------------------------------------ */
 /*  DELETE /api/cms/[section]?id=xxx                                   */
+/*  Requires an admin session.                                         */
 /* ------------------------------------------------------------------ */
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ section: string }> },
 ) {
+  const authError = await requireAdmin();
+  if (authError) return authError;
+
   const { section } = await params;
 
   if (!isValidTable(section)) {
