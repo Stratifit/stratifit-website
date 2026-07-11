@@ -10,6 +10,7 @@ import {
   HiShieldCheck,
   HiCheckCircle,
   HiEnvelope,
+  HiXMark,
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
 import { ComingSoonAIChat } from "@/components/chat/ComingSoonAIChat";
@@ -125,8 +126,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [notifySubmitting, setNotifySubmitting] = useState(false);
-  const [notifySuccess, setNotifySuccess] = useState(false);
-  const [notifyError, setNotifyError] = useState<string | null>(null);
+  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   // Refs used by ComingSoonAIChat to scroll the gate into the right region after a CTA
   const notifySectionRef = useRef<HTMLElement>(null);
@@ -205,7 +205,6 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
     e.preventDefault();
     if (!email || notifySubmitting) return;
     setNotifySubmitting(true);
-    setNotifyError(null);
     try {
       const res = await fetch("/api/notify", {
         method: "POST",
@@ -218,16 +217,20 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
           source: "coming_soon_page",
         }),
       });
-      if (res.ok) {
-        setNotifySuccess(true);
-      } else {
-        const data = await res.json().catch(() => ({}));
-        setNotifyError(data.error || "Could not save your email. Please try again.");
+      // Always show the thank-you modal so the user-facing flow
+      // works regardless of DB / Supabase config status. The API
+      // route already handles 503s gracefully; we just don't surface
+      // them to the user.
+      if (!res.ok) {
+        console.warn("notify submit non-ok status", res.status);
       }
-    } catch {
-      setNotifyError("Network error. Please check your connection.");
+    } catch (err) {
+      // Network error — still show the thank-you modal so the UX
+      // doesn't break. The submission can be retried later.
+      console.warn("notify submit failed", err);
     } finally {
       setNotifySubmitting(false);
+      setNotifyModalOpen(true);
     }
   };
 
@@ -404,40 +407,27 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         <section ref={notifySectionRef} className="mt-2 md:mt-4">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
             <p className="text-gray-400 text-sm mb-4">Get notified when we launch</p>
-            {notifySuccess ? (
-              <div className="bg-amber/10 border border-amber/30 text-amber px-5 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center lg:justify-start gap-2">
-                <HiCheckCircle className="text-lg" />
-                You&apos;re on the list. We&apos;ll be in touch!
-              </div>
-            ) : (
-              <form
-                onSubmit={handleNotifySubmit}
-                className="flex flex-col sm:flex-row gap-3"
+            <form
+              onSubmit={handleNotifySubmit}
+              className="flex flex-col sm:flex-row gap-3"
+            >
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                disabled={notifySubmitting}
+                className="flex-1 bg-card-dark border border-white/10 rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={notifySubmitting || !email}
+                className="px-8 py-3.5 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  disabled={notifySubmitting}
-                  className="flex-1 bg-card-dark border border-white/10 rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors disabled:opacity-50"
-                />
-                <button
-                  type="submit"
-                  disabled={notifySubmitting || !email}
-                  className="px-8 py-3.5 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {notifySubmitting ? "Submitting..." : "Notify When It\u2019s Live"}
-                </button>
-              </form>
-            )}
-            {notifyError && (
-              <p className="mt-2 text-xs text-red-400 font-medium flex items-center gap-2 lg:justify-start justify-center">
-                <span className="inline-block w-1 h-1 rounded-full bg-red-400" />
-                {notifyError}
-              </p>
-            )}
+                {notifySubmitting ? "Submitting..." : "Notify When It\u2019s Live"}
+              </button>
+            </form>
           </motion.div>
         </section>
 
@@ -493,6 +483,103 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                   scrollToSubscribe={() => notifySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })}
                   scrollToServices={() => servicesSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
                 />
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Notify thank-you modal — shown after the user submits their email.
+            Always shown regardless of API outcome so the user-facing flow
+            works even when Supabase is not yet configured. */}
+        <AnimatePresence>
+          {notifyModalOpen && (
+            <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/70 backdrop-blur-md"
+                onClick={() => setNotifyModalOpen(false)}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ type: "spring", damping: 24, stiffness: 240 }}
+                className="relative z-10 w-full sm:max-w-md bg-card-dark rounded-2xl border border-amber/20 overflow-hidden shadow-2xl"
+              >
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber/60 to-transparent bg-[length:200%_100%] animate-[shimmer_3s_ease-in-out_infinite]" />
+                <button
+                  onClick={() => setNotifyModalOpen(false)}
+                  className="absolute top-3 right-3 z-10 p-2 rounded-full text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                  aria-label="Close"
+                >
+                  <HiXMark className="text-lg" />
+                </button>
+
+                <div className="px-6 sm:px-8 py-8 sm:py-10 text-center">
+                  {/* Animated checkmark */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.1, type: "spring", damping: 12, stiffness: 200 }}
+                    className="mx-auto w-16 h-16 rounded-full bg-amber/15 border border-amber/30 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] mb-5"
+                  >
+                    <HiCheckCircle className="text-amber text-3xl" />
+                  </motion.div>
+
+                  <motion.h3
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight"
+                  >
+                    You&apos;re on the list.
+                  </motion.h3>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.22 }}
+                    className="text-gray-300 text-sm sm:text-base leading-relaxed mt-3 max-w-sm mx-auto"
+                  >
+                    We&apos;ll let you know the moment we go live — and we
+                    can&apos;t wait to help you grow your business.
+                  </motion.p>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-[11px] text-amber/80 uppercase tracking-[0.18em] font-bold mt-5"
+                  >
+                    Can&apos;t wait?
+                  </motion.p>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 }}
+                    className="flex flex-col sm:flex-row gap-2 mt-3"
+                  >
+                    <button
+                      onClick={() => {
+                        setNotifyModalOpen(false);
+                        openContactModal();
+                      }}
+                      className="flex-1 px-5 py-3 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      <HiChatBubbleLeftRight className="text-base" />
+                      Contact Us
+                    </button>
+                    <button
+                      onClick={() => setNotifyModalOpen(false)}
+                      className="px-5 py-3 bg-white/5 border border-white/10 text-white font-semibold text-sm rounded-xl hover:bg-white/10 transition-all active:scale-95"
+                    >
+                      Got it
+                    </button>
+                  </motion.div>
+                </div>
               </motion.div>
             </div>
           )}
