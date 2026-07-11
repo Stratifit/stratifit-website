@@ -2,6 +2,9 @@
 
 import { FaLinkedinIn, FaInstagram, FaXTwitter } from "react-icons/fa6";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, ALL_LANGUAGES, type Language, type FooterContent } from "@/lib/cms-types";
 
 const footerLinks: Record<string, { label: string; href?: string; action?: string }[]> = {
   Platform: [
@@ -23,6 +26,32 @@ const footerLinks: Record<string, { label: string; href?: string; action?: strin
 };
 
 export function Footer() {
+  const { lang } = useLanguage();
+  const { data: cmsFooter } = useCms<FooterContent>("footer_content", {
+    fallback: {
+      id: "",
+      tagline: Object.fromEntries(ALL_LANGUAGES.map((l) => [l, "Digital excellence, built from foundation to full scale."])) as Record<Language, string>,
+      columns: [],
+      social_links: [],
+    },
+  });
+
+  const tagline = t(cmsFooter?.tagline, lang) || "Digital excellence, built from foundation to full scale.";
+
+  // Use CMS footer links if available, otherwise fall back to hardcoded
+  const columns = cmsFooter?.columns?.length
+    ? cmsFooter.columns.reduce<Record<string, { label: string; href?: string; action?: string }[]>>((acc, col) => {
+        const titleKey = t(col.title, lang) || col.title.en || "";
+        if (titleKey) {
+          acc[titleKey] = col.links.map((link) => ({
+            label: t(link.label, lang),
+            href: link.href,
+            action: link.action ?? undefined,
+          }));
+        }
+        return acc;
+      }, {})
+    : footerLinks;
   return (
     <footer id="site-footer" className="bg-[#0a0a0a] border-t border-white/5 relative">
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-8">
@@ -38,13 +67,13 @@ export function Footer() {
               </span>
             </div>
             <p className="text-sm text-gray-500 font-medium max-w-[80%] leading-relaxed">
-              Digital excellence, built from foundation to full scale.
+              {tagline}
             </p>
           </div>
 
           {/* Link columns */}
           <div className="grid grid-cols-3 gap-4">
-            {Object.entries(footerLinks).map(([title, links]) => (
+            {Object.entries(columns).map(([title, links]) => (
               <div key={title} className="flex flex-col gap-3">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-1">
                   {title}

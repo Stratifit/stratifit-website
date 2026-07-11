@@ -15,6 +15,8 @@ import {
   HiListBullet,
   HiBell,
   HiCog6Tooth,
+  HiPencilSquare,
+  HiLanguage,
 } from "react-icons/hi2";
 
 export type NavItem = {
@@ -51,6 +53,13 @@ export const navGroups: NavGroup[] = [
       { key: "insights", href: "/admin/insights", icon: HiNewspaper, label: "Insights", badge: "14" },
       { key: "buy-business", href: "/admin/buy-business", icon: HiBuildingStorefront, label: "Buy a Business", badge: "23" },
       { key: "testimonials", href: "/admin/testimonials", icon: HiChatBubbleLeftRight, label: "Testimonials", badge: "32" },
+    ],
+  },
+  {
+    label: "Site Content",
+    items: [
+      { key: "content", href: "/admin/content", icon: HiPencilSquare, label: "Content Editor" },
+      { key: "content-languages", href: "/admin/content?lang=en", icon: HiLanguage, label: "Languages", badge: "4" },
     ],
   },
   {

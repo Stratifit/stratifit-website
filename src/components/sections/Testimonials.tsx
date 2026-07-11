@@ -4,9 +4,38 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HiStar, HiArrowRight, HiArrowLeft } from "react-icons/hi2";
 import Link from "next/link";
-import { testimonials } from "@/data/testimonials";
+import { testimonials as fallbackTestimonials } from "@/data/testimonials";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type TestimonialItem } from "@/lib/cms-types";
+
+interface TestimonialData {
+  name: string;
+  role: string;
+  initials: string;
+  rating: number;
+  text: string;
+}
+
+const FALLBACK_TESTIMONIALS: TestimonialData[] = fallbackTestimonials;
 
 export function Testimonials() {
+  const { lang } = useLanguage();
+  const { data: cmsTestimonials } = useCms<TestimonialItem[]>("testimonials", { fallback: [] });
+
+  const testimonials: TestimonialData[] =
+    cmsTestimonials && cmsTestimonials.length > 0
+      ? [...cmsTestimonials]
+          .filter((item) => item.is_active)
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((item) => ({
+            name: item.name,
+            role: t(item.role, lang),
+            initials: item.initials,
+            rating: item.rating,
+            text: t(item.text, lang),
+          }))
+      : FALLBACK_TESTIMONIALS;
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);

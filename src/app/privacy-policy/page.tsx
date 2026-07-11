@@ -3,9 +3,17 @@
 import { motion } from "framer-motion";
 import { HiArrowLeft, HiShieldCheck, HiLockClosed, HiEye, HiDocumentText } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type LegalPage } from "@/lib/cms-types";
 
 export default function PrivacyPolicyPage() {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const { data: legalPages } = useCms<LegalPage[]>("legal_pages", { fallback: [] });
+  const cmsLegal = legalPages?.find((p) => p.slug === "privacy-policy");
+  const title = cmsLegal ? t(cmsLegal.title, lang) : "Privacy Policy";
+  const heroContent = cmsLegal ? t(cmsLegal.content, lang) : null;
 
   return (
     <main className="min-h-screen bg-black">
@@ -21,7 +29,7 @@ export default function PrivacyPolicyPage() {
           >
             <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Legal</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              Privacy <span className="text-amber">Policy</span>
+              {title}
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
               Your privacy matters to us. This policy explains how Stratifit collects, uses, and
@@ -35,7 +43,17 @@ export default function PrivacyPolicyPage() {
       {/* Content */}
       <section className="pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-12">
-          {/* 1. Introduction */}
+          {heroContent ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="bg-card-dark rounded-2xl border border-white/5 p-6 sm:p-8 prose prose-invert max-w-none"
+              dangerouslySetInnerHTML={{ __html: heroContent }}
+            />
+          ) : (
+            <>
+              {/* 1. Introduction */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -291,6 +309,8 @@ export default function PrivacyPolicyPage() {
               </p>
             </div>
           </motion.div>
+            </>
+          )}
         </div>
       </section>
 

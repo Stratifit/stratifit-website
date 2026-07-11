@@ -8,9 +8,34 @@ import {
   HiChatBubbleLeftRight,
 } from "react-icons/hi2";
 import { FaqAIChat } from "@/components/chat/FaqAIChat";
-import { staticFaq as faqs } from "@/data/static-faq";
+import { staticFaq as fallbackFaq } from "@/data/static-faq";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type FaqEntry } from "@/lib/cms-types";
+
+interface FaqData {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+const FALLBACK_FAQ: FaqData[] = fallbackFaq;
 
 export function FAQ() {
+  const { lang } = useLanguage();
+  const { data: cmsFaq } = useCms<FaqEntry[]>("faq_entries", { fallback: [] });
+
+  const faqs: FaqData[] =
+    cmsFaq && cmsFaq.length > 0
+      ? [...cmsFaq]
+          .filter((f) => f.is_active)
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((f) => ({
+            id: f.id,
+            question: t(f.question, lang),
+            answer: t(f.answer, lang),
+          }))
+      : FALLBACK_FAQ;
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [faqOpen, setFaqOpen] = useState(false);
 

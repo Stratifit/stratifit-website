@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { AIChatbot } from "@/components/chat/AIChatbot";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useLanguage } from "@/lib/LanguageContext";
+import { useCms } from "@/lib/use-cms";
+import { t, type HeaderNavLink, type SiteSettings } from "@/lib/cms-types";
 import { HiMenu, HiX } from "react-icons/hi";
 import {
   HiChatBubbleLeftRight,
@@ -15,6 +18,10 @@ import {
   HiCpuChip,
 } from "react-icons/hi2";
 
+/* ------------------------------------------------------------------ */
+/*  Static fallback data (used when Supabase is not configured)       */
+/* ------------------------------------------------------------------ */
+
 const serviceTiles = [
   { icon: HiSparkles, label: "Branding", href: "/brand-design" },
   { icon: HiCommandLine, label: "Development", href: "/website-development" },
@@ -24,21 +31,69 @@ const serviceTiles = [
 
 const languages = ["EN", "FR", "DE", "ES"];
 
-const navLinks = [
+interface NavLink {
+  label: string;
+  href?: string;
+  action?: string;
+  isCta?: boolean;
+  ctaText?: string;
+}
+
+const FALLBACK_NAV: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "Services", href: "#services" },
   { label: "Insights", href: "/insights" },
   { label: "Work", href: "/portfolio" },
   { label: "About", href: "/about" },
+  { label: "FAQ", href: "#faq" },
   { label: "Contact", action: "contact" },
 ];
 
+const FALLBACK_SITE_NAME = "Stratifit";
+const FALLBACK_TAGLINE = "Digital Excellence";
+const FALLBACK_CTA = "Start Your Project";
+const FALLBACK_LOGO_TEXT = "SF";
+
 export function Header() {
   const pathname = usePathname();
+  const { lang, langCode, setLangCode } = useLanguage();
+
+  // CMS: nav links
+  const { data: cmsNavLinks } = useCms<HeaderNavLink[]>("header_nav_links", {
+    fallback: [],
+  });
+
+  // CMS: site settings (logo, tagline)
+  const { data: cmsSettings } = useCms<SiteSettings>("site_settings", {
+    fallback: undefined,
+  });
+
+  // Merge CMS nav with fallback
+  const navLinks: NavLink[] =
+    cmsNavLinks && cmsNavLinks.length > 0
+      ? [...cmsNavLinks]
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .filter((l) => l.is_active)
+          .map((l) => ({
+            label: t(l.label, lang),
+            href: l.action != null ? undefined : l.href,
+            action: l.action || undefined,
+            isCta: l.is_cta,
+            ctaText: t(l.cta_text, lang),
+          }))
+      : FALLBACK_NAV;
+
+  // Separate CTA link from nav (only contact-modal CTAs get special treatment)
+  const ctaLink = navLinks.find((l) => l.isCta && l.action === "contact");
+  const displayNav = navLinks.filter((l) => !(l.isCta && l.action === "contact"));
+  const ctaText = ctaLink?.ctaText || FALLBACK_CTA;
+  const siteName = t(cmsSettings?.site_name, lang) || FALLBACK_SITE_NAME;
+  const tagline = t(cmsSettings?.site_tagline, lang) || FALLBACK_TAGLINE;
+  const logoText = cmsSettings?.logo_text || FALLBACK_LOGO_TEXT;
+
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(true);
-  const [lang, setLang] = useState("EN");
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -101,21 +156,21 @@ export function Header() {
           {/* Desktop: Logo on left */}
           <a href="/" className="hidden lg:flex items-center gap-2.5 group shrink-0 order-1">
             <div className="w-9 h-9 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
-              <span className="text-black font-black text-xs tracking-tighter">SF</span>
+              <span className="text-black font-black text-xs tracking-tighter">{logoText}</span>
             </div>
             <div className="flex flex-col leading-none">
               <span className="font-heading font-black text-lg tracking-tight uppercase text-white">
-                Stratifit
+                {siteName}
               </span>
               <span className="text-[8px] font-bold text-amber tracking-[0.2em] uppercase">
-                Digital Excellence
+                {tagline}
               </span>
             </div>
           </a>
 
           {/* Desktop: Nav links center */}
           <div className="hidden lg:flex items-center gap-8 order-2 lg:pl-40">
-            {navLinks.map((link) => {
+            {displayNav.map((link) => {
               if (link.action === "contact") {
                 return (
                   <button
@@ -146,20 +201,19 @@ export function Header() {
             })}
           </div>
 
-          {/* Mobile: Logo centered */}
-          <a
-            href="/"
-            className="lg:hidden flex items-center gap-2 group shrink-0 order-2 absolute left-1/2 -translate-x-1/2"
-          >
-            <div className="w-8 h-8 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
-              <span className="text-black font-black text-[10px] tracking-tighter">SF</span>
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-heading font-black text-base tracking-tight uppercase text-white">
-                Stratifit
-              </span>
-            </div>
-          </a>
+          {/* Mobile: Logo centered */}            <a
+              href="/"
+              className="lg:hidden flex items-center gap-2 group shrink-0 order-2 absolute left-1/2 -translate-x-1/2"
+            >
+              <div className="w-8 h-8 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
+                <span className="text-black font-black text-[10px] tracking-tighter">{logoText}</span>
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="font-heading font-black text-base tracking-tight uppercase text-white">
+                  {siteName}
+                </span>
+              </div>
+            </a>
 
           {/* Desktop: CTA right */}
           <div className="hidden lg:block order-3">
@@ -167,7 +221,7 @@ export function Header() {
               onClick={openContactModal}
               className="px-6 py-2.5 bg-amber text-black font-bold text-sm rounded-full hover:bg-amber-light transition-all active:scale-95 shadow-[0_0_20px_rgba(245,158,11,0.2)]"
             >
-              Start Your Project
+              {ctaText}
             </button>
           </div>
 
@@ -189,20 +243,20 @@ export function Header() {
           >
             {/* Header - matches home */}
             <div className="flex-none px-4 py-3 flex items-center justify-between border-b border-white/10 h-16">
-              <a
-                href="/"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 group shrink-0"
-              >
-                <div className="w-8 h-8 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
-                  <span className="text-black font-black text-[10px] tracking-tighter">SF</span>
-                </div>
-                <div className="flex flex-col leading-none">
-                  <span className="font-heading font-black text-base tracking-tight uppercase text-white">
-                    Stratifit
-                  </span>
-                </div>
-              </a>
+            <a
+              href="/"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2 group shrink-0"
+            >
+              <div className="w-8 h-8 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
+                <span className="text-black font-black text-[10px] tracking-tighter">{logoText}</span>
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="font-heading font-black text-base tracking-tight uppercase text-white">
+                  {siteName}
+                </span>
+              </div>
+            </a>
               <button
                 onClick={() => setIsOpen(false)}
                 aria-label="Close menu"
@@ -276,17 +330,22 @@ export function Header() {
                   )}
                 </div>
 
-                {/* Other nav items */}
-                {[
-                  { label: "Our Work", href: "/portfolio" },
-                  { label: "Insights", href: "/insights" },
-                  { label: "About", href: "/about" },
-                  { label: "FAQ", href: "#faq" },
-                ].map((item) => (
+                {/* Other nav items — from CMS with Home & Services filtered out (those are handled above) */}
+                {displayNav
+                  .filter((l) => l.href !== "/" && l.href !== "#services")
+                  .map((item) => (
                   <a
                     key={item.label}
-                    href={item.href}
-                    onClick={() => setIsOpen(false)}
+                    href={item.href ?? "#"}
+                    onClick={(e) => {
+                      if (item.action === "contact") {
+                        e.preventDefault();
+                        setIsOpen(false);
+                        openContactModal();
+                      } else {
+                        setIsOpen(false);
+                      }
+                    }}
                     className="group flex items-center justify-between py-3 border-b border-white/10"
                   >
                     <span className="text-2xl font-heading font-black text-white group-hover:text-amber transition-colors">
@@ -306,7 +365,7 @@ export function Header() {
                   className="w-full bg-amber hover:bg-amber-light text-black font-bold text-base py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-transform transform active:scale-95"
                 >
                   <HiChatBubbleLeftRight className="text-xl" />
-                  <span>Message Us</span>
+                  <span>{ctaText}</span>
                 </button>
               </div>
 
@@ -316,9 +375,9 @@ export function Header() {
                   {languages.map((l) => (
                     <button
                       key={l}
-                      onClick={() => setLang(l)}
+                      onClick={() => setLangCode(l)}
                       className={`px-3.5 py-1 rounded-full text-xs font-bold tracking-wide transition-all ${
-                        lang === l ? "bg-amber text-black" : "text-gray-400 hover:text-white"
+                        langCode === l ? "bg-amber text-black" : "text-gray-400 hover:text-white"
                       }`}
                     >
                       {l}

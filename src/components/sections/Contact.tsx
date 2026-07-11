@@ -3,8 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HiArrowRight, HiChevronDown, HiEnvelope } from "react-icons/hi2";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, ta, type ContactFormConfig, type SectionLabels } from "@/lib/cms-types";
 
-const services = [
+const FALLBACK_SERVICES = [
   "Brand Design",
   "Logo Design",
   "Visual Identity",
@@ -15,7 +18,7 @@ const services = [
   "Growth Marketing",
 ];
 
-const budgetRanges = [
+const FALLBACK_BUDGETS = [
   { label: "$300 – $1,000", value: "300-1000" },
   { label: "$1,000 – $3,000", value: "1000-3000" },
   { label: "$3,000 – $5,000", value: "3000-5000" },
@@ -26,7 +29,41 @@ const budgetRanges = [
   { label: "$15K – $20K", value: "15000-20000" },
 ];
 
+// Fallback success-state headlines (used when contact_form_config has none)
+const FALLBACK_SUCCESS_TITLE = "Message Sent!";
+const FALLBACK_SUCCESS_MESSAGE =
+  "Thanks for reaching out. We'll get back to you within 24 hours.";
+
 export function Contact() {
+  const { lang } = useLanguage();
+
+  const { data: cmsConfig } = useCms<ContactFormConfig>("contact_form_config", {
+    fallback: undefined,
+  });
+  const { data: cmsLabels } = useCms<SectionLabels>("section_labels");
+
+  const heading = t(cmsConfig?.heading, lang) || "Let's Talk";
+  const subheading =
+    t(cmsConfig?.subheading, lang) ||
+    "Ready to start your project? Fill out the form and we'll get back to you within 24 hours.";
+  const successTitle = t(cmsConfig?.success_title, lang) || FALLBACK_SUCCESS_TITLE;
+  const successMessage = t(cmsConfig?.success_message, lang) || FALLBACK_SUCCESS_MESSAGE;
+
+  const services = ta(cmsConfig?.services_list, lang).length
+    ? ta(cmsConfig!.services_list, lang)
+    : FALLBACK_SERVICES;
+
+  const budgetRanges =
+    Array.isArray(cmsConfig?.budget_ranges) && cmsConfig!.budget_ranges.length > 0
+      ? cmsConfig!.budget_ranges.map((r) => ({
+          label: t(r.label, lang) || r.value,
+          value: r.value,
+        }))
+      : FALLBACK_BUDGETS;
+
+  // Section heading pulled from section_labels (with safe fallback)
+  const sectionLabelText = t(cmsLabels?.contact_label, lang) || "Contact";
+
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -87,13 +124,14 @@ export function Contact() {
           transition={{ duration: 0.5 }}
           className="mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Contact</p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
+            {sectionLabelText}
+          </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Let&apos;s <span className="text-amber">Talk</span>
+            {heading}
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Ready to start your project? Fill out the form and we&apos;ll get back to you within 24
-            hours.
+            {subheading}
           </p>
         </motion.div>
 
@@ -116,10 +154,8 @@ export function Contact() {
                 <div className="w-16 h-16 rounded-full bg-amber/10 flex items-center justify-center mx-auto mb-6 border border-amber/20">
                   <HiEnvelope className="text-amber text-2xl" />
                 </div>
-                <h3 className="font-heading font-bold text-2xl text-white mb-3">Message Sent!</h3>
-                <p className="text-gray-400">
-                  Thanks for reaching out. We&apos;ll get back to you within 24 hours.
-                </p>
+                <h3 className="font-heading font-bold text-2xl text-white mb-3">{successTitle}</h3>
+                <p className="text-gray-400">{successMessage}</p>
               </motion.div>
             ) : (
               <>

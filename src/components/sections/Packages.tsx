@@ -4,70 +4,66 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HiCheck } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, ta, type ServicePackage } from "@/lib/cms-types";
 
-const packages = [
+interface PackageData {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  popular: boolean;
+  cta: string;
+}
+
+const FALLBACK_PACKAGES: PackageData[] = [
   {
-    name: "Launch",
-    price: "$5,000",
-    period: "/ project",
+    name: "Launch", price: "$5,000", period: "/ project",
     description: "Perfect for startups needing an MVP and brand foundation.",
-    features: [
-      "Identity & Logo Design",
-      "5-Page Responsive Website",
-      "Basic SEO Setup",
-      "2 Weeks of Support",
-    ],
-    popular: false,
-    cta: "Get Started",
+    features: ["Identity & Logo Design", "5-Page Responsive Website", "Basic SEO Setup", "2 Weeks of Support"],
+    popular: false, cta: "Get Started",
   },
   {
-    name: "Grow",
-    price: "$12,000",
-    period: "/ project",
+    name: "Grow", price: "$12,000", period: "/ project",
     description: "For brands ready to capture market share and scale.",
-    features: [
-      "Full Brand System",
-      "Custom Web App / E‑commerce",
-      "CMS Integration",
-      "3 Months Growth Marketing",
-      "30 Days Post-Launch Support",
-    ],
-    popular: true,
-    cta: "Get Started",
+    features: ["Full Brand System", "Custom Web App / E‑commerce", "CMS Integration", "3 Months Growth Marketing", "30 Days Post-Launch Support"],
+    popular: true, cta: "Get Started",
   },
   {
-    name: "Scale",
-    price: "$25,000",
-    period: "/ project",
+    name: "Scale", price: "$25,000", period: "/ project",
     description: "Enterprise-grade solutions for established companies.",
-    features: [
-      "Complex Systems Architecture",
-      "Dedicated Product Team",
-      "AI & Automation Suite",
-      "Full Growth Engine Setup",
-      "24/7 SLA Support",
-    ],
-    popular: false,
-    cta: "Contact Sales",
+    features: ["Complex Systems Architecture", "Dedicated Product Team", "AI & Automation Suite", "Full Growth Engine Setup", "24/7 SLA Support"],
+    popular: false, cta: "Contact Sales",
   },
   {
-    name: "Custom",
-    price: "Let's Talk",
-    period: "",
+    name: "Custom", price: "Let's Talk", period: "",
     description: "Tailored solutions for unique challenges and enterprise scale.",
-    features: [
-      "Custom Scope & Timeline",
-      "Multi-Discipline Team",
-      "Unlimited Revisions",
-      "Dedicated Account Manager",
-      "Priority Support",
-    ],
-    popular: false,
-    cta: "Book a Call",
+    features: ["Custom Scope & Timeline", "Multi-Discipline Team", "Unlimited Revisions", "Dedicated Account Manager", "Priority Support"],
+    popular: false, cta: "Book a Call",
   },
 ];
 
 export function Packages() {
+  const { lang } = useLanguage();
+  const { data: cmsPackages } = useCms<ServicePackage[]>("service_packages", { fallback: [] });
+
+  const packages: PackageData[] =
+    cmsPackages && cmsPackages.length > 0
+      ? [...cmsPackages]
+          .filter((p) => p.is_active)
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((p) => ({
+            name: t(p.name, lang),
+            price: t(p.price, lang),
+            period: t(p.period, lang),
+            description: t(p.description, lang),
+            features: ta(p.features, lang),
+            popular: p.is_popular,
+            cta: t(p.cta_text, lang),
+          }))
+      : FALLBACK_PACKAGES;
   const [activePackageIndex, setActivePackageIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 

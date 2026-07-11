@@ -10,9 +10,26 @@ import {
   HiRocketLaunch,
 } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type AboutPageContent } from "@/lib/cms-types";
 
 export default function AboutPage() {
   const router = useRouter();
+  const { lang } = useLanguage();
+
+  const { data: aboutData } = useCms<AboutPageContent>("about_page_content");
+
+  const heroTitlePrefix = t(aboutData?.hero_title_prefix, lang) || "About ";
+  const heroTitleHighlight = t(aboutData?.hero_title_highlight, lang) || "Stratifit";
+  const heroSub = t(aboutData?.hero_subtitle, lang) || "We are a premium digital agency that builds brands, scales businesses, and engineers growth through strategy, design, and technology.";
+  const missionText = t(aboutData?.mission_text, lang) || "To empower ambitious brands with the strategy, design, and technology they need to dominate their markets.";
+  const storyText = t(aboutData?.story_text, lang) || "";
+  const teamText = t(aboutData?.team_text, lang) || "";
+  const ctaPrefix = t(aboutData?.cta_title_prefix, lang) || "Ready to Work ";
+  const ctaHighlight = t(aboutData?.cta_title_highlight, lang) || "Together?";
+  const ctaSub = t(aboutData?.cta_subtitle, lang) || "Let's build something exceptional.";
+  const ctaBtn = t(aboutData?.cta_button_text, lang) || "Start Your Project";
 
   return (
     <main className="min-h-screen bg-black">
@@ -28,11 +45,10 @@ export default function AboutPage() {
           >
             <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">About</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              About <span className="text-amber">Stratifit</span>
+              {heroTitlePrefix}<span className="text-amber">{heroTitleHighlight}</span>
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              We are a premium digital agency that builds brands, scales businesses, and engineers
-              growth through strategy, design, and technology.
+              {heroSub}
             </p>
           </motion.div>
         </div>
@@ -81,9 +97,7 @@ export default function AboutPage() {
               Our Mission
             </h2>
             <p className="text-gray-300 text-base md:text-lg leading-relaxed border-l-2 border-amber/30 pl-4 sm:pl-6">
-              To empower ambitious brands with the strategy, design, and technology they need to
-              dominate their markets. We combine creative excellence with technical precision to
-              deliver digital products that drive measurable business results.
+              {missionText}
             </p>
           </motion.div>
 
@@ -97,11 +111,13 @@ export default function AboutPage() {
               Our Story
             </h2>
             <p className="text-gray-300 text-base md:text-lg leading-relaxed border-l-2 border-amber/30 pl-4 sm:pl-6">
-              Founded with a vision to bridge the gap between premium branding and technical
+              {storyText || (
+                <>Founded with a vision to bridge the gap between premium branding and technical
               execution, Stratifit has grown from a boutique design studio into a full-scale digital
               agency. Today, we partner with startups and enterprises alike — delivering brand
               identities, web platforms, AI automation systems, and growth engines that transform
-              how businesses operate and scale.
+              how businesses operate and scale.</>
+              )}
             </p>
           </motion.div>
 
@@ -163,10 +179,12 @@ export default function AboutPage() {
               Our Team
             </h2>
             <p className="text-gray-300 text-base md:text-lg leading-relaxed border-l-2 border-amber/30 pl-4 sm:pl-6">
-              We are strategists, designers, engineers, and marketers who share a common obsession:
+              {teamText || (
+                <>We are strategists, designers, engineers, and marketers who share a common obsession:
               building exceptional digital experiences. Our team brings together decades of combined
               expertise from top agencies, startups, and Fortune 500 companies — united by a passion
-              for craftsmanship and a commitment to client success.
+              for craftsmanship and a commitment to client success.</>
+              )}
             </p>
           </motion.div>
 
@@ -178,14 +196,14 @@ export default function AboutPage() {
             className="text-center py-8 border-t border-white/10"
           >
             <h2 className="text-2xl md:text-3xl font-heading font-black text-white mb-4">
-              Ready to Work <span className="text-amber">Together?</span>
+              {ctaPrefix}<span className="text-amber">{ctaHighlight}</span>
             </h2>
-            <p className="text-gray-400 text-sm mb-6">Let&apos;s build something exceptional.</p>
+            <p className="text-gray-400 text-sm mb-6">{ctaSub}</p>
             <a
               href="/#contact"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
             >
-              Start Your Project
+              {ctaBtn}
             </a>
           </motion.div>
         </div>

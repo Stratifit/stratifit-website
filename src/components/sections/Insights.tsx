@@ -4,11 +4,47 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HiArrowRight } from "react-icons/hi2";
 import Link from "next/link";
-import { insights } from "@/data/insights";
+import { insights as fallbackInsights } from "@/data/insights";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type InsightItem } from "@/lib/cms-types";
 
-const featuredInsights = insights.slice(0, 4);
+interface InsightData {
+  slug: string;
+  category: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  readTime: string;
+  date: string;
+}
+
+const FALLBACK_INSIGHTS: InsightData[] = fallbackInsights.slice(0, 4).map((i) => ({
+  slug: i.slug, category: i.category, title: i.title, excerpt: i.excerpt,
+  image: i.image, readTime: i.readTime, date: i.date,
+}));
 
 export function Insights() {
+  const { lang } = useLanguage();
+  const { data: cmsInsights } = useCms<InsightItem[]>("insights", { fallback: [] });
+
+  const allInsights: InsightData[] =
+    cmsInsights && cmsInsights.length > 0
+      ? [...cmsInsights]
+          .filter((i) => i.is_published)
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((i) => ({
+            slug: i.slug,
+            category: i.category,
+            title: t(i.title, lang),
+            excerpt: t(i.excerpt, lang),
+            image: i.image,
+            readTime: i.read_time,
+            date: i.date,
+          }))
+      : FALLBACK_INSIGHTS;
+
+  const featuredInsights = allInsights.slice(0, 4);
   const [activeInsightIndex, setActiveInsightIndex] = useState(0);
   const insightRef = useRef<HTMLDivElement>(null);
 

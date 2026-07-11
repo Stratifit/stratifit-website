@@ -8,8 +8,25 @@ import {
   HiWrenchScrewdriver,
   HiRocketLaunch,
 } from "react-icons/hi2";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type ProcessStep } from "@/lib/cms-types";
 
-const steps = [
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  HiMagnifyingGlass,
+  HiLightBulb,
+  HiWrenchScrewdriver,
+  HiRocketLaunch,
+};
+
+interface StepData {
+  number: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+}
+
+const FALLBACK_STEPS: StepData[] = [
   {
     number: "01",
     icon: HiMagnifyingGlass,
@@ -41,6 +58,21 @@ const steps = [
 ];
 
 export function Process() {
+  const { lang } = useLanguage();
+  const { data: cmsSteps } = useCms<ProcessStep[]>("process_steps", { fallback: [] });
+
+  const steps: StepData[] =
+    cmsSteps && cmsSteps.length > 0
+      ? [...cmsSteps]
+          .sort((a, b) => a.step_number - b.step_number)
+          .map((s) => ({
+            number: String(s.step_number).padStart(2, "0"),
+            icon: ICON_MAP[s.icon] || HiMagnifyingGlass,
+            title: t(s.title, lang),
+            description: t(s.description, lang),
+          }))
+      : FALLBACK_STEPS;
+
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const processRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +80,6 @@ export function Process() {
     const el = processRef.current;
     if (!el) return;
     const handleScroll = () => {
-      // Calculate active step for dot indicator
       const cardWidth = 280;
       const gap = 16;
       const padding = 24;
@@ -59,7 +90,7 @@ export function Process() {
     el.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => el.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [steps.length]);
 
   return (
     <section className="py-24 md:py-32 bg-surface relative overflow-hidden">

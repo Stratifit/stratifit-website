@@ -4,11 +4,48 @@ import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { HiArrowRight, HiArrowLeft } from "react-icons/hi2";
 import Link from "next/link";
-import { projects, projectCategories } from "@/data/projects";
+import { projects as fallbackProjects, projectCategories } from "@/data/projects";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, ta, type ProjectItem } from "@/lib/cms-types";
 
-const featuredProjects = projects.slice(0, 8);
+interface ProjectData {
+  id: string | number;
+  slug: string;
+  title: string;
+  category: string;
+  description: string;
+  image: string;
+  shortMetric: string;
+  shortLabel: string;
+}
+
+const FALLBACK_PROJECTS: ProjectData[] = fallbackProjects
+  .slice(0, 8)
+  .map((p) => ({ id: p.id, slug: p.slug, title: p.title, category: p.category, description: p.description, image: p.image, shortMetric: p.shortMetric, shortLabel: p.shortLabel }));
 
 export function Portfolio() {
+  const { lang } = useLanguage();
+  const { data: cmsProjects } = useCms<ProjectItem[]>("projects", { fallback: [] });
+
+  const allProjects: ProjectData[] =
+    cmsProjects && cmsProjects.length > 0
+      ? [...cmsProjects]
+          .filter((p) => p.is_active)
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((p) => ({
+            id: p.id,
+            slug: p.id,
+            title: t(p.title, lang),
+            category: p.category,
+            description: t(p.description, lang),
+            image: p.image,
+            shortMetric: p.short_metric,
+            shortLabel: t(p.short_label, lang),
+          }))
+      : FALLBACK_PROJECTS;
+
+  const featuredProjects = allProjects.slice(0, 8);
   const [activeFilter, setActiveFilter] = useState("All");
   const [activePortfolioIndex, setActivePortfolioIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

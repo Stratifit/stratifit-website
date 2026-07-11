@@ -3,6 +3,9 @@
 import { motion } from "framer-motion";
 import { HiArrowRight, HiCheckCircle } from "react-icons/hi2";
 import { MdDiamond, MdDesignServices, MdCode, MdRocketLaunch } from "react-icons/md";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, ta, type CoreService } from "@/lib/cms-types";
 
 const services = [
   {
@@ -55,7 +58,41 @@ const cardVariants = {
   },
 };
 
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  MdDiamond,
+  MdDesignServices,
+  MdCode,
+  MdRocketLaunch,
+};
+
 export function CoreServices() {
+  const { lang } = useLanguage();
+
+  const { data: cmsServices } = useCms<CoreService[]>("core_services", {
+    fallback: [],
+  });
+
+  // Use CMS data if available (non-empty), otherwise fall back to hardcoded services
+  const displayServices =
+    cmsServices && cmsServices.length > 0
+      ? cmsServices
+          .filter((s) => s.is_active)
+          .map((s) => ({
+            icon: ICON_MAP[s.icon] || MdDiamond,
+            title: t(s.title, lang),
+            href: s.href,
+            description: t(s.description, lang),
+            deliverables: ta(s.deliverables, lang),
+            ctaText: t(s.cta_text, lang) || "Learn More",
+          }))
+      : services.map((s) => ({
+          icon: s.icon,
+          title: s.title,
+          href: s.href,
+          description: s.description,
+          deliverables: s.deliverables,
+          ctaText: "Learn More",
+        }));
   return (
     <section id="services" className="pt-2 pb-12 md:pt-4 md:pb-16">
       <div className="max-w-7xl mx-auto px-6">
@@ -82,7 +119,7 @@ export function CoreServices() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {services.map((service) => (
+          {displayServices.map((service) => (
             <motion.div
               key={service.title}
               variants={cardVariants}
@@ -126,7 +163,7 @@ export function CoreServices() {
                   href={service.href}
                   className="mt-2 w-full py-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center gap-2 text-sm font-bold text-amber hover:bg-amber/5 hover:border-amber/30 transition-all group/link"
                 >
-                  Learn More
+                  {service.ctaText}
                   <HiArrowRight className="text-lg group-hover/link:translate-x-1 transition-transform" />
                 </a>
               </div>

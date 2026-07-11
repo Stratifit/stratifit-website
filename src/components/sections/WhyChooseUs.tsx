@@ -3,37 +3,51 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { HiBolt, HiShieldCheck, HiChartBar, HiCpuChip } from "react-icons/hi2";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type WhyChooseUsBenefit } from "@/lib/cms-types";
 
-const benefits = [
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  HiShieldCheck,
+  HiBolt,
+  HiChartBar,
+  HiCpuChip,
+};
+
+interface BenefitData {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  stat: string;
+  statLabel: string;
+}
+
+const FALLBACK_BENEFITS: BenefitData[] = [
   {
     icon: HiShieldCheck,
     title: "Premium Quality & Precision",
-    description:
-      "Every deliverable is engineered with meticulous attention to detail, ensuring your brand commands authority from day one.",
+    description: "Every deliverable is engineered with meticulous attention to detail, ensuring your brand commands authority from day one.",
     stat: "100%",
     statLabel: "Client Retention",
   },
   {
     icon: HiBolt,
     title: "Fast, Reliable Delivery",
-    description:
-      "Our agile processes mean you get high-quality output on aggressive timelines without sacrificing excellence.",
+    description: "Our agile processes mean you get high-quality output on aggressive timelines without sacrificing excellence.",
     stat: "48h",
     statLabel: "Avg. Turnaround",
   },
   {
     icon: HiChartBar,
     title: "Data-Driven Results",
-    description:
-      "We measure everything that matters. Every decision is backed by analytics to maximize your return on investment.",
+    description: "We measure everything that matters. Every decision is backed by analytics to maximize your return on investment.",
     stat: "5x",
     statLabel: "Avg. ROAS",
   },
   {
     icon: HiCpuChip,
     title: "Modern Technology Stack",
-    description:
-      "Built on cutting-edge tools — Next.js, AI, automation — so your infrastructure scales with your ambition.",
+    description: "Built on cutting-edge tools — Next.js, AI, automation — so your infrastructure scales with your ambition.",
     stat: "15+",
     statLabel: "Tech Partners",
   },
@@ -54,6 +68,21 @@ const cardVariants = {
 };
 
 export function WhyChooseUs() {
+  const { lang } = useLanguage();
+  const { data: cmsBenefits } = useCms<WhyChooseUsBenefit[]>("why_choose_us_benefits", { fallback: [] });
+
+  const benefits: BenefitData[] =
+    cmsBenefits && cmsBenefits.length > 0
+      ? [...cmsBenefits]
+          .sort((a, b) => a.sort_order - b.sort_order)
+          .map((b) => ({
+            icon: ICON_MAP[b.icon] || HiShieldCheck,
+            title: t(b.title, lang),
+            description: t(b.description, lang),
+            stat: t(b.stat, lang),
+            statLabel: t(b.stat_label, lang),
+          }))
+      : FALLBACK_BENEFITS;
   const [activeCardIndex, setActiveCardIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 

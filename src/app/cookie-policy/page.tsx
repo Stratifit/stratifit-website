@@ -9,9 +9,17 @@ import {
   HiDevicePhoneMobile,
 } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type LegalPage } from "@/lib/cms-types";
 
 export default function CookiePolicyPage() {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const { data: legalPages } = useCms<LegalPage[]>("legal_pages", { fallback: [] });
+  const cmsLegal = legalPages?.find((p) => p.slug === "cookie-policy");
+  const title = cmsLegal ? t(cmsLegal.title, lang) : "Cookie Policy";
+  const heroContent = cmsLegal ? t(cmsLegal.content, lang) : null;
 
   return (
     <main className="min-h-screen bg-black">
@@ -27,7 +35,7 @@ export default function CookiePolicyPage() {
           >
             <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Legal</p>
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-tight md:leading-none tracking-tight mb-4">
-              Cookie <span className="text-amber">Policy</span>
+              {title}
             </h1>
             <p className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
               Learn how Stratifit uses cookies and similar technologies to enhance your browsing

@@ -4,6 +4,7 @@ import "./globals.css";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
 import { MarketingChromeTop, MarketingChromeBottom } from "@/components/layout/MarketingChrome";
 import { DesktopChatbot } from "@/components/chat/DesktopChatbot";
+import { LanguageProvider } from "@/lib/LanguageContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -48,11 +49,11 @@ export default function RootLayout({
           }}
         />
         <SmoothScroll>
-          {/* Above-main: fixed-positioned header (DOM order doesn't affect its visual pinning). */}
-          <MarketingChromeTop />
-          <main className="flex-1">{children}</main>
-          {/* Below-main: footer + cookie banner + contact modal (DOM order makes them render after page content). */}
-          <MarketingChromeBottom />
+          <LanguageProvider>
+            <MarketingChromeTop />
+            <main className="flex-1">{children}</main>
+            <MarketingChromeBottom />
+          </LanguageProvider>
         </SmoothScroll>
         {/* Desktop floating chat — outside SmoothScroll so positioning is correct.
             Self-gates via pathname check inside DesktopChatbot.tsx so it never

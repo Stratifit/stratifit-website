@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ComponentType } from "react";
 import { motion, animate } from "framer-motion";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { t, type HeroContent } from "@/lib/cms-types";
 import {
   HiArrowRight,
   HiSparkles,
@@ -88,6 +91,22 @@ function Counter({ target, suffix }: { target: string; suffix: string }) {
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLanguage();
+
+  // Fetch hero content from CMS, fallback to hardcoded strings
+  const { data: heroData } = useCms<HeroContent>("hero_content");
+
+  const badgeText = t(heroData?.badge_text, lang) || "Premium Digital Agency";
+  const heading1 = t(heroData?.heading_line1, lang) || "We Build Websites, Brands & Systems";
+  const heading2 = t(heroData?.heading_line2, lang) || "That Grow Businesses.";
+  const subheading = t(heroData?.subheading, lang) || "We help startups and businesses build brands, websites, and systems that turn visitors into paying customers.";
+  const ctaPrimary = t(heroData?.cta_primary, lang) || "Start Your Project";
+  const ctaSecondary = t(heroData?.cta_secondary, lang) || "Book a Strategy Call";
+  const trustedByLabel = t(heroData?.trusted_by_label, lang) || "Trusted by Growing Companies";
+  const techPrefix = t(heroData?.tech_stack_label_prefix, lang) || "Our ";
+  const techHighlight = t(heroData?.tech_stack_highlight, lang) || "Tech";
+  const techSuffix = t(heroData?.tech_stack_label_suffix, lang) || " Stack";
+  const techSubtitle = t(heroData?.tech_stack_subtitle, lang) || "We use the best tools in the industry to build, automate, and scale your digital presence.";
 
   return (
     <section
@@ -115,24 +134,22 @@ export function Hero() {
               <div className="flex items-center justify-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-amber animate-pulse shrink-0" />
                 <span className="text-[10px] sm:text-xs font-bold text-amber uppercase tracking-[0.2em]">
-                  Premium Digital Agency
+                  {badgeText}
                 </span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-5xl text-center lg:whitespace-nowrap font-heading font-black leading-[1.05] md:leading-[0.95] tracking-tight">
-                We Build Websites,
+                {heading1}
                 <span className="hidden lg:inline"> </span>
                 <br className="lg:hidden" />
-                Brands &amp; Systems
                 <br />
                 <span className="text-amber lg:inline-block lg:w-full lg:text-center">
-                  That Grow Businesses.
+                  {heading2}
                 </span>
               </h1>
 
               <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto text-center">
-                We help startups and businesses build brands, websites, and systems that turn
-                visitors into paying customers.
+                {subheading}
               </p>
             </motion.div>
 
@@ -146,7 +163,7 @@ export function Hero() {
                 onClick={openContactModal}
                 className="group px-6 sm:px-8 py-3.5 sm:py-4 bg-amber text-black font-bold rounded-xl flex items-center justify-center gap-2 sm:gap-3 hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.3)] active:scale-95 text-sm sm:text-base"
               >
-                Start Your Project
+                {ctaPrimary}
                 <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
               </button>
               <button
@@ -154,7 +171,7 @@ export function Hero() {
                 className="px-6 sm:px-8 py-3.5 sm:py-4 border border-white/15 text-white font-semibold rounded-xl flex items-center justify-center gap-2 sm:gap-3 hover:border-amber/50 hover:text-amber transition-all active:scale-95 text-sm sm:text-base"
               >
                 <HiSparkles className="shrink-0" />
-                Book a Strategy Call
+                {ctaSecondary}
               </button>
             </motion.div>
 
@@ -195,14 +212,14 @@ export function Hero() {
           <div className="sm:hidden flex items-center gap-3 opacity-70">
             <span className="flex-1 h-px bg-white/10" />
             <span className="text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shrink-0 text-white">
-              Trusted by <span style={{ color: "#F59E0B" }}>Growing</span> Companies
+              {trustedByLabel}
             </span>
             <span className="flex-1 h-px bg-white/10" />
           </div>
           {/* Items row */}
           <div className="flex items-center justify-between lg:justify-start gap-2 sm:gap-6 md:gap-8 opacity-70 px-4 sm:px-0 whitespace-nowrap shrink-0">
             <span className="hidden sm:inline text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-widest text-white shrink-0">
-              Trusted by <span style={{ color: "#F59E0B" }}>Growing</span> Companies
+              {trustedByLabel}
             </span>
             {trustedBy.map(({ name, icon: Icon }) => (
               <span
@@ -221,9 +238,9 @@ export function Hero() {
             <h3 className="text-base sm:text-lg font-heading font-black tracking-tight mb-1 flex items-center justify-center gap-4 max-w-2xl mx-auto">
               <span className="inline-block flex-1 h-px bg-white/10" />
               <span>
-                <span className="text-white/70">Our </span>
-                <span style={{ color: "#F59E0B" }}>Tech</span>
-                <span className="text-white/70"> Stack</span>
+                <span className="text-white/70">{techPrefix}</span>
+                <span style={{ color: "#F59E0B" }}>{techHighlight}</span>
+                <span className="text-white/70">{techSuffix}</span>
               </span>
               <span className="inline-block flex-1 h-px bg-white/10" />
             </h3>
@@ -231,8 +248,7 @@ export function Hero() {
               className="text-sm sm:text-base leading-relaxed text-center"
               style={{ color: "#E5E7EB" }}
             >
-              We use the best tools in the industry to build, automate, and scale your digital
-              presence.
+              {techSubtitle}
             </p>
           </div>
           <div className="overflow-hidden py-4 md:py-6">
