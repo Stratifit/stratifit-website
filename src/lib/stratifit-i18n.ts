@@ -295,6 +295,22 @@ const labelTranslations: Record<string, Record<Language, string>> = {
   service_funnel_d2: { en: "Conversion Optimization", fr: "Optimisation de la conversion", de: "Conversion-Optimierung", es: "Optimizaci\u00f3n de Conversi\u00f3n" },
   service_funnel_d3: { en: "CRM Setup", fr: "Configuration CRM", de: "CRM-Einrichtung", es: "Configuraci\u00f3n CRM" },
   service_funnel_d4: { en: "Analytics & Reporting", fr: "Analyses et rapports", de: "Analysen & Berichte", es: "An\u00e1lisis e Informes" },
+
+  /* ============================================================
+     Coming Soon AI Chat — inline subscribe flow
+     Status badge + email capture state in the chatbot. When the
+     user clicks the green "Subscribe" badge the chat switches
+     into email-capture mode and POSTs to /api/notify with
+     source = "coming_soon_chat".
+     ============================================================ */
+  chat_badge_subscribe: { en: "Subscribe", fr: "S\u2019abonner", de: "Abonnieren", es: "Suscribirse" },
+  chat_badge_subscribed: { en: "Subscribed \u2713", fr: "Abonn\u00e9 \u2713", de: "Abonniert \u2713", es: "Suscrito \u2713" },
+  chat_subscribe_prompt: { en: "I can add you to the launch list right here \u2014 what\u2019s your best email?", fr: "Je peux vous ajouter \u00e0 la liste de lancement d\u2019ici \u2014 quel est votre meilleur e-mail ?", de: "Ich kann Sie direkt hier zur Startliste hinzuf\u00fcgen \u2014 wie lautet Ihre E-Mail?", es: "Puedo agregarte a la lista de lanzamiento aqu\u00ed mismo \u2014 \u00bfcu\u00e1l es tu correo?" },
+  chat_email_placeholder: { en: "Enter your email\u2026", fr: "Entrez votre e-mail\u2026", de: "E-Mail eingeben\u2026", es: "Ingresa tu correo\u2026" },
+  chat_email_invalid: { en: "Please enter a valid email address.", fr: "Veuillez entrer une adresse e-mail valide.", de: "Bitte geben Sie eine g\u00fcltige E-Mail-Adresse ein.", es: "Ingresa una direcci\u00f3n de correo v\u00e1lida." },
+  chat_subscribe_success: { en: "\u2705 You\u2019re on the launch list. We\u2019ll let you know the moment we go live.", fr: "\u2705 Vous \u00eates sur la liste. Nous vous pr\u00e9viendrons d\u00e8s le lancement.", de: "\u2705 Sie sind auf der Startliste. Wir benachrichtigen Sie, sobald wir live sind.", es: "\u2705 Est\u00e1s en la lista de lanzamiento. Te avisaremos en cuanto estemos en vivo." },
+  chat_subscribe_error: { en: "\u26a0\ufe0f Couldn\u2019t save your email right now. Please try again or scroll down to the form.", fr: "\u26a0\ufe0f Impossible d\u2019enregistrer votre e-mail. R\u00e9essayez ou utilisez le formulaire ci-dessous.", de: "\u26a0\ufe0f E-Mail konnte nicht gespeichert werden. Bitte erneut versuchen oder das Formular unten verwenden.", es: "\u26a0\ufe0f No se pudo guardar tu correo. Int\u00e9ntalo de nuevo o usa el formulario de abajo." },
+  chat_subscribe_input_btn: { en: "Subscribe", fr: "S\u2019abonner", de: "Abonnieren", es: "Suscribirse" },
 };
 
 /**

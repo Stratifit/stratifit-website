@@ -15,8 +15,12 @@ import {
   HiPaperAirplane,
   HiXMark,
   HiHeart,
+  HiCheck,
+  HiBell,
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 export type ComingSoonRole = "bot" | "user";
 export type ComingSoonIntent = "subscribe" | "team" | "info";
@@ -33,6 +37,12 @@ type Chip = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
 };
+
+/* Inline subscribe state machine. Drives the email-capture flow
+   triggered by the green "Subscribe" status badge in the chip rail. */
+type SubscribeState = "idle" | "collecting" | "submitting" | "success";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const chips: Chip[] = [
   { id: "launch", label: "When do you launch?", icon: HiClock },
@@ -116,6 +126,58 @@ export function ComingSoonAIChat({
   const [messages, setMessages] = useState<ComingSoonMessage[]>([greeting]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { lang } = useLanguage();
+
+  // Inline-subscribe state machine. Drives the green "Subscribe" status
+  // badge in the chip rail and the email-capture flow.
+  const [subscribeState, setSubscribeState] = useState<SubscribeState>("idle");
+  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const startSubscribe = () => {
+    if (subscribeState === "success" || subscribeState === "submitting") return;
+    setSubscribeState("collecting");
+    setEmailError(null);
+    setInput("");
+    setMessages((prev) => [
+      ...prev,
+      { role: "bot", text: tLabel("chat_subscribe_prompt", lang) },
+    ]);
+  };
+
+  const submitEmail = async () => {
+    if (subscribeState === "submitting") return;
+    const email = input.trim();
+    if (!email || !EMAIL_RE.test(email)) {
+      setEmailError(tLabel("chat_email_invalid", lang));
+      return;
+    }
+    setSubscribeState("submitting");
+    setEmailError(null);
+    try {
+      const res = await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          lang,
+          source: "coming_soon_chat",
+        }),
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      // Echo the submitted email as a user bubble, then a bot confirmation
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", text: email },
+        { role: "bot", text: tLabel("chat_subscribe_success", lang) },
+      ]);
+      setInput("");
+      setSubscribeState("success");
+    } catch (err) {
+      console.warn("chat subscribe failed", err);
+      setEmailError(tLabel("chat_subscribe_error", lang));
+      setSubscribeState("collecting");
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -296,7 +358,28 @@ export function ComingSoonAIChat({
 
       {/* Chip rail */}
       <div className="flex-none px-5 py-2 border-t border-white/5 bg-black/40 relative z-10">
-        <div className="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1">
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1 items-center">
+          {/* Status badge — "Subscribe" with a pulsing green dot.
+              Clicking it triggers the inline email-capture flow. */}
+          {subscribeState === "success" ? (
+            <span className="inline-flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[11px] font-bold">
+              <HiCheck className="text-xs" />
+              {tLabel("chat_badge_subscribed", lang)}
+            </span>
+          ) : (
+            <button
+              onClick={startSubscribe}
+              disabled={subscribeState === "submitting"}
+              className="inline-flex items-center gap-1.5 shrink-0 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-[11px] font-bold hover:bg-green-500/20 transition-all shadow-[0_0_10px_rgba(34,197,94,0.15)] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="relative flex items-center justify-center w-2 h-2">
+                <span className="absolute inline-flex w-full h-full rounded-full bg-green-400 opacity-60 animate-ping" />
+                <span className="relative inline-flex w-1.5 h-1.5 rounded-full bg-green-400" />
+              </span>
+              {tLabel("chat_badge_subscribe", lang)}
+            </button>
+          )}
+
           {chips.map((c) => (
             <button
               key={c.id}
@@ -312,26 +395,69 @@ export function ComingSoonAIChat({
 
       {/* Input */}
       <div className="flex-none px-5 py-3 border-t border-white/10 bg-black/50 relative z-10">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") ask(input);
-            }}
-            placeholder="Ask anything — pricing, services, launch…"
-            className="flex-1 bg-card-dark border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
-          />
-          <button
-            onClick={() => ask(input)}
-            disabled={!input.trim()}
-            aria-label="Send"
-            className="w-10 h-10 rounded-xl bg-amber text-black flex items-center justify-center hover:bg-amber-light transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
-          >
-            <HiPaperAirplane className="text-sm" />
-          </button>
-        </div>
+        {subscribeState === "collecting" || subscribeState === "submitting" ? (
+          <div className="flex flex-col gap-1.5">
+            {emailError && (
+              <p className="text-[10px] text-red-400 font-medium flex items-center gap-1.5">
+                <span className="inline-block w-1 h-1 rounded-full bg-red-400" />
+                {emailError}
+              </p>
+            )}
+            <div className="flex items-center gap-2">
+              <input
+                type="email"
+                value={input}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  if (emailError) setEmailError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") submitEmail();
+                }}
+                placeholder={tLabel("chat_email_placeholder", lang)}
+                disabled={subscribeState === "submitting"}
+                className={`flex-1 bg-card-dark border rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:outline-none transition-colors disabled:opacity-50 ${
+                  emailError
+                    ? "border-red-500/60 focus:border-red-500"
+                    : "border-green-500/30 focus:border-green-400"
+                }`}
+              />
+              <button
+                onClick={submitEmail}
+                disabled={subscribeState === "submitting" || !input.trim()}
+                aria-label={tLabel("chat_subscribe_input_btn", lang)}
+                className="w-10 h-10 rounded-xl bg-green-500 text-black flex items-center justify-center hover:bg-green-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+              >
+                {subscribeState === "submitting" ? (
+                  <span className="w-3 h-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <HiPaperAirplane className="text-sm" />
+                )}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") ask(input);
+              }}
+              placeholder="Ask anything — pricing, services, launch…"
+              className="flex-1 bg-card-dark border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
+            />
+            <button
+              onClick={() => ask(input)}
+              disabled={!input.trim()}
+              aria-label="Send"
+              className="w-10 h-10 rounded-xl bg-amber text-black flex items-center justify-center hover:bg-amber-light transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+            >
+              <HiPaperAirplane className="text-sm" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
