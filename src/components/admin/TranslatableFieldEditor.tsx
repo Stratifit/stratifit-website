@@ -1,6 +1,7 @@
 "use client";
 
 import { ALL_LANGUAGES, LANGUAGE_FLAGS, LANGUAGE_LABELS, type Language, type TranslatableString } from "@/lib/cms-types";
+import { Flag } from "@/components/layout/Flag";
 
 interface TranslatableFieldProps {
   label: string;
@@ -37,7 +38,7 @@ export function TranslatableFieldEditor({
         {ALL_LANGUAGES.map((lang) => (
           <div key={lang}>
             <div className="flex items-center gap-1.5 mb-1">
-              <span className="text-xs">{LANGUAGE_FLAGS[lang]}</span>
+              <Flag code={LANGUAGE_FLAGS[lang]} width={16} height={12} />
               <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
                 {LANGUAGE_LABELS[lang]}
               </span>
@@ -105,7 +106,7 @@ export function TranslatableArrayEditor({
         {ALL_LANGUAGES.map((lang) => (
           <div key={lang} className="space-y-1.5">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs">{LANGUAGE_FLAGS[lang]}</span>
+              <Flag code={LANGUAGE_FLAGS[lang]} width={16} height={12} />
               <span className="text-[10px] font-bold text-gray-500 uppercase">
                 {LANGUAGE_LABELS[lang]}
               </span>

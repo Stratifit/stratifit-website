@@ -1,5 +1,6 @@
 @import url("https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400,300&display=swap");
 @import "tailwindcss";
+@import "flag-icons/css/flag-icons.min.css";
 
 @theme inline {
   --color-amber: #f59e0b;

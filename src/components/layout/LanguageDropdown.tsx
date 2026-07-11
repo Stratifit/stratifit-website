@@ -4,18 +4,22 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/LanguageContext";
 import { tLabel } from "@/lib/stratifit-i18n";
+import { Flag } from "@/components/layout/Flag";
 
 /* ------------------------------------------------------------------ */
 /*  Language list - single source of truth for the entire header.    */
 /*  `labelKey` is resolved via tLabel() so dropdown labels change    */
 /*  with the active language (e.g. "Anglais" when French is active). */
+/*  `flagCode` is the ISO country code used by the <Flag /> component */
+/*  (flag-icons CSS) so flags render on every OS (emoji regional-     */
+/*  indicator pairs show as letter codes on Windows).                  */
 /* ------------------------------------------------------------------ */
 
 export const languages = [
-  { code: "EN", flag: "🇺🇸", labelKey: "lang_english" },
-  { code: "FR", flag: "🇫🇷", labelKey: "lang_french" },
-  { code: "DE", flag: "🇩🇪", labelKey: "lang_german" },
-  { code: "ES", flag: "🇪🇸", labelKey: "lang_spanish" },
+  { code: "EN", flagCode: "us", labelKey: "lang_english" },
+  { code: "FR", flagCode: "fr", labelKey: "lang_french" },
+  { code: "DE", flagCode: "de", labelKey: "lang_german" },
+  { code: "ES", flagCode: "es", labelKey: "lang_spanish" },
 ];
 
 interface LanguageDropdownProps {
@@ -53,7 +57,10 @@ export function LanguageDropdown({ size = "md" }: LanguageDropdownProps) {
         className={`flex items-center gap-2 ${buttonClasses} rounded-full bg-white/5 border border-white/10 hover:border-amber/30 transition-all font-medium text-white`}
       >
         <span className="text-base leading-none">
-          {languages.find((l) => l.code === langCode)?.flag}
+          {(() => {
+            const active = languages.find((l) => l.code === langCode);
+            return active ? <Flag code={active.flagCode} width={20} height={14} /> : null;
+          })()}
         </span>
         <span>{langCode}</span>
         <svg
@@ -84,7 +91,7 @@ export function LanguageDropdown({ size = "md" }: LanguageDropdownProps) {
                 }}
                 className={`w-full flex items-center gap-3 ${dropdownItemPadding} text-sm transition-colors ${langCode === l.code ? "text-amber bg-amber/5" : "text-gray-300 hover:text-white hover:bg-white/5"}`}
               >
-                <span className="text-base leading-none">{l.flag}</span>
+                <span className="text-base leading-none"><Flag code={l.flagCode} width={20} height={14} /></span>
                 <span className={`font-medium ${isSm ? "text-xs" : ""}`}>
                   {isSm ? l.code : tLabel(l.labelKey, lang)}
                 </span>

@@ -14,10 +14,10 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
 };
 
 export const LANGUAGE_FLAGS: Record<Language, string> = {
-  en: "🇬🇧",
-  de: "🇩🇪",
-  fr: "🇫🇷",
-  es: "🇪🇸",
+  en: "gb",
+  de: "de",
+  fr: "fr",
+  es: "es",
 };
 
 /** A translatable string: keyed by language code. */
