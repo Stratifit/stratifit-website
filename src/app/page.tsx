@@ -99,7 +99,7 @@ function ComingSoonHeader() {
   const { data: cmsSettings } = useCms<SiteSettings>("site_settings", { fallback: undefined });
   const logoText = cmsSettings?.logo_text || "SF";
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
+    <div className="sticky top-0 left-0 right-0 z-50 bg-black border-b border-white/5 pointer-events-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 lg:h-20 flex items-center justify-between">
         {/* Left: logo icon (no label) */}
         <a
@@ -232,7 +232,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">
+    <main className="min-h-screen bg-black text-white relative overflow-x-hidden">
       {/* Coming Soon header — logo icon (no label) + language dropdown */}
       <ComingSoonHeader />
 
