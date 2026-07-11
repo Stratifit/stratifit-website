@@ -24,6 +24,9 @@ import {
   type FaqTopic,
 } from "@/lib/faq-knowledge";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
+import type { Language } from "@/lib/cms-types";
 
 export type FaqChatRole = "bot" | "user";
 
@@ -43,34 +46,56 @@ type Props = {
   onClose?: () => void;
 };
 
+/** Topic chip config — labels are i18n keys. The actual translated text is
+ *  computed in getAllTopics(lang) below so the topic rail updates when the
+ *  user switches the language dropdown. */
+const topicConfig: { id: FaqTopic; labelKey: string; icon: ComponentType<{ className?: string }> }[] = [
+  { id: "all",      labelKey: "chatbot_ai_cat_faq",         icon: HiQuestionMarkCircle },
+  { id: "Services", labelKey: "chatbot_f_topic_services",  icon: HiSparkles },
+  { id: "Pricing",  labelKey: "chatbot_f_topic_pricing",   icon: HiCurrencyDollar },
+  { id: "Support",  labelKey: "chatbot_f_topic_support",   icon: HiShieldCheck },
+  { id: "Business", labelKey: "chatbot_f_topic_about",     icon: HiInformationCircle },
+];
+
+function getAllTopics(lang: Language): { id: FaqTopic; label: string; icon: ComponentType<{ className?: string }> }[] {
+  return topicConfig.map((t) => ({ id: t.id, label: tLabel(t.labelKey, lang), icon: t.icon }));
+}
+
 export function FaqAIChat({
   variant = "embedded",
   initialExpanded = false,
-  title = "Ask Stratifit AI",
-  subtitle = "Get instant, expert answers to common questions — 24/7.",
+  title,
+  subtitle,
   onClose,
 }: Props) {
+  const { lang } = useLanguage();
+  // Default title/subtitle/greeting come from the i18n map; callers can still
+  // override via props if they want a custom header.
+  const resolvedTitle = title ?? tLabel("chatbot_f_title", lang);
+  const resolvedSubtitle = subtitle ?? tLabel("chatbot_f_subtitle", lang);
+
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<FaqChatMessage[]>([
     {
       role: "bot",
-      text:
-        "👋 Hi! I'm Stratifit AI. Pick a topic below to dive in, or type your own question.",
+      text: tLabel("chatbot_f_greeting", lang),
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [activeTopic, setActiveTopic] = useState<FaqTopic>("all");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  /** Topic chip rail — visible at the top of the chat. Matches the public
-   *  FAQ banner reference: FAQ, Services, Pricing, Support, About. */
-  const allTopics: { id: FaqTopic; label: string; icon: ComponentType<{ className?: string }> }[] = [
-    { id: "all",      label: "FAQ",      icon: HiQuestionMarkCircle },
-    { id: "Services", label: "Services", icon: HiSparkles },
-    { id: "Pricing",  label: "Pricing",  icon: HiCurrencyDollar },
-    { id: "Support",  label: "Support",  icon: HiShieldCheck },
-    { id: "Business", label: "About",    icon: HiInformationCircle },
-  ];
+  // Recompute the greeting when the language changes so the very first
+  // message the user sees is already in their language.
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length <= 1) return [{ role: "bot", text: tLabel("chatbot_f_greeting", lang) }];
+      return prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const allTopics = getAllTopics(lang);
 
   /** Popular pills filtered by the active topic ("all" shows every popular entry). */
   const popular = popularFaqIds
@@ -104,8 +129,7 @@ export function FaqAIChat({
           ...prev,
           {
             role: "bot",
-            text:
-              "🤔 I couldn&apos;t find a matching answer. Try a popular question above, or tap below to chat with a human — we typically reply within 24 hours.",
+            text: tLabel("chatbot_f_fallback", lang),
             matchedFaqId: "__fallback__",
           },
         ]);
@@ -116,7 +140,7 @@ export function FaqAIChat({
   const handleHumanFallback = () => {
     setMessages((prev) => [
       ...prev,
-      { role: "bot", text: "Opening the contact form so a human can take over..." },
+      { role: "bot", text: tLabel("chatbot_f_human_opening", lang) },
     ]);
     setTimeout(() => openContactModal(), 700);
   };
@@ -142,19 +166,19 @@ export function FaqAIChat({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="font-heading font-black text-white text-sm">{title}</span>
+            <span className="font-heading font-black text-white text-sm">{resolvedTitle}</span>
             <span className="inline-flex items-center gap-1 text-[9px] text-gray-400 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-              Online
+              {tLabel("chatbot_f_status", lang)}
             </span>
           </div>
-          <p className="text-xs text-gray-400 leading-relaxed">{subtitle}</p>
+          <p className="text-xs text-gray-400 leading-relaxed">{resolvedSubtitle}</p>
         </div>
         {onClose && (
           <button
             onClick={onClose}
             className="p-2 -mr-2 text-gray-400 hover:text-white transition-colors"
-            aria-label="Close FAQ chat"
+            aria-label={tLabel("chatbot_f_aria_close", lang)}
           >
             <HiXMark size={20} />
           </button>
@@ -193,7 +217,7 @@ export function FaqAIChat({
       <div className="px-5 sm:px-6 pb-3">
         <div className="flex items-baseline justify-between mb-2 gap-2">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500">
-            Popular Questions
+            {tLabel("chatbot_f_popular", lang)}
             {activeTopic !== "all" && (
               <span className="ml-2 text-amber normal-case tracking-normal font-medium">
                 · {allTopics.find((t) => t.id === activeTopic)?.label ?? activeTopic}
@@ -205,16 +229,17 @@ export function FaqAIChat({
               onClick={() => setActiveTopic("all")}
               className="text-[10px] text-gray-500 hover:text-amber transition-colors"
             >
-              Show all
+              {tLabel("chatbot_f_show_all", lang)}
             </button>
           )}
         </div>
         {popular.length === 0 ? (
-          <p className="text-[11px] text-gray-500 italic">
-            No popular questions in <span className="text-amber">{allTopics.find((t) => t.id === activeTopic)?.label ?? activeTopic}</span> yet — tap
-            <span className="text-amber mx-1">Show all</span>
-            or type your question below.
-          </p>
+          <p
+            className="text-[11px] text-gray-500 italic"
+            dangerouslySetInnerHTML={{
+              __html: tLabel("chatbot_f_no_popular", lang).replace("{topic}", `<span class="text-amber">${allTopics.find((t) => t.id === activeTopic)?.label ?? activeTopic}</span>`),
+            }}
+          />
         ) : (
           <div className="flex flex-wrap gap-1.5">
             {popular.map((entry) => (
@@ -286,7 +311,7 @@ export function FaqAIChat({
                           className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/15 rounded-lg text-xs text-white font-medium hover:bg-amber/15 hover:border-amber/30 transition-all"
                         >
                           <HiUserGroup className="text-amber text-base" />
-                          Talk to a human
+                          {tLabel("chatbot_f_human_cta", lang)}
                         </button>
                       )}
                     </motion.div>
@@ -390,13 +415,13 @@ export function FaqAIChat({
             onKeyDown={(e) => {
               if (e.key === "Enter") ask(input);
             }}
-            placeholder="Search questions… e.g. What does the process look like?"
+            placeholder={tLabel("chatbot_f_placeholder", lang)}
             className="w-full bg-card-dark border border-white/10 rounded-xl pl-11 pr-12 py-3 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
           />
           <button
             onClick={() => ask(input)}
             disabled={!input.trim()}
-            aria-label="Send"
+            aria-label={tLabel("chatbot_f_aria_send", lang)}
             className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg bg-amber text-black flex items-center justify-center hover:bg-amber-light transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <HiPaperAirplane className="text-sm" />
@@ -408,13 +433,13 @@ export function FaqAIChat({
       <div className="px-5 sm:px-6 py-3 border-t border-white/5 flex items-center justify-between gap-3 bg-black/30">
         <p className="text-[10px] text-gray-500 flex items-center gap-1.5">
           <HiUserGroup className="text-amber text-xs" />
-          Prefer a human? We&apos;ll reply within 24h.
+          {tLabel("chatbot_f_footer_human", lang)}
         </p>
         <button
           onClick={openContactModal}
           className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber hover:text-amber-light transition-colors"
         >
-          Contact Team
+          {tLabel("chatbot_f_footer_cta", lang)}
         </button>
       </div>
     </div>

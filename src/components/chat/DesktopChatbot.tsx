@@ -3,9 +3,12 @@
 import { usePathname } from "next/navigation";
 import { AIChatbot } from "@/components/chat/AIChatbot";
 import { HiChatBubbleLeftRight } from "react-icons/hi2";
+import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 export function DesktopChatbot() {
   const pathname = usePathname();
+  const { lang } = useLanguage();
   if (pathname?.startsWith("/admin")) return null;
   return (
     <div
@@ -15,7 +18,7 @@ export function DesktopChatbot() {
     >
       <span className="text-white text-xs font-medium whitespace-nowrap">
         <HiChatBubbleLeftRight className="inline text-amber text-sm mr-1.5" />
-        Chat with us
+        {tLabel("chatbot_d_trigger", lang)}
       </span>
       <AIChatbot />
     </div>

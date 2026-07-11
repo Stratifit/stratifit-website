@@ -18,6 +18,9 @@ import {
   HiCreditCard,
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
+import type { Language } from "@/lib/cms-types";
 
 type Message = {
   role: "bot" | "user";
@@ -27,102 +30,125 @@ type Message = {
 
 type Chip = {
   id: string;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
 };
 
-const chips: Chip[] = [
-  { id: "pricing", label: "Pricing & Cost", icon: HiCurrencyDollar },
-  { id: "timeline", label: "Timeline", icon: HiClock },
-  { id: "stack", label: "Tech Stack", icon: HiCog },
-  { id: "process", label: "Our Process", icon: HiLightBulb },
-  { id: "services", label: "Services", icon: HiBriefcase },
-  { id: "portfolio", label: "Portfolio", icon: HiEye },
-  { id: "team", label: "Our Team", icon: HiUsers },
-  { id: "revisions", label: "Revisions", icon: HiPencilSquare },
-  { id: "payment", label: "Payment Terms", icon: HiCreditCard },
-  { id: "support", label: "Support", icon: HiLifebuoy },
+/* Chip config — labels are i18n keys. The actual translated text is
+   computed in getChips(lang) below so the chip rail updates when the
+   user switches the language dropdown. */
+const chipConfig: Chip[] = [
+  { id: "pricing", labelKey: "chatbot_c_chip_pricing", icon: HiCurrencyDollar },
+  { id: "timeline", labelKey: "chatbot_c_chip_timeline", icon: HiClock },
+  { id: "stack", labelKey: "chatbot_c_chip_stack", icon: HiCog },
+  { id: "process", labelKey: "chatbot_c_chip_process", icon: HiLightBulb },
+  { id: "services", labelKey: "chatbot_c_chip_services", icon: HiBriefcase },
+  { id: "portfolio", labelKey: "chatbot_c_chip_portfolio", icon: HiEye },
+  { id: "team", labelKey: "chatbot_c_chip_team", icon: HiUsers },
+  { id: "revisions", labelKey: "chatbot_c_chip_revisions", icon: HiPencilSquare },
+  { id: "payment", labelKey: "chatbot_c_chip_payment", icon: HiCreditCard },
+  { id: "support", labelKey: "chatbot_c_chip_support", icon: HiLifebuoy },
 ];
 
-const botResponses: Record<string, Message> = {
-  greeting: {
-    role: "bot",
-    text: "Hey! I'm Stratifit AI — your instant project advisor. Tap a topic below or type your question. I can help with pricing, timelines, portfolio, revisions, payments, and more.",
-    quickReplies: ["Pricing", "Timeline", "Portfolio", "Our Process"],
-  },
-  pricing: {
-    role: "bot",
-    text: "Transparent pricing, tailored to you:\n\nBrand Design — $3,000-$15,000\nWebsite Development — $5,000-$25,000\nAI Automation — $3,000-$20,000\nGrowth Marketing — from $1,500/mo\n\nEvery project is custom-scoped. Want an exact quote?",
-    quickReplies: ["Get a Quote", "Timeline", "Tech Stack"],
-  },
-  timeline: {
-    role: "bot",
-    text: "Typical turnaround times:\n\nBranding — 2-4 weeks\nFull website — 4-8 weeks\nAI automation — 3-6 weeks\nMarketing — ongoing, results in 30-90 days\n\nMost projects kick off within 48 hours. Rush delivery available.",
-    quickReplies: ["Pricing", "Our Process", "Get a Quote"],
-  },
-  stack: {
-    role: "bot",
-    text: "Our modern, scalable tech stack:\n\nFrontend — Next.js, React, TypeScript, Tailwind CSS\nBackend — Node.js, Python, PostgreSQL\nAI — OpenAI, LangChain, custom models\nInfra — Vercel, AWS, Docker\n\nProduction-grade and fully documented.",
-    quickReplies: ["Our Process", "Pricing", "Services"],
-  },
-  process: {
-    role: "bot",
-    text: "Our proven 4-step process:\n\n1. Strategy — We dig deep into your goals, audience & market\n2. Design — Wireframes → prototypes → pixel-perfect mockups\n3. Build — Clean code, regular check-ins, zero surprises\n4. Launch & Grow — Deploy, optimize, and ongoing support\n\nWe keep you in the loop at every step.",
-    quickReplies: ["Timeline", "Pricing", "Services"],
-  },
-  services: {
-    role: "bot",
-    text: "We cover the full digital spectrum:\n\nBrand Design — Strategy, identity, guidelines\nWeb Development — Custom sites, apps, ecommerce\nAI & Automation — Chatbots, workflows, integrations\nGrowth Marketing — SEO, ads, content, analytics\nBuy a Business — Acquire ready-made online businesses\n\nWhich area fits your needs?",
-    quickReplies: ["Pricing", "Timeline", "Get a Quote"],
-  },
-  portfolio: {
-    role: "bot",
-    text: "We've delivered for startups, scale-ups, and enterprises across industries:\n\nFintech — Brand + web platform for a Series A startup\nEcommerce — Full Shopify build for a DTC brand\nSaaS — AI dashboard + growth engine for a B2B tool\nHealth — Brand identity + patient portal for a clinic\n\nCheck out our full portfolio at /portfolio for case studies, metrics, and visuals.",
-    quickReplies: ["Pricing", "Our Process", "Services"],
-  },
-  team: {
-    role: "bot",
-    text: "We're strategists, designers, engineers, and marketers — all under one roof:\n\nStrategists — Brand positioning & go-to-market\nDesigners — UI/UX, visual identity, motion\nEngineers — Full-stack, AI, DevOps\nMarketers — SEO, paid ads, content, analytics\n\nNo outsourcing. No freelancer roulette. Just a tight, senior team obsessed with quality.",
-    quickReplies: ["Our Process", "Portfolio", "Services"],
-  },
-  revisions: {
-    role: "bot",
-    text: "Our revision policy is built around collaboration, not endless rounds:\n\nBranding — Up to 3 rounds of revisions included\nWeb Development — 2 rounds during design, 2 during build\nAI & Automation — Iterative testing included in scope\n\nAdditional rounds available at our hourly rate. We work fast and get it right — most clients approve within 2 rounds.",
-    quickReplies: ["Pricing", "Our Process", "Timeline"],
-  },
-  payment: {
-    role: "bot",
-    text: "Simple, transparent payment terms:\n\n50% deposit to kick off\n50% on completion, before launch\nMilestone billing available for projects $10K+\nMonthly retainer options for ongoing work\n\nWe accept bank transfer, credit card, and PayPal. Invoices are sent via email with clear breakdowns.",
-    quickReplies: ["Pricing", "Get a Quote", "Revisions"],
-  },
-  support: {
-    role: "bot",
-    text: "Post-launch we've got your back:\n\n30 days of free support after launch\nPriority email support — response within 24h\nMaintenance retainers available\nMonthly performance reports included\n\nYour success doesn't end at launch.",
-    quickReplies: ["Pricing", "Services", "Speak to Team"],
-  },
-  quote: {
-    role: "bot",
-    text: "Great choice! Let's get you a custom proposal. Our team will scope your project, prep a detailed estimate, and get back to you within 24 hours. Opening the contact form now...",
-    quickReplies: [],
-  },
-  contactTeam: {
-    role: "bot",
-    text: "Absolutely — our team would love to chat! Opening the contact form so you can tell us about your project. We'll respond within 24 hours.",
-    quickReplies: [],
-  },
-  fallback: {
-    role: "bot",
-    text: "Good question! I can help with pricing, timelines, tech stack, portfolio, revisions, payment terms, our process, services, or support. Tap a topic above or try rephrasing!",
-    quickReplies: ["Pricing", "Portfolio", "Our Process", "Services"],
-  },
-};
+function getChips(lang: Language): { id: string; label: string; icon: Chip["icon"] }[] {
+  return chipConfig.map((c) => ({ id: c.id, label: tLabel(c.labelKey, lang), icon: c.icon }));
+}
+
+function getResponses(lang: Language): Record<string, Message> {
+  return {
+    greeting: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_greeting", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_timeline", lang), tLabel("chatbot_c_qr_portfolio", lang), tLabel("chatbot_c_qr_process", lang)],
+    },
+    pricing: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_pricing", lang),
+      quickReplies: [tLabel("chatbot_c_qr_quote", lang), tLabel("chatbot_c_qr_timeline", lang), tLabel("chatbot_c_qr_stack", lang)],
+    },
+    timeline: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_timeline", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_process", lang), tLabel("chatbot_c_qr_quote", lang)],
+    },
+    stack: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_stack", lang),
+      quickReplies: [tLabel("chatbot_c_qr_process", lang), tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_services", lang)],
+    },
+    process: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_process", lang),
+      quickReplies: [tLabel("chatbot_c_qr_timeline", lang), tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_services", lang)],
+    },
+    services: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_services", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_timeline", lang), tLabel("chatbot_c_qr_quote", lang)],
+    },
+    portfolio: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_portfolio", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_process", lang), tLabel("chatbot_c_qr_services", lang)],
+    },
+    team: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_team", lang),
+      quickReplies: [tLabel("chatbot_c_qr_process", lang), tLabel("chatbot_c_qr_portfolio", lang), tLabel("chatbot_c_qr_services", lang)],
+    },
+    revisions: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_revisions", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_process", lang), tLabel("chatbot_c_qr_timeline", lang)],
+    },
+    payment: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_payment", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_quote", lang), tLabel("chatbot_c_chip_revisions", lang)],
+    },
+    support: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_support", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_services", lang), tLabel("chatbot_c_qr_speak", lang)],
+    },
+    quote: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_quote", lang),
+      quickReplies: [],
+    },
+    contactTeam: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_contact", lang),
+      quickReplies: [],
+    },
+    fallback: {
+      role: "bot",
+      text: tLabel("chatbot_c_resp_fallback", lang),
+      quickReplies: [tLabel("chatbot_c_qr_pricing", lang), tLabel("chatbot_c_qr_portfolio", lang), tLabel("chatbot_c_qr_process", lang), tLabel("chatbot_c_qr_services", lang)],
+    },
+  };
+}
 
 export default function ContactChatbot() {
+  const { lang } = useLanguage();
+  const chips = getChips(lang);
+  const botResponses = getResponses(lang);
   const [messages, setMessages] = useState<Message[]>([botResponses.greeting]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Recompute the greeting + responses map when the language changes so
+  // the very first message the user sees is already in their language.
+  useEffect(() => {
+    const greeting = botResponses.greeting;
+    setMessages((prev) => {
+      if (prev.length <= 1) return [greeting];
+      return prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -145,7 +171,12 @@ export default function ContactChatbot() {
   const handleSend = (text: string) => {
     const lower = text.toLowerCase();
 
-    if (lower.includes("quote") || lower.includes("speak to team") || lower.includes("contact")) {
+    if (
+      lower.includes("quote") || lower.includes("speak to team") || lower.includes("contact") ||
+      lower.includes("devis") || lower.includes("parler") || lower.includes("équipe") || lower.includes("contacter") ||
+      lower.includes("angebot") || lower.includes("team sprechen") || lower.includes("kontakt") ||
+      lower.includes("cotiz") || lower.includes("hablar") || lower.includes("equipo") || lower.includes("contacto")
+    ) {
       const userMsg: Message = { role: "user", text };
       setMessages((prev) => [...prev, userMsg]);
       setIsTyping(true);
@@ -166,44 +197,78 @@ export default function ContactChatbot() {
     setExpanded(true);
 
     let response: Message;
+    // Language-aware keyword detection: matches each language's stems
+    // so users typing in their native language still land on the
+    // right scripted answer.
     if (
-      lower.includes("pric") ||
-      lower.includes("cost") ||
-      lower.includes("budget") ||
-      lower.includes("estimate")
+      lower.includes("pric") || lower.includes("cost") || lower.includes("budget") || lower.includes("estimate") ||
+      lower.includes("prix") || lower.includes("coût") || lower.includes("budget") ||
+      lower.includes("preis") || lower.includes("kosten") || lower.includes("budget") ||
+      lower.includes("precio") || lower.includes("costo")
     )
       response = botResponses.pricing;
     else if (
-      lower.includes("time") ||
-      lower.includes("long") ||
-      lower.includes("week") ||
-      lower.includes("timeline")
+      lower.includes("time") || lower.includes("long") || lower.includes("week") || lower.includes("timeline") ||
+      lower.includes("délai") || lower.includes("temps") || lower.includes("semaine") ||
+      lower.includes("zeit") || lower.includes("woche") || lower.includes("dauer") ||
+      lower.includes("plazo") || lower.includes("tiempo") || lower.includes("semana")
     )
       response = botResponses.timeline;
-    else if (lower.includes("stack") || lower.includes("tech") || lower.includes("code"))
-      response = botResponses.stack;
-    else if (lower.includes("process") || lower.includes("step") || lower.includes("method"))
-      response = botResponses.process;
-    else if (lower.includes("service") || lower.includes("offer")) response = botResponses.services;
     else if (
-      lower.includes("portfolio") ||
-      lower.includes("past work") ||
-      lower.includes("case study") ||
-      lower.includes("examples")
+      lower.includes("stack") || lower.includes("tech") || lower.includes("code") ||
+      lower.includes("stack") || lower.includes("technique") ||
+      lower.includes("stack") || lower.includes("tech") ||
+      lower.includes("stack") || lower.includes("tecnolog")
+    )
+      response = botResponses.stack;
+    else if (
+      lower.includes("process") || lower.includes("step") || lower.includes("method") ||
+      lower.includes("processus") || lower.includes("étape") ||
+      lower.includes("prozess") || lower.includes("schritt") ||
+      lower.includes("proceso") || lower.includes("paso")
+    )
+      response = botResponses.process;
+    else if (
+      lower.includes("service") || lower.includes("offer") ||
+      lower.includes("service") || lower.includes("offre") ||
+      lower.includes("dienst") || lower.includes("leistung") ||
+      lower.includes("servicio") || lower.includes("ofrece")
+    )
+      response = botResponses.services;
+    else if (
+      lower.includes("portfolio") || lower.includes("past work") || lower.includes("case study") || lower.includes("examples") ||
+      lower.includes("portfolio") || lower.includes("réalisation") || lower.includes("étude") ||
+      lower.includes("portfolio") || lower.includes("arbeit") || lower.includes("fall") ||
+      lower.includes("portafolio") || lower.includes("caso") || lower.includes("ejemplo")
     )
       response = botResponses.portfolio;
-    else if (lower.includes("team") || lower.includes("who") || lower.includes("people"))
+    else if (
+      lower.includes("team") || lower.includes("who") || lower.includes("people") ||
+      lower.includes("équipe") || lower.includes("qui") ||
+      lower.includes("team") || lower.includes("wer") ||
+      lower.includes("equipo") || lower.includes("quién")
+    )
       response = botResponses.team;
-    else if (lower.includes("revision") || lower.includes("change") || lower.includes("edit"))
+    else if (
+      lower.includes("revision") || lower.includes("change") || lower.includes("edit") ||
+      lower.includes("révision") || lower.includes("modif") ||
+      lower.includes("revision") || lower.includes("änderung") ||
+      lower.includes("revisión") || lower.includes("cambio")
+    )
       response = botResponses.revisions;
     else if (
-      lower.includes("payment") ||
-      lower.includes("deposit") ||
-      lower.includes("invoice") ||
-      lower.includes("pay")
+      lower.includes("payment") || lower.includes("deposit") || lower.includes("invoice") || lower.includes("pay") ||
+      lower.includes("paiement") || lower.includes("acompte") || lower.includes("facture") ||
+      lower.includes("zahlung") || lower.includes("anzahlung") || lower.includes("rechnung") ||
+      lower.includes("pago") || lower.includes("anticipo") || lower.includes("factura")
     )
       response = botResponses.payment;
-    else if (lower.includes("support") || lower.includes("maintain") || lower.includes("after"))
+    else if (
+      lower.includes("support") || lower.includes("maintain") || lower.includes("after") ||
+      lower.includes("support") || lower.includes("maintenance") ||
+      lower.includes("support") || lower.includes("wartung") ||
+      lower.includes("soporte") || lower.includes("mantenimiento")
+    )
       response = botResponses.support;
     else response = botResponses.fallback;
 
@@ -231,14 +296,15 @@ export default function ContactChatbot() {
         <div className="flex items-center justify-center gap-2 mb-3">
           <HiSparkles className="text-amber text-base" />
           <p className="text-[10px] font-bold tracking-[0.3em] text-amber uppercase">
-            Instant Answers
+            {tLabel("chatbot_c_label", lang)}
           </p>
         </div>
-        <h2 className="text-xl sm:text-2xl font-heading font-black text-white mb-2">
-          Ask Stratifit <span className="text-amber">AI</span>
-        </h2>
+        <h2
+          className="text-xl sm:text-2xl font-heading font-black text-white mb-2"
+          dangerouslySetInnerHTML={{ __html: tLabel("chatbot_c_title", lang) }}
+        />
         <p className="text-gray-400 text-xs sm:text-sm max-w-md mx-auto">
-          Get instant answers about pricing, timelines, and more. Or talk to a human — your choice.
+          {tLabel("chatbot_c_subtitle", lang)}
         </p>
       </div>
 
@@ -249,7 +315,7 @@ export default function ContactChatbot() {
             key={chip.id}
             onClick={() => handleChip(chip.id)}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-card-dark border border-white/10 text-white text-xs font-medium hover:bg-white/10 hover:border-amber/30 transition-all group"
-            aria-label={`Ask about ${chip.label}`}
+            aria-label={tLabel("chatbot_c_aria_ask", lang).replace("{label}", chip.label)}
           >
             <chip.icon className="text-amber text-sm group-hover:scale-110 transition-transform" />
             {chip.label}
@@ -334,8 +400,8 @@ export default function ContactChatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about pricing, timeline, tech stack..."
-              aria-label="Type your question"
+              placeholder={tLabel("chatbot_c_placeholder", lang)}
+              aria-label={tLabel("chatbot_c_aria_send", lang)}
               className="flex-1 bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
             />
             <button
@@ -346,7 +412,7 @@ export default function ContactChatbot() {
                 }
               }}
               disabled={!input.trim()}
-              aria-label="Send message"
+              aria-label={tLabel("chatbot_c_aria_send", lang)}
               className="w-10 h-10 rounded-xl bg-amber text-black flex items-center justify-center hover:bg-amber-light transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
             >
               <HiPaperAirplane className="text-base" />
@@ -359,15 +425,15 @@ export default function ContactChatbot() {
       <div className="mt-6 text-center">
         <div className="flex items-center justify-center gap-1.5 mb-2">
           <HiUserGroup className="text-gray-500 text-sm" />
-          <p className="text-gray-500 text-xs">Prefer a human?</p>
+          <p className="text-gray-500 text-xs">{tLabel("chatbot_c_footer_human", lang)}</p>
         </div>
         <button
           onClick={openContactModal}
           className="inline-flex items-center gap-2 px-8 py-3.5 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
         >
-          Contact Our Team
+          {tLabel("chatbot_c_footer_cta", lang)}
         </button>
-        <p className="text-[10px] text-gray-500 mt-3">No spam. Your data stays private.</p>
+        <p className="text-[10px] text-gray-500 mt-3">{tLabel("chatbot_c_footer_privacy", lang)}</p>
       </div>
     </section>
   );

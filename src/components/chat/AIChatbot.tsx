@@ -14,10 +14,13 @@ import {
   HiLifebuoy,
   HiBuildingOffice2,
 } from "react-icons/hi2";
+import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
+import type { Language } from "@/lib/cms-types";
 
 type Category = {
   id: string;
-  label: string;
+  labelKey: string;
   icon: React.ComponentType<{ className?: string }>;
 };
 
@@ -27,73 +30,91 @@ type Message = {
   quickReplies?: string[];
 };
 
-const categories: Category[] = [
-  { id: "faq", label: "FAQ", icon: HiQuestionMarkCircle },
-  { id: "services", label: "Services", icon: HiBriefcase },
-  { id: "pricing", label: "Pricing", icon: HiCurrencyDollar },
-  { id: "support", label: "Support", icon: HiLifebuoy },
-  { id: "about", label: "About", icon: HiBuildingOffice2 },
+/* Category config — labels are i18n keys. The actual translated text
+   is computed in getCategories(lang) below. */
+const categoryConfig: Category[] = [
+  { id: "faq", labelKey: "chatbot_ai_cat_faq", icon: HiQuestionMarkCircle },
+  { id: "services", labelKey: "chatbot_ai_cat_services", icon: HiBriefcase },
+  { id: "pricing", labelKey: "chatbot_ai_cat_pricing", icon: HiCurrencyDollar },
+  { id: "support", labelKey: "chatbot_ai_cat_support", icon: HiLifebuoy },
+  { id: "about", labelKey: "chatbot_ai_cat_about", icon: HiBuildingOffice2 },
 ];
 
-const responses: Record<string, Message> = {
-  greeting: {
-    role: "bot",
-    text: "👋 Hi! I'm Stratifit AI — here to help. What would you like to know?",
-    quickReplies: ["FAQ", "Services", "Pricing", "Support", "Help", "Contact"],
-  },
-  faq: {
-    role: "bot",
-    text: "Here are some common questions:\n\n🕐 **Timeline** — 4–6 weeks for branding, 6–12 weeks for full website builds.\n\n💳 **Payments** — 50% deposit, 50% on completion. Milestone billing available for larger projects.\n\n🔧 **Tech Stack** — Next.js, React, TypeScript, Tailwind CSS, Node.js.\n\n🔄 **Post-Launch** — 30 days complimentary support included. Maintenance retainers available.\n\n🤖 **AI** — We build production AI solutions from chatbots to workflow automation.\n\nAsk me anything else!",
-    quickReplies: ["Services", "Pricing", "Speak to Team"],
-  },
-  services: {
-    role: "bot",
-    text: "Here's what we offer:\n\n🎨 **Brand Design** — Strategy, identity, guidelines, logo design\n\n💻 **Website Development** — Custom Next.js sites, ecommerce, web apps\n\n🤖 **AI & Automation** — Chatbots, workflow automation, AI integrations\n\n📈 **Growth Marketing** — SEO, paid ads, content marketing, analytics\n\nWhich area interests you?",
-    quickReplies: ["Branding", "Development", "AI & Automation", "Pricing"],
-  },
-  pricing: {
-    role: "bot",
-    text: "Our project pricing is transparent:\n\n🎨 **Branding** — $3,000 – $15,000\n💻 **Web Development** — $5,000 – $25,000\n🤖 **AI Automation** — $3,000 – $20,000\n📈 **Growth Marketing** — starting at $1,500/mo\n\nEvery project is scoped to your needs. Want a custom quote?",
-    quickReplies: ["Get a Quote", "Services", "FAQ"],
-  },
-  support: {
-    role: "bot",
-    text: "We're here for you! 📧\n\n✉️ **Email**: hello@stratifit.com\n⏱️ **Response Time**: Within 24 hours\n🛡️ **Post-Launch**: 30 days free support\n🔧 **Maintenance**: Custom retainers available\n\nWant to speak directly with our team?",
-    quickReplies: ["Speak to Team", "FAQ", "Services"],
-  },
-  about: {
-    role: "bot",
-    text: "**Stratifit** is a digital excellence studio specializing in brand design, web development, AI automation, and growth marketing.\n\n📍 We work with startups, scale-ups, and enterprises worldwide.\n\n🏆 Our approach: strategy-first, design-driven, tech-powered.\n\nWant to see our work or start a project?",
-    quickReplies: ["Services", "Pricing", "Speak to Team"],
-  },
-  branding: {
-    role: "bot",
-    text: "Our branding services include:\n\n🎯 **Brand Strategy** — Positioning, messaging, audience research\n🎨 **Visual Identity** — Logo, color systems, typography\n📖 **Brand Guidelines** — Comprehensive usage documentation\n\nStarting at $3,000. Want to discuss your brand?",
-    quickReplies: ["Pricing", "Speak to Team", "Services"],
-  },
-  development: {
-    role: "bot",
-    text: "We build modern, performant websites:\n\n⚡ **Next.js & React** — Blazing fast, SEO-optimized\n🎨 **Tailwind CSS** — Beautiful, responsive designs\n🛒 **Ecommerce** — Shopify, custom solutions\n🔌 **Integrations** — Stripe, HubSpot, APIs\n\nProjects from $5,000. Ready to build?",
-    quickReplies: ["Pricing", "Speak to Team", "Services"],
-  },
-  ai: {
-    role: "bot",
-    text: "AI & Automation solutions:\n\n💬 **Chatbots** — Customer support, lead qualification\n⚙️ **Workflow Automation** — Connect your tools, save hours\n🧠 **Custom AI** — Fine-tuned models for your business\n📊 **Analytics** — AI-powered insights & reporting\n\nStarting at $3,000. Let's automate!",
-    quickReplies: ["Pricing", "Speak to Team", "Services"],
-  },
-  quote: {
-    role: "bot",
-    text: "Let's get you a custom quote! Fill out our contact form and we'll get back to you within 24 hours with a detailed proposal tailored to your needs. Opening the contact form for you now...",
-    quickReplies: [],
-  },
-  team: {
-    role: "bot",
-    text: "Our team would love to hear from you! You can reach us at hello@stratifit.com or fill out our contact form for a detailed consultation.\n\nWe typically respond within 24 hours.",
-    quickReplies: ["Open Contact Form", "Support", "FAQ"],
-  },
-};
+function getCategories(lang: Language): { id: string; label: string; icon: Category["icon"] }[] {
+  return categoryConfig.map((c) => ({ id: c.id, label: tLabel(c.labelKey, lang), icon: c.icon }));
+}
+
+function getResponses(lang: Language): Record<string, Message> {
+  return {
+    greeting: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_greeting", lang),
+      quickReplies: [
+        tLabel("chatbot_ai_cat_faq", lang),
+        tLabel("chatbot_ai_cat_services", lang),
+        tLabel("chatbot_ai_cat_pricing", lang),
+        tLabel("chatbot_ai_cat_support", lang),
+        tLabel("chatbot_ai_qr_help", lang),
+        tLabel("chatbot_ai_qr_contact", lang),
+      ],
+    },
+    faq: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_faq", lang),
+      quickReplies: [tLabel("chatbot_ai_cat_services", lang), tLabel("chatbot_ai_cat_pricing", lang), tLabel("chatbot_ai_qr_speak", lang)],
+    },
+    services: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_services", lang),
+      quickReplies: [tLabel("chatbot_ai_qr_branding", lang), tLabel("chatbot_ai_qr_development", lang), tLabel("chatbot_ai_qr_ai", lang), tLabel("chatbot_ai_cat_pricing", lang)],
+    },
+    pricing: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_pricing", lang),
+      quickReplies: [tLabel("chatbot_ai_qr_quote", lang), tLabel("chatbot_ai_cat_services", lang), tLabel("chatbot_ai_cat_faq", lang)],
+    },
+    support: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_support", lang),
+      quickReplies: [tLabel("chatbot_ai_qr_speak", lang), tLabel("chatbot_ai_cat_faq", lang), tLabel("chatbot_ai_cat_services", lang)],
+    },
+    about: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_about", lang),
+      quickReplies: [tLabel("chatbot_ai_cat_services", lang), tLabel("chatbot_ai_cat_pricing", lang), tLabel("chatbot_ai_qr_speak", lang)],
+    },
+    branding: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_branding", lang),
+      quickReplies: [tLabel("chatbot_ai_cat_pricing", lang), tLabel("chatbot_ai_qr_speak", lang), tLabel("chatbot_ai_cat_services", lang)],
+    },
+    development: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_development", lang),
+      quickReplies: [tLabel("chatbot_ai_cat_pricing", lang), tLabel("chatbot_ai_qr_speak", lang), tLabel("chatbot_ai_cat_services", lang)],
+    },
+    ai: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_ai", lang),
+      quickReplies: [tLabel("chatbot_ai_cat_pricing", lang), tLabel("chatbot_ai_qr_speak", lang), tLabel("chatbot_ai_cat_services", lang)],
+    },
+    quote: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_quote", lang),
+      quickReplies: [],
+    },
+    team: {
+      role: "bot",
+      text: tLabel("chatbot_ai_resp_team", lang),
+      quickReplies: [tLabel("chatbot_ai_qr_open_form", lang), tLabel("chatbot_ai_cat_support", lang), tLabel("chatbot_ai_cat_faq", lang)],
+    },
+  };
+}
 
 export function AIChatbot() {
+  const { lang } = useLanguage();
+  const categories = getCategories(lang);
+  const responses = getResponses(lang);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([responses.greeting]);
   const [input, setInput] = useState("");
@@ -163,7 +184,10 @@ export function AIChatbot() {
   }, [isOpen]);
 
   const handleSend = (text: string) => {
-    // Check for contact form navigation
+    // Check for contact form navigation. Each language's quick-reply
+    // stems are included so translated buttons (e.g. "Obtenir un devis"
+    // / "Angebot anfordern" / "Solicitar cotización") still trigger the
+    // contact modal in their respective language.
     const lower = text.toLowerCase();
     if (
       lower === "contact" ||
@@ -172,7 +196,11 @@ export function AIChatbot() {
       lower.includes("open contact form") ||
       lower.includes("speak to team") ||
       lower.includes("get a quote") ||
-      lower.includes("contact form")
+      lower.includes("contact form") ||
+      lower.includes("obtenir un devis") ||
+      lower.includes("parler") || lower.includes("équipe") || lower.includes("contacter") || lower.includes("aide") || lower.includes("formulaire") ||
+      lower.includes("angebot") || lower.includes("team sprechen") || lower.includes("kontakt") || lower.includes("hilfe") || lower.includes("formular") ||
+      lower.includes("cotiz") || lower.includes("hablar") || lower.includes("equipo") || lower.includes("contacto") || lower.includes("ayuda") || lower.includes("formulario")
     ) {
       const userMsg: Message = { role: "user", text };
       setMessages((prev) => [...prev, userMsg]);
@@ -199,19 +227,66 @@ export function AIChatbot() {
     setIsTyping(true);
 
     let botResponse: Message;
-    if (lower.includes("faq") || lower.includes("question")) botResponse = responses.faq;
-    else if (lower.includes("service") || lower.includes("offer")) botResponse = responses.services;
-    else if (lower.includes("pric") || lower.includes("cost") || lower.includes("budget"))
+    // Language-aware keyword detection: matches each language's stems
+    // so users typing in their native language still land on the
+    // right scripted answer.
+    if (
+      lower.includes("faq") || lower.includes("question") ||
+      lower.includes("frage") || lower.includes("fragen") ||
+      lower.includes("pregunta") || lower.includes("preguntas")
+    ) botResponse = responses.faq;
+    else if (
+      lower.includes("service") || lower.includes("offer") ||
+      lower.includes("service") || lower.includes("offre") ||
+      lower.includes("dienst") || lower.includes("leistung") ||
+      lower.includes("servicio") || lower.includes("ofrece")
+    ) botResponse = responses.services;
+    else if (
+      lower.includes("pric") || lower.includes("cost") || lower.includes("budget") ||
+      lower.includes("prix") || lower.includes("coût") || lower.includes("budget") ||
+      lower.includes("preis") || lower.includes("kosten") ||
+      lower.includes("precio") || lower.includes("costo")
+    )
       botResponse = responses.pricing;
-    else if (lower.includes("support") || lower.includes("contact"))
+    else if (
+      lower.includes("support") || lower.includes("contact") ||
+      lower.includes("support") || lower.includes("contact") ||
+      lower.includes("support") || lower.includes("kontakt") ||
+      lower.includes("soporte") || lower.includes("contacto")
+    )
       botResponse = responses.support;
-    else if (lower.includes("about") || lower.includes("who")) botResponse = responses.about;
-    else if (lower.includes("brand")) botResponse = responses.branding;
-    else if (lower.includes("develop") || lower.includes("web") || lower.includes("site"))
+    else if (
+      lower.includes("about") || lower.includes("who") ||
+      lower.includes("propos") || lower.includes("qui") ||
+      lower.includes("über") || lower.includes("wer") ||
+      lower.includes("acerca") || lower.includes("quién")
+    ) botResponse = responses.about;
+    else if (
+      lower.includes("brand") || lower.includes("marque") || lower.includes("marke") || lower.includes("marca")
+    ) botResponse = responses.branding;
+    else if (
+      lower.includes("develop") || lower.includes("web") || lower.includes("site") ||
+      lower.includes("dév") || lower.includes("site") ||
+      lower.includes("entwick") || lower.includes("website") ||
+      lower.includes("desarr") || lower.includes("sitio")
+    )
       botResponse = responses.development;
-    else if (lower.includes("ai") || lower.includes("auto")) botResponse = responses.ai;
-    else if (lower.includes("quote")) botResponse = responses.quote;
-    else if (lower.includes("team") || lower.includes("speak")) botResponse = responses.team;
+    else if (
+      // Tightened to require "automat" or "chatbot" as the primary stem
+      // across all 4 languages. Bare "ai"/"ia"/"ki" was too broad (matched
+      // "main", "available", "domain", "again", "había", "werden", etc.).
+      lower.includes("automat") || lower.includes("chatbot") || lower.includes("agent") ||
+      lower.includes("automat") || lower.includes("chatbot") || lower.includes("agent") ||
+      lower.includes("automat") || lower.includes("chatbot") || lower.includes("agent") ||
+      lower.includes("automat") || lower.includes("chatbot") || lower.includes("agent")
+    ) botResponse = responses.ai;
+    else if (lower.includes("quote") || lower.includes("devis") || lower.includes("angebot") || lower.includes("cotiz")) botResponse = responses.quote;
+    else if (
+      lower.includes("team") || lower.includes("speak") || lower.includes("human") || lower.includes("help") ||
+      lower.includes("équipe") || lower.includes("aide") ||
+      lower.includes("team") || lower.includes("hilfe") ||
+      lower.includes("equipo") || lower.includes("ayuda")
+    ) botResponse = responses.team;
     else botResponse = responses.greeting;
 
     // Simulate typing delay
@@ -244,7 +319,7 @@ export function AIChatbot() {
           setShowBadge(false);
         }}
         className="relative w-10 h-10 rounded-full bg-amber flex items-center justify-center hover:scale-110 active:scale-95 transition-transform shadow-[0_0_15px_rgba(245,158,11,0.3)]"
-        aria-label="Open chat"
+        aria-label={tLabel("chatbot_ai_aria_open", lang)}
         data-chat-trigger=""
       >
         <HiChatBubbleLeftRight className="text-black text-lg" />
@@ -283,17 +358,17 @@ export function AIChatbot() {
                         <HiChatBubbleLeftRight className="text-black text-lg" />
                       </div>
                       <div>
-                        <span className="font-heading font-black text-white text-sm">Stratifit AI</span>
+                        <span className="font-heading font-black text-white text-sm">{tLabel("chatbot_ai_title", lang)}</span>
                         <div className="flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                          <span className="text-[9px] text-gray-400 font-medium">Online</span>
+                          <span className="text-[9px] text-gray-400 font-medium">{tLabel("chatbot_ai_status", lang)}</span>
                         </div>
                       </div>
                     </div>
                     <button
                       onClick={() => setIsOpen(false)}
                       className="p-2 -mr-2 text-gray-400 hover:text-white transition-colors"
-                      aria-label="Close chat"
+                      aria-label={tLabel("chatbot_ai_aria_close", lang)}
                     >
                       <HiXMark size={22} />
                     </button>
@@ -382,7 +457,7 @@ export function AIChatbot() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type your message..."
+                        placeholder={tLabel("chatbot_ai_placeholder", lang)}
                         className="flex-1 bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
                       />
                       <button
