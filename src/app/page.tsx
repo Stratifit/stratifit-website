@@ -13,6 +13,10 @@ import {
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
 import { ComingSoonAIChat } from "@/components/chat/ComingSoonAIChat";
+import { LanguageDropdown } from "@/components/layout/LanguageDropdown";
+import { useCms } from "@/lib/use-cms";
+import { tLabel } from "@/lib/stratifit-i18n";
+import { t, type SiteSettings } from "@/lib/cms-types";
 import {
   MdDiamond,
   MdDesignServices,
@@ -85,6 +89,36 @@ const services = [
 ];
 
 const TARGET_DATE = new Date("2026-08-10T00:00:00");
+
+/* ------------------------------------------------------------------ */
+/*  Coming Soon header — logo icon (no label) + language dropdown    */
+/* ------------------------------------------------------------------ */
+
+function ComingSoonHeader() {
+  // Pull logo text from CMS (same source as main Header); fallback to "SF"
+  const { data: cmsSettings } = useCms<SiteSettings>("site_settings", { fallback: undefined });
+  const logoText = cmsSettings?.logo_text || "SF";
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 lg:h-20 flex items-center justify-between">
+        {/* Left: logo icon (no label) */}
+        <a
+          href="/"
+          aria-label="Stratifit home"
+          className="pointer-events-auto flex items-center group shrink-0"
+        >
+          <div className="w-9 h-9 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
+            <span className="text-black font-black text-xs tracking-tighter">{logoText}</span>
+          </div>
+        </a>
+        {/* Right: language dropdown (compact, matches mobile header style) */}
+        <div className="pointer-events-auto">
+          <LanguageDropdown size="sm" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
   const [password, setPassword] = useState("");
@@ -165,7 +199,11 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+    <main className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Coming Soon header — logo icon (no label) + language dropdown */}
+      <ComingSoonHeader />
+
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         {/* Blueprint / dot grid texture — sits deep behind everything */}
         <div className="absolute inset-0 bg-grid opacity-40" />
 
