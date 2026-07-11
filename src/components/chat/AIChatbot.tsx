@@ -101,12 +101,22 @@ export function AIChatbot() {
   const [showBadge, setShowBadge] = useState(false);
   const [mounted, setMounted] = useState(false);
 
+  // setMounted(true) post-mount so createPortal can safely target document.body.
+  // This is the canonical "isMounted" pattern; reading document during SSR would
+  // throw, so we explicitly delay the portal to after hydration. The
+  // set-state-in-effect rule doesn't apply to this idiom.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const isOpenRef = useRef(isOpen);
-  isOpenRef.current = isOpen;
+  // Sync the ref in useLayoutEffect rather than during render so the
+  // setTimeout callback inside handleSend sees the fresh `isOpen` value
+  // without mutating a ref mid-render.
+  useLayoutEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
 
   // Pin scroll to bottom on open — useLayoutEffect fires after layout, before paint
   useLayoutEffect(() => {

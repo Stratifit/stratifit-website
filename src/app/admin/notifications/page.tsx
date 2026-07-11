@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { motion } from "framer-motion";
 import {
   HiBell,
@@ -22,7 +22,7 @@ const notifications = [
   { id: "n-6", title: "New testimonial suggested", body: "Linnea Couture left 5★ feedback. Ready to publish?", time: "1d ago", unread: false, type: "content", cta: { label: "Review", href: "/admin/testimonials" } },
 ];
 
-const typeIcon: Record<string, any> = {
+const typeIcon: Record<string, ComponentType<{ className?: string }>> = {
   lead: HiUserGroup,
   billing: HiCurrencyDollar,
   chat: HiChatBubbleLeftRight,

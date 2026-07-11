@@ -36,11 +36,8 @@ export function AdminTopBar() {
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
-  /* Close menu/popover on navigation */
-  useEffect(() => {
-    setMenuOpen(false);
-    setProfileOpen(false);
-  }, [pathname]);
+  /* Close menu/popover on navigation — handled by `onClick` handlers on the
+   * nav links themselves, so no separate pathname effect is needed. */
 
   /* Body scroll lock while the mobile drawer is open */
   useEffect(() => {

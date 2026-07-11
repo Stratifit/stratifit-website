@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -655,13 +656,13 @@ export function GrowthMarketing() {
             </div>
           </div>
           <div className="hidden md:flex justify-end mt-8">
-            <a
+            <Link
               href="/portfolio"
               className="inline-flex items-center gap-2 text-amber text-sm font-bold uppercase tracking-wider hover:text-amber-light transition-colors group"
             >
               View All Projects
               <HiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-            </a>
+            </Link>
           </div>
         </div>
 

@@ -105,7 +105,7 @@ export function FaqAIChat({
           {
             role: "bot",
             text:
-              "🤔 I couldn't find a matching answer. Try a popular question above, or tap below to chat with a human — we typically reply within 24 hours.",
+              "🤔 I couldn&apos;t find a matching answer. Try a popular question above, or tap below to chat with a human — we typically reply within 24 hours.",
             matchedFaqId: "__fallback__",
           },
         ]);
@@ -408,7 +408,7 @@ export function FaqAIChat({
       <div className="px-5 sm:px-6 py-3 border-t border-white/5 flex items-center justify-between gap-3 bg-black/30">
         <p className="text-[10px] text-gray-500 flex items-center gap-1.5">
           <HiUserGroup className="text-amber text-xs" />
-          Prefer a human? We'll reply within 24h.
+          Prefer a human? We&apos;ll reply within 24h.
         </p>
         <button
           onClick={openContactModal}

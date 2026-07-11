@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { HiArrowLeft, HiCheck, HiDocumentText } from "react-icons/hi2";
 import { insights } from "@/data/insights";
@@ -8,15 +9,17 @@ import { insights } from "@/data/insights";
 export default function AdminInsightDetail({ params }: { params: { slug: string } }) {
   // Match against the static dataset to populate the form fields
   const found = insights.find((p) => (p.slug ?? "").toLowerCase() === params.slug.toLowerCase());
-  // Insight has no "status" field in the schema — publish-state is derived from `date` (future ⇒ scheduled, near-now ⇒ published, old ⇒ archived)
-  const derivedStatus = (() => {
+  // Insight has no "status" field in the schema — publish-state is derived from `date`
+  // (future ⇒ scheduled, near-now ⇒ published, old ⇒ archived). The derivation uses
+  // `useState` lazy init so `Date.now()` only runs once per mount, not on every render.
+  const [derivedStatus] = useState<"draft" | "scheduled" | "published" | "archived">(() => {
     const d = Date.parse(found?.date ?? "");
     if (!isFinite(d)) return "draft";
     const now = Date.now();
     if (d > now + 86_400_000) return "scheduled";
     if (d < now - 365 * 86_400_000) return "archived";
     return "published";
-  })();
+  });
   const fallback = {
     title: params.slug.replace(/-/g, " "),
     category: "Strategy",

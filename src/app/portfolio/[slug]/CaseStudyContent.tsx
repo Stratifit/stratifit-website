@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   HiCheckCircle,
@@ -339,13 +340,13 @@ export function CaseStudyContent({ project }: { project: Project }) {
             <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-8 max-w-2xl mx-auto">
               Same rigor, same playbook — applied to your business and measured by your metrics.
             </p>{" "}
-            <a
+            <Link
               href="/#contact"
               className="group inline-flex px-8 sm:px-12 py-4 sm:py-5 bg-amber text-black font-bold rounded-xl items-center justify-center gap-3 hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_50px_rgba(245,158,11,0.5)] active:scale-95 text-base sm:text-lg"
             >
               Start your project with Stratifit
               <HiArrowRight className="group-hover:translate-x-1 transition-transform text-xl" />
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   HiArrowLeft,
@@ -199,12 +200,12 @@ export default function AboutPage() {
               {ctaPrefix}<span className="text-amber">{ctaHighlight}</span>
             </h2>
             <p className="text-gray-400 text-sm mb-6">{ctaSub}</p>
-            <a
+            <Link
               href="/#contact"
               className="inline-flex items-center gap-2 px-8 py-3.5 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_30px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
             >
               {ctaBtn}
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>

@@ -242,7 +242,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
           Free-form matcher
         </div>
         <div className="bg-black border border-white/10 rounded-xl px-4 py-3 text-[11px] font-mono text-gray-400">
-          findComingSoonAnswer("user typed query") → {"{"} id: <span className="text-amber">"{findIdFor(entry.id)}"</span> {"}"}
+          findComingSoonAnswer(&quot;user typed query&quot;) → {"{"} id: <span className="text-amber">&quot;{findIdFor(entry.id)}&quot;</span> {"}"}
         </div>
       </section>
     </div>

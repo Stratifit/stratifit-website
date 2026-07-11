@@ -45,7 +45,10 @@ export default function AdminFaqPage() {
       const raw = typeof window !== "undefined" && window.localStorage.getItem(KB_STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) setEntries(parsed);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setEntries(parsed);
+        }
       }
     } catch { /* ignore */ }
   }, []);

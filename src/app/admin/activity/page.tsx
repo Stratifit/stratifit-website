@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { motion } from "framer-motion";
 import {
   HiClock,
@@ -26,7 +26,7 @@ const events = [
 
 const types = ["all", "publish", "lead", "edit", "email", "sync", "bid", "billing", "team"];
 
-const typeIcon: Record<string, any> = {
+const typeIcon: Record<string, ComponentType<{ className?: string }>> = {
   publish: HiCheckCircle,
   lead: HiUserGroup,
   edit: HiPencil,

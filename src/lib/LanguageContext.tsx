@@ -39,11 +39,17 @@ const STORAGE_KEY = "stratifit-lang";
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [langCode, setLangCodeState] = useState<string>("EN");
 
-  // Hydrate from localStorage on mount
+  // Hydrate from localStorage on mount. The set-state-in-effect pattern is
+  // intentional here: reading localStorage during the initial render would
+  // cause a hydration mismatch (server renders with the default "EN", client
+  // would render in whatever language localStorage holds). Doing it in a
+  // post-mount effect lets the server output stay stable and triggers a single
+  // re-render with the user's preferred language.
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored && CODE_TO_LANG[stored]) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLangCodeState(stored);
       }
     } catch {

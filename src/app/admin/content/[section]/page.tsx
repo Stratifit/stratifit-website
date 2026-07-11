@@ -56,14 +56,21 @@ export default function ContentEditorPage() {
             : [],
       );
     } catch (err) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setError(err instanceof Error ? err.message : "Error loading");
     } finally {
       setLoading(false);
     }
   }, [config]);
 
+  // fetchData internally calls setLoading/setError/setItems, so the call from a
+  // useEffect counts as a "setState in effect" per the react-compiler rule.
+  // This is the canonical data-fetching pattern; we deliberately let the
+  // effect trigger the state transitions rather than driving them off renders.
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     fetchData();
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [fetchData]);
 
   if (!hasSupabase()) {

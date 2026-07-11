@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback, useRef } from "react";
 import { hasSupabase } from "@/lib/supabase";
 import type { Language } from "@/lib/cms-types";
 
@@ -34,8 +34,12 @@ export function useCms<T = unknown>(
   // Use a ref to hold latest fallback, avoiding stale closures without
   // adding it to useCallback deps (which would cause infinite re-renders
   // when fallback is an inline array/object literal like [] or {}).
+  // The ref is updated in useLayoutEffect (not during render) so that
+  // effects triggered by `fallback` changes always see the up-to-date value.
   const fallbackRef = useRef(fallback);
-  fallbackRef.current = fallback;
+  useLayoutEffect(() => {
+    fallbackRef.current = fallback;
+  }, [fallback]);
 
   const fetchData = useCallback(async () => {
     if (!hasSupabase()) {

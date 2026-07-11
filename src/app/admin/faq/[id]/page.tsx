@@ -22,6 +22,9 @@ export default function AdminSlugFaqDetail({ params }: { params: { id: string } 
   const [seed, setSeed] = useState<StaticFaqEntry | null>(null);
 
   useEffect(() => {
+    // setState in effect: this useEffect deliberately hydrates from localStorage
+    // after mount. Multiple setStates seed the local state; block-disable covers them.
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (isNew) {
       setSeed({
         id: nextStaticFaqId(getStoredEntries() ?? initialStaticFaq),
@@ -33,12 +36,24 @@ export default function AdminSlugFaqDetail({ params }: { params: { id: string } 
     const stored = getStoredEntries();
     const list = stored ?? initialStaticFaq;
     const found = list.find((e) => e.id === params.id);
-    if (found) setSeed(found);
-    else setSeed({ id: params.id, question: params.id.replace(/-/g, ' '), answer: '' });
+    if (found) {
+      setSeed(found);
+    }
+    else {
+      setSeed({ id: params.id, question: params.id.replace(/-/g, ' '), answer: '' });
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [params.id, isNew]);
 
   const [draft, setDraft] = useState<StaticFaqEntry | null>(null);
-  useEffect(() => { if (seed) setDraft(seed); }, [seed]);
+  useEffect(() => {
+    // setState in effect: copies the hydrated seed into a local draft.
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (seed) {
+      setDraft(seed);
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [seed]);
 
   if (!draft) return <p className="text-xs text-gray-500">Loading...</p>;
 

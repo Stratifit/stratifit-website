@@ -86,7 +86,7 @@ export default function AdminTestimonialsPage() {
                 {"{{testimonial.quote}}"}
               </p>
               <p className="text-sm text-gray-300 leading-relaxed line-clamp-3">
-                "{t.text}"
+                &quot;{t.text}&quot;
               </p>
               <div className="mt-4 flex items-center justify-between">
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${

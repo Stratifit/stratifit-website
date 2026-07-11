@@ -19,14 +19,21 @@ export default function AdminFaqPage() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    // setState in effect: this useEffect deliberately hydrates from localStorage
+    // after mount to avoid SSR/CSR hydration mismatches. Both setStates are part
+    // of the same hydration routine, so we block-disable the rule for the body.
+    /* eslint-disable react-hooks/set-state-in-effect */
     try {
       const raw = typeof window !== 'undefined' && window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as StaticFaqEntry[];
-        if (Array.isArray(parsed) && parsed.length > 0) setEntries(parsed);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setEntries(parsed);
+        }
       }
     } catch { /* ignore */ }
     setHydrated(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   const persist = (next: StaticFaqEntry[]) => {

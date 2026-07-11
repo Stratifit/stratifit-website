@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { AIChatbot } from "@/components/chat/AIChatbot";
@@ -154,7 +155,7 @@ export function Header() {
           </button>
 
           {/* Desktop: Logo on left */}
-          <a href="/" className="hidden lg:flex items-center gap-2.5 group shrink-0 order-1">
+          <Link href="/" className="hidden lg:flex items-center gap-2.5 group shrink-0 order-1">
             <div className="w-9 h-9 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
               <span className="text-black font-black text-xs tracking-tighter">{logoText}</span>
             </div>
@@ -166,7 +167,7 @@ export function Header() {
                 {tagline}
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop: Nav links center */}
           <div className="hidden lg:flex items-center gap-8 order-2 lg:pl-40">
@@ -201,7 +202,7 @@ export function Header() {
             })}
           </div>
 
-          {/* Mobile: Logo centered */}            <a
+          {/* Mobile: Logo centered */}            <Link
               href="/"
               className="lg:hidden flex items-center gap-2 group shrink-0 order-2 absolute left-1/2 -translate-x-1/2"
             >
@@ -213,7 +214,7 @@ export function Header() {
                   {siteName}
                 </span>
               </div>
-            </a>
+            </Link>
 
           {/* Desktop: CTA right */}
           <div className="hidden lg:block order-3">
@@ -243,7 +244,7 @@ export function Header() {
           >
             {/* Header - matches home */}
             <div className="flex-none px-4 py-3 flex items-center justify-between border-b border-white/10 h-16">
-            <a
+            <Link
               href="/"
               onClick={() => setIsOpen(false)}
               className="flex items-center gap-2 group shrink-0"
@@ -256,7 +257,7 @@ export function Header() {
                   {siteName}
                 </span>
               </div>
-            </a>
+            </Link>
               <button
                 onClick={() => setIsOpen(false)}
                 aria-label="Close menu"
@@ -270,7 +271,7 @@ export function Header() {
             <div className="flex-1 flex flex-col justify-between px-6 py-3 overflow-y-auto menu-scroll">
               <nav className="flex flex-col gap-0 mt-1">
                 {/* Home - always first */}
-                <a
+                <Link
                   href="/"
                   onClick={() => setIsOpen(false)}
                   className="group flex items-center justify-between py-3 border-b border-white/10"
@@ -278,7 +279,7 @@ export function Header() {
                   <span className="text-2xl font-heading font-black text-white group-hover:text-amber transition-colors">
                     Home
                   </span>
-                </a>
+                </Link>
 
                 {/* Services - expandable */}
                 <div className="flex flex-col border-b border-white/10 pb-3 mb-1">
@@ -389,17 +390,17 @@ export function Header() {
               {/* Footer links */}
               <div className="mb-2 text-center">
                 <p className="text-[0.7rem] text-white/70 font-medium tracking-wide">
-                  <a className="hover:text-white transition-colors" href="/privacy-policy">
+                  <Link className="hover:text-white transition-colors" href="/privacy-policy">
                     Privacy Policy
-                  </a>
+                  </Link>
                   <span className="mx-1">.</span>
-                  <a className="hover:text-white transition-colors" href="/terms-conditions">
+                  <Link className="hover:text-white transition-colors" href="/terms-conditions">
                     Terms of Service
-                  </a>
+                  </Link>
                   <span className="mx-1">.</span>
-                  <a className="hover:text-white transition-colors" href="/cookie-policy">
+                  <Link className="hover:text-white transition-colors" href="/cookie-policy">
                     Cookie Policy
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
