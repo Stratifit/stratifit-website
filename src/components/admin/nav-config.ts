@@ -42,7 +42,7 @@ export const navGroups: NavGroup[] = [
     items: [
       { key: "dashboard", href: "/admin", icon: HiHome, label: "Overview" },
       { key: "leads", href: "/admin/leads", icon: HiUsers, label: "Leads", badge: "12" },
-      { key: "subscriptions", href: "/admin/subscriptions", icon: HiEnvelope, label: "Subscriptions", badge: "248" },
+      { key: "subscriptions", href: "/admin/subscriptions", icon: HiEnvelope, label: "Notify Subscribers" },
       { key: "services", href: "/admin/services", icon: HiSparkles, label: "Services" },
     ],
   },

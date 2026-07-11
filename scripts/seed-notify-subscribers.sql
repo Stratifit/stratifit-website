@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS notify_subscribers (id UUID PRIMARY KEY DEFAULT uuid_generate_v4(), email TEXT NOT NULL UNIQUE, status TEXT NOT NULL DEFAULT 'subscribed', source TEXT DEFAULT 'coming_soon_page', lang TEXT DEFAULT 'en', created_at TIMESTAMPTZ DEFAULT NOW()); CREATE INDEX IF NOT EXISTS notify_subscribers_created_at_idx ON notify_subscribers(created_at DESC);

@@ -356,7 +356,21 @@ CREATE TABLE IF NOT EXISTS contact_form_config (
 INSERT INTO contact_form_config (id) VALUES (uuid_generate_v4()) ON CONFLICT DO NOTHING;
 
 /* ============================================================
-   24. section_labels (single row — overrides for every section heading)
+   24. notify_subscribers (list — "Notify When It's Live" emails)
+   ============================================================ */
+CREATE TABLE IF NOT EXISTS notify_subscribers (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT NOT NULL UNIQUE,
+  status TEXT NOT NULL DEFAULT 'subscribed',
+  source TEXT DEFAULT 'coming_soon_page',
+  lang TEXT DEFAULT 'en',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS notify_subscribers_created_at_idx
+  ON notify_subscribers(created_at DESC);
+
+/* ============================================================
+   25. section_labels (single row — overrides for every section heading)
    ============================================================ */
 CREATE TABLE IF NOT EXISTS section_labels (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

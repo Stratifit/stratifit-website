@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -124,6 +124,9 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  const [notifySubmitting, setNotifySubmitting] = useState(false);
+  const [notifySuccess, setNotifySuccess] = useState(false);
+  const [notifyError, setNotifyError] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   // Refs used by ComingSoonAIChat to scroll the gate into the right region after a CTA
   const notifySectionRef = useRef<HTMLElement>(null);
@@ -195,6 +198,36 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
       onUnlock();
     } else {
       setPasswordError("Incorrect password. Please try again.");
+    }
+  };
+
+  const handleNotifySubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!email || notifySubmitting) return;
+    setNotifySubmitting(true);
+    setNotifyError(null);
+    try {
+      const res = await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          lang: typeof window !== "undefined"
+            ? (document.documentElement.lang || "en")
+            : "en",
+          source: "coming_soon_page",
+        }),
+      });
+      if (res.ok) {
+        setNotifySuccess(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setNotifyError(data.error || "Could not save your email. Please try again.");
+      }
+    } catch {
+      setNotifyError("Network error. Please check your connection.");
+    } finally {
+      setNotifySubmitting(false);
     }
   };
 
@@ -371,10 +404,40 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         <section ref={notifySectionRef} className="mt-2 md:mt-4">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
             <p className="text-gray-400 text-sm mb-4">Get notified when we launch</p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" className="flex-1 bg-card-dark border border-white/10 rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors" />
-              <button className="px-8 py-3.5 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 shrink-0">Notify When It&apos;s Live</button>
-            </div>
+            {notifySuccess ? (
+              <div className="bg-amber/10 border border-amber/30 text-amber px-5 py-3.5 rounded-xl text-sm font-bold flex items-center justify-center lg:justify-start gap-2">
+                <HiCheckCircle className="text-lg" />
+                You&apos;re on the list. We&apos;ll be in touch!
+              </div>
+            ) : (
+              <form
+                onSubmit={handleNotifySubmit}
+                className="flex flex-col sm:flex-row gap-3"
+              >
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  disabled={notifySubmitting}
+                  className="flex-1 bg-card-dark border border-white/10 rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={notifySubmitting || !email}
+                  className="px-8 py-3.5 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {notifySubmitting ? "Submitting..." : "Notify When It\u2019s Live"}
+                </button>
+              </form>
+            )}
+            {notifyError && (
+              <p className="mt-2 text-xs text-red-400 font-medium flex items-center gap-2 lg:justify-start justify-center">
+                <span className="inline-block w-1 h-1 rounded-full bg-red-400" />
+                {notifyError}
+              </p>
+            )}
           </motion.div>
         </section>
 
