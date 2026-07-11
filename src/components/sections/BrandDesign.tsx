@@ -145,7 +145,7 @@ export function BrandDesign() {
   };
 
   return (
-    <section className="py-24 md:py-32">
+    <section className="pt-0 pb-24 md:pt-0 md:pb-32">
       <div className="max-w-7xl mx-auto px-6 space-y-24 md:space-y-32">
         {/* Hero */}
         <section className="relative min-h-[60vh] flex items-center pt-24 pb-0 md:pt-20 md:pb-0">
