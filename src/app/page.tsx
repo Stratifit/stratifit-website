@@ -255,7 +255,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-8 pb-16 md:py-24 lg:py-32 flex flex-col justify-center min-h-screen lg:min-h-0">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-16 md:py-24 lg:py-32 flex flex-col justify-center min-h-screen lg:min-h-0">
         {/* Hero */}
         <section className="mb-16 md:mb-20 lg:mb-24">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left">
