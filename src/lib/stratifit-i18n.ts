@@ -236,6 +236,65 @@ const labelTranslations: Record<string, Record<Language, string>> = {
   form_select_range: { en: "Select range", fr: "Sélectionner une plage", de: "Bereich auswählen", es: "Seleccionar rango" },
   form_custom_budget: { en: "Custom budget", fr: "Budget personnalisé", de: "Individuelles Budget", es: "Presupuesto personalizado" },
   form_send_message: { en: "Send Message", fr: "Envoyer le Message", de: "Nachricht Senden", es: "Enviar Mensaje" },
+
+  /* ============================================================
+     Coming Soon page
+     Used by the ComingSoonGate (src/app/page.tsx) and rendered
+     before the site is unlocked. All user-facing copy on the
+     gate — hero, countdown, password prompt, services headings,
+     notify form, contact teaser, and the post-submit thank-you
+     modal — comes from these keys so the entire page swaps
+     language when the user changes the LanguageDropdown.
+     ============================================================ */
+
+  /* ---------- Hero ---------- */
+  coming_soon_prefix: { en: "Stratifit is", fr: "Stratifit est", de: "Stratifit ist", es: "Stratifit está" },
+  coming_soon_highlight: { en: "Coming Soon", fr: "Bientôt Disponible", de: "Demnächst", es: "Próximamente" },
+  coming_soon_subheading: { en: "A new digital agency experience is launching shortly.", fr: "Une nouvelle expérience d'agence numérique arrive bientôt.", de: "Ein neues Digitalagentur-Erlebnis startet in Kürze.", es: "Una nueva experiencia de agencia digital se lanzará en breve." },
+
+  /* ---------- Countdown ---------- */
+  countdown_days: { en: "Days", fr: "Jours", de: "Tage", es: "Días" },
+  countdown_hours: { en: "Hours", fr: "Heures", de: "Stunden", es: "Horas" },
+  countdown_minutes: { en: "Minutes", fr: "Minutes", de: "Minuten", es: "Minutos" },
+  countdown_seconds: { en: "Seconds", fr: "Secondes", de: "Sekunden", es: "Segundos" },
+
+  /* ---------- Password Gate ---------- */
+  password_prompt: { en: "Enter password to preview the website", fr: "Entrez le mot de passe pour prévisualiser le site", de: "Passwort eingeben, um die Website in der Vorschau anzuzeigen", es: "Ingresa la contraseña para previsualizar el sitio" },
+  password_placeholder: { en: "Enter password", fr: "Mot de passe", de: "Passwort eingeben", es: "Introducir contraseña" },
+  password_view_btn: { en: "View Website", fr: "Voir le Site", de: "Website Ansehen", es: "Ver Sitio" },
+  password_error: { en: "Incorrect password. Please try again.", fr: "Mot de passe incorrect. Veuillez réessayer.", de: "Falsches Passwort. Bitte erneut versuchen.", es: "Contraseña incorrecta. Inténtalo de nuevo." },
+
+  /* ---------- Notify Me ---------- */
+  notify_prompt: { en: "Get notified when we launch", fr: "Soyez notifié lors du lancement", de: "Bei Start benachrichtigen", es: "Recibe notificaciones cuando lancemos" },
+  notify_placeholder: { en: "Enter your email", fr: "Entrez votre e-mail", de: "E-Mail eingeben", es: "Introduce tu correo" },
+  notify_btn: { en: "Notify When It\u2019s Live", fr: "M\u2019avertir du Lancement", de: "Bei Start Benachrichtigen", es: "Notificarme al Lanzar" },
+  notify_submitting: { en: "Submitting...", fr: "Envoi...", de: "Wird gesendet...", es: "Enviando..." },
+
+  /* ---------- Contact teaser ---------- */
+  contact_direct_prompt: { en: "Or get in touch directly", fr: "Ou contactez-nous directement", de: "Oder kontaktieren Sie uns direkt", es: "O ponte en contacto directamente" },
+  contact_placeholder_text: { en: "Tell us about your upcoming project", fr: "Parlez-nous de votre prochain projet", de: "Erzählen Sie uns von Ihrem Projekt", es: "Cuéntanos sobre tu próximo proyecto" },
+  contact_send_btn: { en: "Send Message", fr: "Envoyer", de: "Senden", es: "Enviar" },
+
+  /* ---------- Thank-you modal ---------- */
+  notify_modal_heading: { en: "You\u2019re on the list.", fr: "Vous \u00eates sur la liste.", de: "Sie sind auf der Liste.", es: "Est\u00e1s en la lista." },
+  notify_modal_body: { en: "We\u2019ll let you know the moment we go live \u2014 and we can\u2019t wait to help you grow your business.", fr: "Nous vous pr\u00e9viendrons d\u00e8s que nous serons en ligne \u2014 et nous avons h\u00e2te de vous aider \u00e0 d\u00e9velopper votre entreprise.", de: "Wir benachrichtigen Sie, sobald wir live sind \u2014 und wir k\u00f6nnen es kaum erwarten, Ihr Unternehmen wachsen zu lassen.", es: "Te avisaremos en cuanto estemos en vivo \u2014 y estamos deseando ayudarte a hacer crecer tu negocio." },
+  notify_modal_cant_wait: { en: "Can\u2019t wait?", fr: "Impatient ?", de: "K\u00f6nnen Sie es nicht erwarten?", es: "\u00bfNo puedes esperar?" },
+  notify_modal_contact_btn: { en: "Contact Us", fr: "Nous Contacter", de: "Kontakt", es: "Cont\u00e1ctanos" },
+  notify_modal_close_btn: { en: "Got it", fr: "Compris", de: "Verstanden", es: "Entendido" },
+
+  /* ---------- Service tile — extra items on the gate (Buy a Business + Funnel Strategy are not in the main CoreServices list) ---------- */
+  service_buy_biz_title: { en: "Buy a Business", fr: "Acheter une Entreprise", de: "Unternehmen Kaufen", es: "Comprar un Negocio" },
+  service_buy_biz_desc: { en: "Acquire vetted, revenue-generating online businesses and skip the startup phase entirely.", fr: "Acqu\u00e9rez des entreprises en ligne v\u00e9rifi\u00e9es et g\u00e9n\u00e9ratrices de revenus, et sautez la phase de d\u00e9marrage.", de: "\u00dcbernehmen Sie gepr\u00fcfte, umsatzgenerierende Online-Unternehmen und \u00fcberspringen Sie die Startup-Phase.", es: "Adquiere negocios en l\u00ednea verificados y generadores de ingresos, y s\u00e1ltate la fase inicial." },
+  service_buy_biz_d1: { en: "Niche Research", fr: "Recherche de niche", de: "Nischenrecherche", es: "Investigaci\u00f3n de Nicho" },
+  service_buy_biz_d2: { en: "Due Diligence", fr: "Diligence raisonnable", de: "Sorgf\u00e4ltige Pr\u00fcfung", es: "Due Diligence" },
+  service_buy_biz_d3: { en: "Brand Acquisition", fr: "Acquisition de marque", de: "Markenakquisition", es: "Adquisici\u00f3n de Marca" },
+  service_buy_biz_d4: { en: "Transition Support", fr: "Accompagnement \u00e0 la transition", de: "\u00dcbergangsunterst\u00fctzung", es: "Soporte de Transici\u00f3n" },
+  service_funnel_title: { en: "Funnel Strategy", fr: "Strat\u00e9gie d\u2019Entonnoir", de: "Funnel-Strategie", es: "Estrategia de Embudo" },
+  service_funnel_desc: { en: "Conversion-optimized funnels and CRM workflows that turn visitors into loyal customers.", fr: "Entonnoirs optimis\u00e9s pour la conversion et flux CRM qui transforment les visiteurs en clients fid\u00e8les.", de: "Conversion-optimierte Funnels und CRM-Workflows, die Besucher in treue Kunden verwandeln.", es: "Embudos optimizados para conversi\u00f3n y flujos CRM que convierten visitantes en clientes leales." },
+  service_funnel_d1: { en: "Funnel Design", fr: "Conception d\u2019entonnoir", de: "Funnel-Design", es: "Dise\u00f1o de Embudo" },
+  service_funnel_d2: { en: "Conversion Optimization", fr: "Optimisation de la conversion", de: "Conversion-Optimierung", es: "Optimizaci\u00f3n de Conversi\u00f3n" },
+  service_funnel_d3: { en: "CRM Setup", fr: "Configuration CRM", de: "CRM-Einrichtung", es: "Configuraci\u00f3n CRM" },
+  service_funnel_d4: { en: "Analytics & Reporting", fr: "Analyses et rapports", de: "Analysen & Berichte", es: "An\u00e1lisis e Informes" },
 };
 
 /**

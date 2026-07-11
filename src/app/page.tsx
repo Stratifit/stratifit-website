@@ -17,6 +17,7 @@ import { ComingSoonAIChat } from "@/components/chat/ComingSoonAIChat";
 import { LanguageDropdown } from "@/components/layout/LanguageDropdown";
 import { useCms } from "@/lib/use-cms";
 import { tLabel } from "@/lib/stratifit-i18n";
+import { useLanguage } from "@/lib/LanguageContext";
 import { t, type SiteSettings } from "@/lib/cms-types";
 import {
   MdDiamond,
@@ -44,48 +45,51 @@ const Contact = dynamic(() => import("@/components/sections/Contact").then((m) =
 /*  Coming‑Soon Gate                                                  */
 /* ------------------------------------------------------------------ */
 
-const services = [
+type ServiceTile = {
+  titleKey: string;
+  descKey: string;
+  deliverableKeys: string[];
+  icon: React.ElementType;
+};
+
+/* Order & shape are fixed across languages — only the strings swap.
+   The keys reference translations added in src/lib/stratifit-i18n.ts. */
+const services: ServiceTile[] = [
   {
-    title: "Brand Design",
-    description:
-      "Crafting unique identities that resonate and leave a lasting impression on your market.",
+    titleKey: "service_brand_title",
+    descKey: "service_brand_desc",
+    deliverableKeys: ["service_brand_d1", "service_brand_d2", "service_brand_d3", "service_brand_d4"],
     icon: MdDiamond,
-    deliverables: ["Brand Strategy", "Logo Design", "Visual Identity", "Brand Guidelines"],
   },
   {
-    title: "Website Development",
-    description:
-      "High-performance websites and web apps engineered for speed, scale, and conversion.",
+    titleKey: "service_website_title",
+    descKey: "service_website_desc",
+    deliverableKeys: ["service_website_d1", "service_website_d2", "service_website_d3", "service_website_d4"],
     icon: MdDesignServices,
-    deliverables: ["Custom Websites", "E‑commerce", "Web Applications", "CMS Integration"],
   },
   {
-    title: "AI & Automation",
-    description:
-      "Intelligent automation that streamlines operations, qualifies leads, and scales support 24/7.",
+    titleKey: "service_ai_title",
+    descKey: "service_ai_desc",
+    deliverableKeys: ["service_ai_d1", "service_ai_d2", "service_ai_d3", "service_ai_d4"],
     icon: MdCode,
-    deliverables: ["AI Lead Qualification", "AI Chatbots", "Workflow Automation", "Custom APIs"],
   },
   {
-    title: "Growth & Marketing",
-    description:
-      "Data-driven campaigns that amplify your brand and drive measurable revenue growth.",
+    titleKey: "service_growth_title",
+    descKey: "service_growth_desc",
+    deliverableKeys: ["service_growth_d1", "service_growth_d2", "service_growth_d3", "service_growth_d4"],
     icon: MdRocketLaunch,
-    deliverables: ["Performance Marketing", "SEO & SEM", "Content Strategy", "Social Media"],
   },
   {
-    title: "Buy a Business",
-    description:
-      "Acquire vetted, revenue-generating online businesses and skip the startup phase entirely.",
+    titleKey: "service_buy_biz_title",
+    descKey: "service_buy_biz_desc",
+    deliverableKeys: ["service_buy_biz_d1", "service_buy_biz_d2", "service_buy_biz_d3", "service_buy_biz_d4"],
     icon: HiGlobeAlt,
-    deliverables: ["Niche Research", "Due Diligence", "Brand Acquisition", "Transition Support"],
   },
   {
-    title: "Funnel Strategy",
-    description:
-      "Conversion-optimized funnels and CRM workflows that turn visitors into loyal customers.",
+    titleKey: "service_funnel_title",
+    descKey: "service_funnel_desc",
+    deliverableKeys: ["service_funnel_d1", "service_funnel_d2", "service_funnel_d3", "service_funnel_d4"],
     icon: HiShieldCheck,
-    deliverables: ["Funnel Design", "Conversion Optimization", "CRM Setup", "Analytics & Reporting"],
   },
 ];
 
@@ -122,6 +126,7 @@ function ComingSoonHeader() {
 }
 
 function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
+  const { lang } = useLanguage();
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
@@ -197,7 +202,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
       setPasswordError(null);
       onUnlock();
     } else {
-      setPasswordError("Incorrect password. Please try again.");
+      setPasswordError(tLabel("password_error", lang));
     }
   };
 
@@ -258,23 +263,23 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-16 md:py-24 lg:py-32 flex flex-col justify-center min-h-screen lg:min-h-0">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-16 md:py-24 lg:py-32 flex flex-col justify-center min-h-screen lg:min-h-0">
         {/* Hero */}
         <section className="mb-16 md:mb-20 lg:mb-24">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="max-w-3xl mx-auto lg:mx-0 text-center lg:text-left">
             <h1 className="text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-black leading-[0.95] tracking-tight mb-6 whitespace-nowrap">
-              Stratifit is <span className="text-amber">Coming Soon</span>
+              {tLabel("coming_soon_prefix", lang)} <span className="text-amber">{tLabel("coming_soon_highlight", lang)}</span>
             </h1>
             <p className="text-gray-400 text-sm sm:text-lg md:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8 whitespace-nowrap">
-              A new digital agency experience is launching shortly.
+              {tLabel("coming_soon_subheading", lang)}
             </p>
             <div className="flex justify-center lg:justify-start">
               <div className="inline-flex items-center gap-4 sm:gap-6 bg-card-dark rounded-2xl px-6 py-4 border border-white/5">
               {[
-                { value: timeLeft?.days, label: "Days" },
-                { value: timeLeft?.hours, label: "Hours" },
-                { value: timeLeft?.minutes, label: "Minutes" },
-                { value: timeLeft?.seconds, label: "Seconds" },
+                { value: timeLeft?.days, label: tLabel("countdown_days", lang) },
+                { value: timeLeft?.hours, label: tLabel("countdown_hours", lang) },
+                { value: timeLeft?.minutes, label: tLabel("countdown_minutes", lang) },
+                { value: timeLeft?.seconds, label: tLabel("countdown_seconds", lang) },
               ].map((item, i) => (
                 <div key={item.label} className="flex items-center gap-4 sm:gap-6">
                   <div className="text-center min-w-[44px] sm:min-w-[60px]">
@@ -301,7 +306,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         {/* Password Access */}
         <section className="">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
-            <p className="text-gray-400 text-sm mb-4">Enter password to preview the website</p>
+            <p className="text-gray-400 text-sm mb-4">{tLabel("password_prompt", lang)}</p>
             <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="password"
@@ -311,13 +316,13 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                   if (passwordError) setPasswordError(null);
                 }}
                 onKeyDown={(e) => { if (e.key === "Enter") handlePasswordSubmit(); }}
-                placeholder="Enter password"
+                placeholder={tLabel("password_placeholder", lang)}
                 className={`flex-1 bg-card-dark border rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-500 focus:outline-none transition-colors ${
                   passwordError ? "border-red-500/60 focus:border-red-500" : "border-white/10 focus:border-amber/50"
                 }`}
               />
               <button onClick={handlePasswordSubmit} className="px-8 py-3.5 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 shrink-0">
-                View Website
+                {tLabel("password_view_btn", lang)}
               </button>
             </div>
             {passwordError && (
@@ -332,9 +337,9 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         {/* Services — same card design as CoreServices, scrollable carousel on mobile */}
         <section ref={servicesSectionRef} className="mt-12 md:mt-16 mb-12 md:mb-16">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center lg:text-left mb-10 md:mb-14">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading font-black leading-tight tracking-tight mb-3">Our Core <span className="text-amber">Services</span></h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-heading font-black leading-tight tracking-tight mb-3">{tLabel("services_title_prefix", lang)} <span className="text-amber">{tLabel("services_title_highlight", lang)}</span></h2>
             <p className="text-gray-400 text-sm sm:text-base leading-relaxed max-w-2xl mx-auto lg:mx-0 border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-              Strategic solutions engineered to scale your digital presence with precision and luxury.
+              {tLabel("services_subtitle", lang)}
             </p>
           </motion.div>
 
@@ -347,7 +352,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
               <div className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {services.map((svc, i) => (
                   <motion.div
-                    key={svc.title}
+                    key={svc.titleKey}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -360,17 +365,17 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                         <svc.icon className="text-amber text-3xl drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
                       </div>
                       <div>
-                        <h3 className="font-heading font-bold text-2xl text-white mb-2 tracking-tight">{svc.title}</h3>
-                        <p className="text-sm text-gray-400 leading-relaxed font-medium">{svc.description}</p>
+                        <h3 className="font-heading font-bold text-2xl text-white mb-2 tracking-tight">{tLabel(svc.titleKey, lang)}</h3>
+                        <p className="text-sm text-gray-400 leading-relaxed font-medium">{tLabel(svc.descKey, lang)}</p>
                       </div>
                       <div className="h-px w-full bg-gradient-to-r from-white/10 to-transparent" />
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-amber font-bold mb-4 opacity-90">Key Deliverables</p>
+                        <p className="text-[10px] uppercase tracking-widest text-amber font-bold mb-4 opacity-90">{tLabel("key_deliverables", lang)}</p>
                         <ul className="space-y-3">
-                          {svc.deliverables.map((item) => (
-                            <li key={item} className="flex items-start gap-3">
+                          {svc.deliverableKeys.map((key) => (
+                            <li key={key} className="flex items-start gap-3">
                               <HiCheckCircle className="text-amber text-lg shrink-0 mt-[-1px]" />
-                              <span className="text-sm text-gray-300 font-medium">{item}</span>
+                              <span className="text-sm text-gray-300 font-medium">{tLabel(key, lang)}</span>
                             </li>
                           ))}
                         </ul>
@@ -380,7 +385,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                         onClick={() => setChatOpen(true)}
                         className="mt-2 w-full py-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center gap-2 text-sm font-bold text-amber hover:bg-amber/5 hover:border-amber/30 transition-all group/link"
                       >
-                        Learn More
+                        {tLabel("btn_learn_more", lang)}
                         <HiArrowRight className="text-lg group-hover/link:translate-x-1 transition-transform" />
                       </button>
                     </div>
@@ -406,7 +411,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         {/* Notify Me */}
         <section ref={notifySectionRef} className="mt-2 md:mt-4">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
-            <p className="text-gray-400 text-sm mb-4">Get notified when we launch</p>
+            <p className="text-gray-400 text-sm mb-4">{tLabel("notify_prompt", lang)}</p>
             <form
               onSubmit={handleNotifySubmit}
               className="flex flex-col sm:flex-row gap-3"
@@ -416,7 +421,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={tLabel("notify_placeholder", lang)}
                 disabled={notifySubmitting}
                 className="flex-1 bg-card-dark border border-white/10 rounded-xl px-5 py-3.5 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors disabled:opacity-50"
               />
@@ -425,7 +430,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                 disabled={notifySubmitting || !email}
                 className="px-8 py-3.5 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {notifySubmitting ? "Submitting..." : "Notify When It\u2019s Live"}
+                {notifySubmitting ? tLabel("notify_submitting", lang) : tLabel("notify_btn", lang)}
               </button>
             </form>
           </motion.div>
@@ -434,17 +439,17 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         {/* Contact Box */}
         <section className="mt-6 md:mt-8">
           <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
-            <p className="text-gray-400 text-sm mb-4">Or get in touch directly</p>
+            <p className="text-gray-400 text-sm mb-4">{tLabel("contact_direct_prompt", lang)}</p>
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="flex-1 flex items-center gap-3 bg-card-dark border border-white/10 rounded-xl px-5 py-3.5 text-gray-500 text-sm">
                 <HiEnvelope className="text-base text-amber/70 shrink-0" />
-                <span>Tell us about your upcoming project</span>
+                <span>{tLabel("contact_placeholder_text", lang)}</span>
               </div>
               <button
                 onClick={openContactModal}
                 className="px-8 py-3.5 bg-card-dark border border-amber/40 text-amber font-bold text-sm rounded-xl hover:bg-amber/10 hover:border-amber transition-all active:scale-95 shrink-0 flex items-center justify-center gap-2"
               >
-                Send Message
+                {tLabel("contact_send_btn", lang)}
                 <HiArrowRight className="text-sm" />
               </button>
             </div>
@@ -534,7 +539,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                     transition={{ delay: 0.15 }}
                     className="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight"
                   >
-                    You&apos;re on the list.
+                    {tLabel("notify_modal_heading", lang)}
                   </motion.h3>
 
                   <motion.p
@@ -543,8 +548,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                     transition={{ delay: 0.22 }}
                     className="text-gray-300 text-sm sm:text-base leading-relaxed mt-3 max-w-sm mx-auto"
                   >
-                    We&apos;ll let you know the moment we go live — and we
-                    can&apos;t wait to help you grow your business.
+                    {tLabel("notify_modal_body", lang)}
                   </motion.p>
 
                   <motion.p
@@ -553,7 +557,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                     transition={{ delay: 0.3 }}
                     className="text-[11px] text-amber/80 uppercase tracking-[0.18em] font-bold mt-5"
                   >
-                    Can&apos;t wait?
+                    {tLabel("notify_modal_cant_wait", lang)}
                   </motion.p>
 
                   <motion.div
@@ -570,13 +574,13 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                       className="flex-1 px-5 py-3 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 flex items-center justify-center gap-2"
                     >
                       <HiChatBubbleLeftRight className="text-base" />
-                      Contact Us
+                      {tLabel("notify_modal_contact_btn", lang)}
                     </button>
                     <button
                       onClick={() => setNotifyModalOpen(false)}
                       className="px-5 py-3 bg-white/5 border border-white/10 text-white font-semibold text-sm rounded-xl hover:bg-white/10 transition-all active:scale-95"
                     >
-                      Got it
+                      {tLabel("notify_modal_close_btn", lang)}
                     </button>
                   </motion.div>
                 </div>
