@@ -156,3 +156,12 @@ body.gate-active #site-header,
 body.gate-active #site-footer {
   display: none;
 }
+
+/* Hide any marketing chrome on /admin/* routes.
+ * Set before paint via an inline script in the root layout
+ * (see layout.tsx — pathname startsWith('/admin') sets body.admin-active),
+ * so this also suppresses the SSR flash of e.g. DesktopChatbot.
+ */
+body.admin-active [data-marketing-chrome] {
+  display: none !important;
+}

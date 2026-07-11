@@ -245,10 +245,24 @@ Every system is measured against real business outcomes.`,
 /* ------------------------------------------------------------------ */
 
 /**
+ * Topic union — extends FaqCategory with the special "all" sentinel used by
+ * FaqAIChat's chip rail. Drives the soft-gate matcher scope below.
+ */
+export type FaqTopic = FaqCategory | "all";
+
+/**
  * Score-based search: counts substring hits across `question`, `keywords`, `category`.
  * Empty query returns `null`.
+ *
+ * Soft gate on topic: when an explicit `activeTopic` is set (not "all"), entries
+ * whose `category` matches the active topic get a +3 score bonus so they're
+ * preferred over un-scoped matches of equal relevance. The bot still surfaces
+ * any answer it knows — we never withhold a known answer behind the filter.
  */
-export function findFaqAnswer(query: string): FaqEntry | null {
+export function findFaqAnswer(
+  query: string,
+  activeTopic?: FaqTopic | null,
+): FaqEntry | null {
   const q = query.trim().toLowerCase();
   if (!q) return null;
   if (q.length < 3) return null; // avoid single-character false matches
@@ -269,6 +283,15 @@ export function findFaqAnswer(query: string): FaqEntry | null {
     for (const w of qWords) {
       if (entry.question.toLowerCase().includes(w)) score += 1;
     }
+    // Soft-gate topic scope — gentle tiebreaker that prefers in-category entries.
+    // A single +3 is below a single keyword hit (~5) so it never over-promotes a
+    // category match over a real relevance match.
+    if (
+      activeTopic && activeTopic !== "all" &&
+      entry.category === activeTopic
+    ) {
+      score += 3;
+    }
     if (score > 0 && (!best || score > best.score)) {
       best = { score, entry };
     }
@@ -286,7 +309,8 @@ export function getRelatedFaqs(ids: string[], excludeId: string, n = 3): FaqEntr
     .slice(0, n);
 }
 
-/** Suggested "popular" questions shown above the input on first open */
+/** Suggested "popular" questions shown above the input on first open.
+ *  Curated to populate the topic chips: each topic must have at least 1 entry. */
 export const popularFaqIds: string[] = [
   "timeline",
   "pricing",
@@ -294,4 +318,6 @@ export const popularFaqIds: string[] = [
   "tech",
   "ai-approach",
   "support",
+  "industries",
+  "remote",
 ];

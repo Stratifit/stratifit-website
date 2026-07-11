@@ -3,71 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import {
-  HiHome,
-  HiUsers,
-  HiEnvelope,
-  HiSparkles,
-  HiBriefcase,
-  HiNewspaper,
-  HiBuildingStorefront,
-  HiChatBubbleLeftRight,
-  HiRectangleStack,
-  HiQuestionMarkCircle,
-  HiChartBar,
-  HiUserGroup,
-  HiListBullet,
-  HiBell,
-  HiCog6Tooth,
-  HiArrowRightOnRectangle,
-} from "react-icons/hi2";
+import { HiBell, HiArrowRightOnRectangle } from "react-icons/hi2";
+import { navGroups } from "./nav-config";
 
 /* ------------------------------------------------------------------ */
-/*  Admin sidebar nav — grouped (CRM · Content · Site · System)        */
+/*  Admin sidebar — uses shared nav-config for section grouping.       */
+/*  Mobile <lg navigation now lives in AdminTopBar's slide-in drawer.  */
 /* ------------------------------------------------------------------ */
-const navGroups = [
-  {
-    label: "CRM & Sales",
-    items: [
-      { key: "dashboard", href: "/admin", placeholder: "{{nav_dashboard}}", icon: HiHome, label: "Overview" },
-      { key: "leads", href: "/admin/leads", placeholder: "{{nav_leads}}", icon: HiUsers, label: "Leads", badge: "12" },
-      { key: "subscriptions", href: "/admin/subscriptions", placeholder: "{{nav_subscriptions}}", icon: HiEnvelope, label: "Subscriptions", badge: "248" },
-      { key: "services", href: "/admin/services", placeholder: "{{nav_services}}", icon: HiSparkles, label: "Services" },
-    ],
-  },
-  {
-    label: "Content",
-    items: [
-      { key: "portfolio", href: "/admin/portfolio", placeholder: "{{nav_portfolio}}", icon: HiBriefcase, label: "Portfolio", badge: "8" },
-      { key: "insights", href: "/admin/insights", placeholder: "{{nav_insights}}", icon: HiNewspaper, label: "Insights", badge: "14" },
-      { key: "buy-business", href: "/admin/buy-business", placeholder: "{{nav_buy_business}}", icon: HiBuildingStorefront, label: "Buy a Business", badge: "23" },
-      { key: "testimonials", href: "/admin/testimonials", placeholder: "{{nav_testimonials}}", icon: HiChatBubbleLeftRight, label: "Testimonials", badge: "32" },
-    ],
-  },
-  {
-    label: "Site Configuration",
-    items: [
-      { key: "packages", href: "/admin/packages", placeholder: "{{nav_packages}}", icon: HiRectangleStack, label: "Packages" },
-      { key: "faq", href: "/admin/faq", placeholder: "{{nav_faq}}", icon: HiQuestionMarkCircle, label: "FAQ", badge: "12" },
-    ],
-  },
-  {
-    label: "System",
-    items: [
-      { key: "analytics", href: "/admin/analytics", placeholder: "{{nav_analytics}}", icon: HiChartBar, label: "Analytics" },
-      { key: "team", href: "/admin/team", placeholder: "{{nav_team}}", icon: HiUserGroup, label: "Team", badge: "5" },
-      { key: "activity", href: "/admin/activity", placeholder: "{{nav_activity}}", icon: HiListBullet, label: "Activity" },
-      { key: "notifications", href: "/admin/notifications", placeholder: "{{nav_notifications}}", icon: HiBell, label: "Notifications", badge: "3" },
-      { key: "settings", href: "/admin/settings", placeholder: "{{nav_settings}}", icon: HiCog6Tooth, label: "Settings" },
-    ],
-  },
-];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-white/5 bg-black min-h-[calc(100vh-4rem)] sticky top-16 self-start">
+    <aside className="hidden lg:flex flex-col w-64 shrink-0 border-r border-white/5 bg-black min-h-[calc(100vh-3.5rem)] sticky top-14 self-start">
       {/* Admin badge */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.25em] text-amber mb-3">
@@ -152,37 +100,5 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
-  );
-}
-
-/**
- * Mobile / tablet sidebar — rendered as a top tab strip
- */
-export function SidebarMobileTabs() {
-  const allItems = navGroups.flatMap((g) => g.items);
-  return (
-    <nav className="lg:hidden border-b border-white/5 bg-black/95 backdrop-blur-xl sticky top-16 z-30">
-      <ul className="flex items-center gap-1 px-3 py-2 overflow-x-auto no-scrollbar">
-        {allItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <li key={item.key} className="shrink-0">
-              <Link
-                href={item.href}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-full text-[11px] font-medium text-gray-300 hover:text-white hover:bg-white/5 border border-transparent whitespace-nowrap"
-              >
-                <Icon className="text-[13px]" />
-                <span>{item.label}</span>
-                {item.badge && (
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/5 text-gray-500">
-                    {item.badge}
-                  </span>
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
   );
 }

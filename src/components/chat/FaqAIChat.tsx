@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import type { ComponentType } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   HiChatBubbleLeftRight,
@@ -9,6 +10,10 @@ import {
   HiSparkles,
   HiUserGroup,
   HiXMark,
+  HiQuestionMarkCircle,
+  HiCurrencyDollar,
+  HiShieldCheck,
+  HiInformationCircle,
 } from "react-icons/hi2";
 import {
   faqKnowledge,
@@ -16,6 +21,7 @@ import {
   getRelatedFaqs,
   popularFaqIds,
   type FaqEntry,
+  type FaqTopic,
 } from "@/lib/faq-knowledge";
 import { openContactModal } from "@/components/contact/ContactModal";
 
@@ -49,15 +55,28 @@ export function FaqAIChat({
     {
       role: "bot",
       text:
-        "👋 Hi! I'm Stratifit AI. I can answer questions about pricing, timelines, process, tech stack, support, and more. Try a popular question below or type your own.",
+        "👋 Hi! I'm Stratifit AI. Pick a topic below to dive in, or type your own question.",
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [activeTopic, setActiveTopic] = useState<FaqTopic>("all");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  /** Topic chip rail — visible at the top of the chat. Matches the public
+   *  FAQ banner reference: FAQ, Services, Pricing, Support, About. */
+  const allTopics: { id: FaqTopic; label: string; icon: ComponentType<{ className?: string }> }[] = [
+    { id: "all",      label: "FAQ",      icon: HiQuestionMarkCircle },
+    { id: "Services", label: "Services", icon: HiSparkles },
+    { id: "Pricing",  label: "Pricing",  icon: HiCurrencyDollar },
+    { id: "Support",  label: "Support",  icon: HiShieldCheck },
+    { id: "Business", label: "About",    icon: HiInformationCircle },
+  ];
+
+  /** Popular pills filtered by the active topic ("all" shows every popular entry). */
   const popular = popularFaqIds
     .map((id) => faqKnowledge.find((e) => e.id === id))
-    .filter((e): e is FaqEntry => Boolean(e));
+    .filter((e): e is FaqEntry => Boolean(e))
+    .filter((e) => activeTopic === "all" || e.category === activeTopic);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -66,7 +85,7 @@ export function FaqAIChat({
   const ask = (text: string, preMatched?: FaqEntry) => {
     const q = text.trim();
     if (!q) return;
-    const matched = preMatched ?? findFaqAnswer(q);
+    const matched = preMatched ?? findFaqAnswer(q, activeTopic);
 
     // Push the user's question as a user-role message
     setMessages((prev) => [...prev, { role: "user", text: q }]);
@@ -142,47 +161,74 @@ export function FaqAIChat({
         )}
       </div>
 
-      {/* Search input */}
-      <div className="px-5 sm:px-6 pb-4">
-        <label className="relative block">
-          <HiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-base pointer-events-none" />
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") ask(input);
-            }}
-            placeholder="Search questions… e.g. What does the process look like?"
-            className="w-full bg-card-dark border border-white/10 rounded-xl pl-11 pr-12 py-3 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
-          />
-          <button
-            onClick={() => ask(input)}
-            disabled={!input.trim()}
-            aria-label="Send"
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg bg-amber text-black flex items-center justify-center hover:bg-amber-light transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            <HiPaperAirplane className="text-sm" />
-          </button>
-        </label>
+      {/* Topic chips — click to filter popular pills + scope the matcher by category */}
+      <div className="flex-none px-4 py-3 border-b border-white/5 bg-black">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          {allTopics.map((topic) => {
+            const active = activeTopic === topic.id;
+            return (
+              <button
+                key={topic.id}
+                onClick={() => {
+                  // "all" can't be deactivated — clicking it again is a no-op
+                  if (active && topic.id !== "all") setActiveTopic("all");
+                  else setActiveTopic(topic.id);
+                }}
+                className={`flex items-center gap-1.5 shrink-0 px-3.5 py-2 rounded-full border text-xs font-medium transition-all ${
+                  active
+                    ? "bg-amber text-black border-amber shadow-[0_0_12px_rgba(245,158,11,0.3)]"
+                    : "bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-amber/30"
+                }`}
+                aria-pressed={active}
+              >
+                <topic.icon className={`text-sm shrink-0 ${active ? "text-black" : "text-amber"}`} />
+                {topic.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Popular pills */}
       <div className="px-5 sm:px-6 pb-3">
-        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500 mb-2">
-          Popular Questions
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {popular.map((entry) => (
+        <div className="flex items-baseline justify-between mb-2 gap-2">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-gray-500">
+            Popular Questions
+            {activeTopic !== "all" && (
+              <span className="ml-2 text-amber normal-case tracking-normal font-medium">
+                · {allTopics.find((t) => t.id === activeTopic)?.label ?? activeTopic}
+              </span>
+            )}
+          </p>
+          {activeTopic !== "all" && (
             <button
-              key={entry.id}
-              onClick={() => ask(entry.question, entry)}
-              className="px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11px] text-gray-300 hover:bg-amber/15 hover:border-amber/30 hover:text-white transition-all inline-flex items-center gap-1.5"
+              onClick={() => setActiveTopic("all")}
+              className="text-[10px] text-gray-500 hover:text-amber transition-colors"
             >
-              <HiSparkles className="text-amber text-[10px] shrink-0" />
-              {entry.question}
+              Show all
             </button>
-          ))}
+          )}
         </div>
+        {popular.length === 0 ? (
+          <p className="text-[11px] text-gray-500 italic">
+            No popular questions in <span className="text-amber">{allTopics.find((t) => t.id === activeTopic)?.label ?? activeTopic}</span> yet — tap
+            <span className="text-amber mx-1">Show all</span>
+            or type your question below.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {popular.map((entry) => (
+              <button
+                key={entry.id}
+                onClick={() => ask(entry.question, entry)}
+                className="px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-[11px] text-gray-300 hover:bg-amber/15 hover:border-amber/30 hover:text-white transition-all inline-flex items-center gap-1.5"
+              >
+                <HiSparkles className="text-amber text-[10px] shrink-0" />
+                {entry.question}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* History */}
@@ -333,6 +379,30 @@ export function FaqAIChat({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Search input — anchored at the bottom (above the footer fallback) so chat history expands upward */}
+      <div className="px-5 sm:px-6 py-3 border-t border-white/5 bg-black/40">
+        <label className="relative block">
+          <HiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-base pointer-events-none" />
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") ask(input);
+            }}
+            placeholder="Search questions… e.g. What does the process look like?"
+            className="w-full bg-card-dark border border-white/10 rounded-xl pl-11 pr-12 py-3 text-white text-sm placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
+          />
+          <button
+            onClick={() => ask(input)}
+            disabled={!input.trim()}
+            aria-label="Send"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-lg bg-amber text-black flex items-center justify-center hover:bg-amber-light transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <HiPaperAirplane className="text-sm" />
+          </button>
+        </label>
+      </div>
 
       {/* Footer fallback */}
       <div className="px-5 sm:px-6 py-3 border-t border-white/5 flex items-center justify-between gap-3 bg-black/30">

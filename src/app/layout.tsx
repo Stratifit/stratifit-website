@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/components/providers/SmoothScroll";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { CookiePopup } from "@/components/layout/CookiePopup";
-import { ContactModal } from "@/components/contact/ContactModal";
+import { MarketingChromeTop, MarketingChromeBottom } from "@/components/layout/MarketingChrome";
 import { DesktopChatbot } from "@/components/chat/DesktopChatbot";
 
 const inter = Inter({
@@ -41,14 +38,25 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} antialiased`}>
       <body className="bg-black text-white min-h-screen flex flex-col">
+        {/* Set body.admin-active for /admin/* paths BEFORE any other body content
+             paints, so the marketing-chrome CSS hide rule suppresses the SSR
+             flash of Header / Footer / CookiePopup / ContactModal / DesktopChatbot. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){if(location.pathname&&location.pathname.indexOf('/admin')===0){document.body.classList.add('admin-active');}})();",
+          }}
+        />
         <SmoothScroll>
-          <Header />
+          {/* Above-main: fixed-positioned header (DOM order doesn't affect its visual pinning). */}
+          <MarketingChromeTop />
           <main className="flex-1">{children}</main>
-          <Footer />
-          <CookiePopup />
-          <ContactModal />
+          {/* Below-main: footer + cookie banner + contact modal (DOM order makes them render after page content). */}
+          <MarketingChromeBottom />
         </SmoothScroll>
-        {/* Desktop floating chat — outside SmoothScroll so positioning is correct */}
+        {/* Desktop floating chat — outside SmoothScroll so positioning is correct.
+            Self-gates via pathname check inside DesktopChatbot.tsx so it never
+            shows on /admin/* paths. */}
         <DesktopChatbot />
         <script
           dangerouslySetInnerHTML={{

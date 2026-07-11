@@ -1,56 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiChevronDown, HiArrowRight } from "react-icons/hi2";
+import {
+  HiChevronDown,
+  HiArrowRight,
+  HiChatBubbleLeftRight,
+} from "react-icons/hi2";
 import { FaqAIChat } from "@/components/chat/FaqAIChat";
-import Link from "next/link";
-
-const faqs = [
-  {
-    question: "What is the typical timeline for a branding project?",
-    answer:
-      "A standard branding project spans 4–6 weeks from discovery to final delivery. Timelines are tailored to scope — brand strategy and identity rollouts may extend to 8 weeks for comprehensive engagements.",
-  },
-  {
-    question: "Do you offer post-launch support?",
-    answer:
-      "Yes. Every engagement includes 30 days of complimentary post-launch support. For ongoing needs, we offer flexible maintenance retainers with guaranteed response times and priority access to our team.",
-  },
-  {
-    question: "How are payments structured?",
-    answer:
-      "We operate on a 50% deposit to commence work, with the remaining 50% due upon project completion. For enterprise-scale engagements, we offer milestone-based billing aligned to delivery phases.",
-  },
-  {
-    question: "What technology stack do you use?",
-    answer:
-      "Our core stack includes Next.js, React, TypeScript, Tailwind CSS, and Node.js. For CMS we recommend Sanity, Contentful, or Strapi. We select the optimal stack per project — never a one-size-fits-all approach.",
-  },
-  {
-    question: "Can you work with our existing systems and tools?",
-    answer:
-      "Absolutely. We integrate natively with your current infrastructure — HubSpot, Salesforce, Stripe, custom APIs, and legacy systems. Our philosophy is to enhance and extend what's already working, not disrupt it.",
-  },
-  {
-    question: "Do you handle ongoing marketing after launch?",
-    answer:
-      "Yes. Our Growth Engine service includes performance marketing, analytics tracking, conversion optimization, CRM automation, and funnel management — all managed as a continuous improvement cycle.",
-  },
-  {
-    question: "What's your approach to AI and automation?",
-    answer:
-      "We build production-grade AI solutions that deliver immediate ROI. From intelligent lead qualification and customer support agents to workflow automation pipelines — every system is measured against real business outcomes.",
-  },
-  {
-    question: "How do you measure success?",
-    answer:
-      "Every engagement begins with defined KPIs tied directly to your business objectives. We track conversion rates, load performance, engagement metrics, and revenue attribution — shared via live dashboards with full transparency.",
-  },
-];
+import { staticFaq as faqs } from "@/data/static-faq";
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [faqOpen, setFaqOpen] = useState(false);
+
+  /* Body scroll lock + Escape-to-close while the FAQ AI modal is open */
+  useEffect(() => {
+    if (!faqOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFaqOpen(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = prev;
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [faqOpen]);
 
   return (
     <section id="faq" className="py-24 md:py-32 bg-surface relative overflow-hidden">
@@ -135,68 +112,74 @@ export function FAQ() {
 
       </div>
 
-      {/* FAQ AI — inline Q&A panel that uses the same knowledge base */}
+      {/* Still have more questions? — vertical banner: line 1 = icon + title +
+          1-line subtitle, line 2 = full-width CTA button that opens the FAQ AI modal. */}
       <div className="max-w-6xl mx-auto px-6 mt-16 md:mt-20 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-10"
+          transition={{ duration: 0.4 }}
+          className="bg-card-dark border border-white/10 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 sm:gap-4 hover:border-amber/30 hover:shadow-[0_0_30px_-5px_rgba(245,158,11,0.25)] transition-all group"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.25em] mb-3">
-            Instant Answers
-          </p>
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-heading font-black tracking-tight">
-            Ask Our <span className="text-amber">FAQ AI</span>
-          </h3>
-          <p className="text-gray-400 text-sm sm:text-base mt-3 max-w-xl mx-auto">
-            Type a question or tap a popular topic below. We&apos;ll match it against our knowledge base, or hand you over to a human.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <FaqAIChat variant="card" />
-          </div>
-          <aside className="lg:col-span-1 bg-card-dark rounded-2xl border border-white/10 p-6 space-y-5 h-fit">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-amber mb-2">
-                Why this works
-              </p>
-              <h4 className="font-heading font-bold text-white text-lg mb-2">
-                Instant, sourced answers
-              </h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Our FAQ AI is grounded in our real knowledge base — pricing, timelines, process, tech stack, support. Answers link to related questions so you can dig deeper without leaving the page.
+          <button
+            type="button"
+            className="flex items-start gap-3 w-full text-left"
+            onClick={() => setFaqOpen(true)}
+            aria-label="Open FAQ AI chat"
+          >
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber/15 border border-amber/30 flex items-center justify-center shrink-0 group-hover:bg-amber/25 transition-colors">
+              <HiChatBubbleLeftRight className="text-amber text-base sm:text-lg" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-sm sm:text-lg md:text-xl font-heading font-black tracking-tight text-white">
+                Still have more <span className="text-amber">questions?</span>
+              </h3>
+              <p className="text-[10px] sm:text-xs text-gray-500 truncate mt-0.5">
+                Chat with our FAQ AI bot — instant answers, 24/7.
               </p>
             </div>
-            <div className="h-px bg-white/5" />
-            <ul className="space-y-2 text-xs text-gray-300">
-              <li className="flex items-start gap-2">
-                <span className="text-amber mt-0.5">✓</span>
-                12 curated FAQs across pricing, process, tech &amp; support
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber mt-0.5">✓</span>
-                Related-question chips after every answer
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-amber mt-0.5">✓</span>
-                Falls back to a human when no match is found
-              </li>
-            </ul>
-            <div className="h-px bg-white/5" />
-            <Link
-              href="/services"
-              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
-            >
-              Browse Services
-              <HiArrowRight className="text-base" />
-            </Link>
-          </aside>
-        </div>
+          </button>
+          <button
+            onClick={() => setFaqOpen(true)}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-amber text-black font-bold rounded-full hover:bg-amber-light transition-all text-xs sm:text-sm active:scale-95 shadow-[0_0_18px_rgba(245,158,11,0.25)] group-hover:gap-3"
+          >
+            Contact our team
+            <HiArrowRight className="text-xs sm:text-sm group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </motion.div>
       </div>
+
+      {/* FAQ AI modal — opens on banner tap, fills viewport on mobile */}
+      <AnimatePresence>
+        {faqOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm"
+              onClick={() => setFaqOpen(false)}
+              aria-hidden="true"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 20 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="fixed inset-0 z-[91] flex items-center justify-center p-0 sm:p-4 pointer-events-none"
+              role="dialog"
+              aria-modal="true"
+              aria-label="FAQ AI chat"
+            >
+              <div className="pointer-events-auto relative bg-card-dark rounded-none sm:rounded-2xl border border-white/10 w-full sm:max-w-3xl h-[100dvh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.7)]">
+                <FaqAIChat onClose={() => setFaqOpen(false)} />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
