@@ -60,7 +60,6 @@ const FALLBACK_NAV: FallbackNavItem[] = [
   { labelKey: "testimonials", href: "/testimonials" },
   { labelKey: "about", href: "/about" },
   { labelKey: "faq", href: "#faq" },
-  { labelKey: "buy_business", href: "/buy-business" },
   { labelKey: "contact", action: "contact" },
 ];
 
