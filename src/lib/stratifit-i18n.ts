@@ -281,6 +281,8 @@ const labelTranslations: Record<string, Record<Language, string>> = {
   notify_modal_cant_wait: { en: "Can\u2019t wait?", fr: "Impatient ?", de: "K\u00f6nnen Sie es nicht erwarten?", es: "\u00bfNo puedes esperar?" },
   notify_modal_contact_btn: { en: "Contact Us", fr: "Nous Contacter", de: "Kontakt", es: "Cont\u00e1ctanos" },
   notify_modal_close_btn: { en: "Got it", fr: "Compris", de: "Verstanden", es: "Entendido" },
+  notify_modal_already_heading: { en: "You're already on the list.", fr: "Vous \u00eates d\u00e9j\u00e0 sur la liste.", de: "Sie stehen bereits auf der Liste.", es: "Ya est\u00e1s en la lista." },
+  notify_modal_already_body: { en: "Good news \u2014 this email is already on our launch list. We'll let you know the moment we go live.", fr: "Bonne nouvelle \u2014 cet e-mail figure d\u00e9j\u00e0 sur notre liste de lancement. Nous vous pr\u00e9viendrons d\u00e8s le lancement.", de: "Gute Nachricht \u2014 diese E-Mail steht bereits auf unserer Startliste. Wir benachrichtigen Sie, sobald wir live sind.", es: "Buenas noticias \u2014 este correo ya est\u00e1 en nuestra lista de lanzamiento. Te avisaremos en cuanto estemos en vivo." },
 
   /* ---------- Service tile — extra items on the gate (Buy a Business + Funnel Strategy are not in the main CoreServices list) ---------- */
   service_buy_biz_title: { en: "Buy a Business", fr: "Acheter une Entreprise", de: "Unternehmen Kaufen", es: "Comprar un Negocio" },
@@ -309,6 +311,7 @@ const labelTranslations: Record<string, Record<Language, string>> = {
   chat_email_placeholder: { en: "Enter your email\u2026", fr: "Entrez votre e-mail\u2026", de: "E-Mail eingeben\u2026", es: "Ingresa tu correo\u2026" },
   chat_email_invalid: { en: "Please enter a valid email address.", fr: "Veuillez entrer une adresse e-mail valide.", de: "Bitte geben Sie eine g\u00fcltige E-Mail-Adresse ein.", es: "Ingresa una direcci\u00f3n de correo v\u00e1lida." },
   chat_subscribe_success: { en: "\u2705 You\u2019re on the launch list. We\u2019ll let you know the moment we go live.", fr: "\u2705 Vous \u00eates sur la liste. Nous vous pr\u00e9viendrons d\u00e8s le lancement.", de: "\u2705 Sie sind auf der Startliste. Wir benachrichtigen Sie, sobald wir live sind.", es: "\u2705 Est\u00e1s en la lista de lanzamiento. Te avisaremos en cuanto estemos en vivo." },
+  chat_subscribe_already: { en: "\u2728 You\u2019re already on the list! We\u2019ve got you covered \u2014 we\u2019ll let you know the moment we go live.", fr: "\u2728 Vous \u00eates d\u00e9j\u00e0 sur la liste ! Nous vous pr\u00e9viendrons d\u00e8s le lancement.", de: "\u2728 Sie stehen bereits auf der Liste! Wir benachrichtigen Sie, sobald wir live sind.", es: "\u2728 \u00a1Ya est\u00e1s en la lista! Te avisaremos en cuanto estemos en vivo." },
   chat_subscribe_error: { en: "\u26a0\ufe0f Couldn\u2019t save your email right now. Please try again or scroll down to the form.", fr: "\u26a0\ufe0f Impossible d\u2019enregistrer votre e-mail. R\u00e9essayez ou utilisez le formulaire ci-dessous.", de: "\u26a0\ufe0f E-Mail konnte nicht gespeichert werden. Bitte erneut versuchen oder das Formular unten verwenden.", es: "\u26a0\ufe0f No se pudo guardar tu correo. Int\u00e9ntalo de nuevo o usa el formulario de abajo." },
   chat_subscribe_input_btn: { en: "Subscribe", fr: "S\u2019abonner", de: "Abonnieren", es: "Suscribirse" },
 };

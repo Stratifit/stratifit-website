@@ -164,11 +164,28 @@ export function ComingSoonAIChat({
         }),
       });
       if (!res.ok) throw new Error(`status ${res.status}`);
+      // Peek at the response body so we can show a tailored message
+      // for already-subscribed emails. If the response is non-JSON
+      // (e.g. 503 from a not-yet-configured DB), we fall through to
+      // the generic success message.
+      let alreadySubscribed = false;
+      try {
+        const data = await res.json();
+        if (data && data.alreadySubscribed === true) alreadySubscribed = true;
+      } catch {
+        // non-JSON — keep default
+      }
       // Echo the submitted email as a user bubble, then a bot confirmation
       setMessages((prev) => [
         ...prev,
         { role: "user", text: email },
-        { role: "bot", text: tLabel("chat_subscribe_success", lang) },
+        {
+          role: "bot",
+          text: tLabel(
+            alreadySubscribed ? "chat_subscribe_already" : "chat_subscribe_success",
+            lang,
+          ),
+        },
       ]);
       setInput("");
       setSubscribeState("success");

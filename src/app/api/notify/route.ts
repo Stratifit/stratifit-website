@@ -44,6 +44,18 @@ export async function POST(req: NextRequest) {
   const safeLang = typeof lang === "string" && lang.length <= 8 ? lang : "en";
   const safeSource = typeof source === "string" && source.length <= 64 ? source : "coming_soon_page";
 
+  // Check whether the email is already on the list so the UI can show a
+  // tailored "already subscribed" message instead of the generic welcome.
+  // The check is a heuristic; uniqueness is still enforced by the unique
+  // constraint on the email column at upsert time, so this is safe under
+  // race conditions (the upsert will simply succeed in the worst case).
+  const { data: existing } = await client
+    .from("notify_subscribers")
+    .select("email")
+    .eq("email", normalizedEmail)
+    .maybeSingle();
+  const alreadySubscribed = !!existing;
+
   const { error } = await client
     .from("notify_subscribers")
     .upsert(
@@ -63,7 +75,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ success: true }, { status: 201 });
+  return NextResponse.json(
+    { success: true, alreadySubscribed },
+    { status: alreadySubscribed ? 200 : 201 },
+  );
 }
 
 /* ------------------------------------------------------------------ */

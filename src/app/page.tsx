@@ -11,6 +11,7 @@ import {
   HiCheckCircle,
   HiEnvelope,
   HiXMark,
+  HiSparkles,
 } from "react-icons/hi2";
 import { openContactModal } from "@/components/contact/ContactModal";
 import { ComingSoonAIChat } from "@/components/chat/ComingSoonAIChat";
@@ -131,7 +132,10 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [notifySubmitting, setNotifySubmitting] = useState(false);
-  const [notifyModalOpen, setNotifyModalOpen] = useState(false);
+  // "success" = new subscription. "already" = email was already on the list.
+  // The modal copy + icon differ between the two so returning subscribers
+  // see a tailored message instead of the generic welcome.
+  const [notifyModalState, setNotifyModalState] = useState<"success" | "already" | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   // Refs used by ComingSoonAIChat to scroll the gate into the right region after a CTA
   const notifySectionRef = useRef<HTMLElement>(null);
@@ -210,6 +214,9 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
     e.preventDefault();
     if (!email || notifySubmitting) return;
     setNotifySubmitting(true);
+    // Default to "new subscription" so a network error or non-JSON response
+    // falls through to the generic welcome modal rather than a confusing state.
+    let modalState: "success" | "already" = "success";
     try {
       const res = await fetch("/api/notify", {
         method: "POST",
@@ -225,8 +232,16 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
       // Always show the thank-you modal so the user-facing flow
       // works regardless of DB / Supabase config status. The API
       // route already handles 503s gracefully; we just don't surface
-      // them to the user.
-      if (!res.ok) {
+      // them to the user. We do, however, peek at the response body
+      // to differentiate "new subscription" from "already on the list".
+      if (res.ok) {
+        try {
+          const data = await res.json();
+          if (data && data.alreadySubscribed === true) modalState = "already";
+        } catch {
+          // non-JSON response (e.g. 503 from API route) — keep default
+        }
+      } else {
         console.warn("notify submit non-ok status", res.status);
       }
     } catch (err) {
@@ -235,7 +250,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
       console.warn("notify submit failed", err);
     } finally {
       setNotifySubmitting(false);
-      setNotifyModalOpen(true);
+      setNotifyModalState(modalState);
     }
   };
 
@@ -495,16 +510,18 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
 
         {/* Notify thank-you modal — shown after the user submits their email.
             Always shown regardless of API outcome so the user-facing flow
-            works even when Supabase is not yet configured. */}
+            works even when Supabase is not yet configured. The copy + icon
+            differ based on whether the email was new ("success") or already
+            on the list ("already"). */}
         <AnimatePresence>
-          {notifyModalOpen && (
+          {notifyModalState !== null && (
             <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-4">
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 bg-black/70 backdrop-blur-md"
-                onClick={() => setNotifyModalOpen(false)}
+                onClick={() => setNotifyModalState(null)}
               />
               <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -515,7 +532,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
               >
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber/60 to-transparent bg-[length:200%_100%] animate-[shimmer_3s_ease-in-out_infinite]" />
                 <button
-                  onClick={() => setNotifyModalOpen(false)}
+                  onClick={() => setNotifyModalState(null)}
                   className="absolute top-3 right-3 z-10 p-2 rounded-full text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
                   aria-label="Close"
                 >
@@ -523,14 +540,18 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                 </button>
 
                 <div className="px-6 sm:px-8 py-8 sm:py-10 text-center">
-                  {/* Animated checkmark */}
+                  {/* Animated icon — checkmark for new, sparkles for already */}
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1, type: "spring", damping: 12, stiffness: 200 }}
                     className="mx-auto w-16 h-16 rounded-full bg-amber/15 border border-amber/30 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] mb-5"
                   >
-                    <HiCheckCircle className="text-amber text-3xl" />
+                    {notifyModalState === "already" ? (
+                      <HiSparkles className="text-amber text-3xl" />
+                    ) : (
+                      <HiCheckCircle className="text-amber text-3xl" />
+                    )}
                   </motion.div>
 
                   <motion.h3
@@ -539,7 +560,12 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                     transition={{ delay: 0.15 }}
                     className="font-heading font-black text-2xl sm:text-3xl text-white tracking-tight"
                   >
-                    {tLabel("notify_modal_heading", lang)}
+                    {tLabel(
+                      notifyModalState === "already"
+                        ? "notify_modal_already_heading"
+                        : "notify_modal_heading",
+                      lang,
+                    )}
                   </motion.h3>
 
                   <motion.p
@@ -548,7 +574,12 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                     transition={{ delay: 0.22 }}
                     className="text-gray-300 text-sm sm:text-base leading-relaxed mt-3 max-w-sm mx-auto"
                   >
-                    {tLabel("notify_modal_body", lang)}
+                    {tLabel(
+                      notifyModalState === "already"
+                        ? "notify_modal_already_body"
+                        : "notify_modal_body",
+                      lang,
+                    )}
                   </motion.p>
 
                   <motion.p
@@ -568,7 +599,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                   >
                     <button
                       onClick={() => {
-                        setNotifyModalOpen(false);
+                        setNotifyModalState(null);
                         openContactModal();
                       }}
                       className="flex-1 px-5 py-3 bg-amber text-black font-bold text-sm rounded-xl hover:bg-amber-light transition-all active:scale-95 flex items-center justify-center gap-2"
@@ -577,7 +608,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
                       {tLabel("notify_modal_contact_btn", lang)}
                     </button>
                     <button
-                      onClick={() => setNotifyModalOpen(false)}
+                      onClick={() => setNotifyModalState(null)}
                       className="px-5 py-3 bg-white/5 border border-white/10 text-white font-semibold text-sm rounded-xl hover:bg-white/10 transition-all active:scale-95"
                     >
                       {tLabel("notify_modal_close_btn", lang)}
