@@ -8,6 +8,7 @@ import { projects as fallbackProjects, projectCategories } from "@/data/projects
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, ta, type ProjectItem } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 interface ProjectData {
   id: string | number;
@@ -23,6 +24,15 @@ interface ProjectData {
 const FALLBACK_PROJECTS: ProjectData[] = fallbackProjects
   .slice(0, 8)
   .map((p) => ({ id: p.id, slug: p.slug, title: p.title, category: p.category, description: p.description, image: p.image, shortMetric: p.shortMetric, shortLabel: p.shortLabel }));
+
+// Map raw category names (from data/projects.ts) to translation keys.
+const CATEGORY_KEYS: Record<string, string> = {
+  "All": "cat_all",
+  "Brand Design": "cat_brand_design",
+  "Web Development": "cat_web_dev",
+  "AI & Automation": "cat_ai_automation",
+  "Growth Marketing": "cat_growth_marketing",
+};
 
 export function Portfolio() {
   const { lang } = useLanguage();
@@ -94,15 +104,14 @@ export function Portfolio() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-12"
+          className="mb-10 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Portfolio</p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">{tLabel("portfolio_label", lang)}</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Our <span className="text-amber">Work</span>
+            {tLabel("portfolio_title_prefix", lang)} <span className="text-amber">{tLabel("portfolio_title_highlight", lang)}</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            We craft digital experiences that define industries and elevate brands through precision
-            and creativity.
+            {tLabel("portfolio_subtitle", lang)}
           </p>
         </motion.div>
 
@@ -118,7 +127,7 @@ export function Portfolio() {
                   : "bg-white/5 border border-white/10 text-white hover:border-amber/30"
               }`}
             >
-              {cat}
+              {tLabel(CATEGORY_KEYS[cat] || cat, lang)}
             </button>
           ))}
         </div>
@@ -155,7 +164,7 @@ export function Portfolio() {
                     href={`/portfolio/${project.slug}`}
                     className="inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider hover:text-amber-light transition-colors group/link"
                   >
-                    View Case Study
+                    {tLabel("view_case_study", lang)}
                     <HiArrowRight className="group-hover/link:translate-x-1 transition-transform" />
                   </Link>
                 </div>
@@ -190,7 +199,7 @@ export function Portfolio() {
             href="/portfolio"
             className="inline-flex items-center gap-2 text-amber text-sm font-bold uppercase tracking-wider hover:text-amber-light transition-colors group"
           >
-            View All Projects
+            {tLabel("view_all_projects", lang)}
             <HiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

@@ -20,7 +20,12 @@ import { ContactModal } from "@/components/contact/ContactModal";
 
 function useIsPublicSite(): boolean {
   const pathname = usePathname();
-  return !pathname?.startsWith("/admin");
+  if (!pathname) return true;
+  // /admin/*  → dedicated admin chrome (top bar + sidebar)
+  // /login    → bare "Welcome back" page, no public header / footer
+  if (pathname.startsWith("/admin")) return false;
+  if (pathname === "/login") return false;
+  return true;
 }
 
 /** Header (fixed-positioned) — renders ABOVE the page main. */

@@ -6,6 +6,7 @@ import { openContactModal } from "@/components/contact/ContactModal";
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, type HeroContent } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 import {
   HiArrowRight,
   HiSparkles,
@@ -27,9 +28,9 @@ import {
 } from "react-icons/hi2";
 
 const stats = [
-  { target: "59", suffix: "+", label: ["Projects", "Delivered"] },
-  { target: "7", suffix: "+", label: ["Years", "Experience"] },
-  { target: "98", suffix: "%", label: ["Client", "Satisfaction"] },
+  { target: "59", suffix: "+", labelKeys: ["hero_stat_projects_l1", "hero_stat_projects_l2"] },
+  { target: "7", suffix: "+", labelKeys: ["hero_stat_years_l1", "hero_stat_years_l2"] },
+  { target: "98", suffix: "%", labelKeys: ["hero_stat_satisfaction_l1", "hero_stat_satisfaction_l2"] },
 ];
 
 const techStack = [
@@ -96,17 +97,17 @@ export function Hero() {
   // Fetch hero content from CMS, fallback to hardcoded strings
   const { data: heroData } = useCms<HeroContent>("hero_content");
 
-  const badgeText = t(heroData?.badge_text, lang) || "Premium Digital Agency";
-  const heading1 = t(heroData?.heading_line1, lang) || "We Build Websites, Brands & Systems";
-  const heading2 = t(heroData?.heading_line2, lang) || "That Grow Businesses.";
-  const subheading = t(heroData?.subheading, lang) || "We help startups and businesses build brands, websites, and systems that turn visitors into paying customers.";
-  const ctaPrimary = t(heroData?.cta_primary, lang) || "Start Your Project";
-  const ctaSecondary = t(heroData?.cta_secondary, lang) || "Book a Strategy Call";
-  const trustedByLabel = t(heroData?.trusted_by_label, lang) || "Trusted by Growing Companies";
-  const techPrefix = t(heroData?.tech_stack_label_prefix, lang) || "Our ";
-  const techHighlight = t(heroData?.tech_stack_highlight, lang) || "Tech";
-  const techSuffix = t(heroData?.tech_stack_label_suffix, lang) || " Stack";
-  const techSubtitle = t(heroData?.tech_stack_subtitle, lang) || "We use the best tools in the industry to build, automate, and scale your digital presence.";
+  const badgeText = t(heroData?.badge_text, lang) || tLabel("hero_badge", lang);
+  const heading1 = t(heroData?.heading_line1, lang) || tLabel("hero_heading_1", lang);
+  const heading2 = t(heroData?.heading_line2, lang) || tLabel("hero_heading_2", lang);
+  const subheading = t(heroData?.subheading, lang) || tLabel("hero_subheading", lang);
+  const ctaPrimary = t(heroData?.cta_primary, lang) || tLabel("start_project", lang);
+  const ctaSecondary = t(heroData?.cta_secondary, lang) || tLabel("hero_cta_secondary", lang);
+  const trustedByLabel = t(heroData?.trusted_by_label, lang) || tLabel("hero_trusted_by_label", lang);
+  const techPrefix = t(heroData?.tech_stack_label_prefix, lang) || tLabel("hero_tech_prefix", lang);
+  const techHighlight = t(heroData?.tech_stack_highlight, lang) || tLabel("hero_tech_highlight", lang);
+  const techSuffix = t(heroData?.tech_stack_label_suffix, lang) || tLabel("hero_tech_suffix", lang);
+  const techSubtitle = t(heroData?.tech_stack_subtitle, lang) || tLabel("hero_tech_subtitle", lang);
 
   return (
     <section
@@ -184,15 +185,15 @@ export function Hero() {
             >
               {stats.map((stat) => (
                 <div
-                  key={stat.label[0]}
+                  key={stat.labelKeys[0]}
                   className="flex flex-col lg:flex-row items-center lg:justify-center text-center px-2 sm:px-4 lg:px-0.5 lg:whitespace-nowrap pb-0 gap-1"
                 >
                   <Counter target={stat.target} suffix={stat.suffix} />
                   <div className="text-[9px] sm:text-[10px] lg:text-sm font-bold text-gray-500 uppercase tracking-wider leading-tight">
-                    {stat.label[0]}
+                    {tLabel(stat.labelKeys[0], lang)}
                     <br className="lg:hidden" />
                     <span className="hidden lg:inline"> </span>
-                    {stat.label[1]}
+                    {tLabel(stat.labelKeys[1], lang)}
                   </div>
                 </div>
               ))}

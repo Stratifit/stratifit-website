@@ -9,6 +9,7 @@ import { openContactModal } from "@/components/contact/ContactModal";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useCms } from "@/lib/use-cms";
 import { t, type HeaderNavLink, type SiteSettings } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 import { HiMenu, HiX } from "react-icons/hi";
 import {
   HiChatBubbleLeftRight,
@@ -20,14 +21,21 @@ import {
 } from "react-icons/hi2";
 
 /* ------------------------------------------------------------------ */
+/*  Hardcoded-label translations live in `src/lib/stratifit-i18n.ts`  */
+/*  and are consumed via `tLabel(key, lang)`. They cover chrome that   */
+/*  isn't CMS-driven (or as a fallback when the relevant CMS table is  */
+/*  empty).                                                            */
+/* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
 /*  Static fallback data (used when Supabase is not configured)       */
 /* ------------------------------------------------------------------ */
 
 const serviceTiles = [
-  { icon: HiSparkles, label: "Branding", href: "/brand-design" },
-  { icon: HiCommandLine, label: "Development", href: "/website-development" },
-  { icon: HiMegaphone, label: "Marketing", href: "/growth-marketing" },
-  { icon: HiCpuChip, label: "Automation", href: "/ai-automation" },
+  { icon: HiSparkles, labelKey: "branding", href: "/brand-design" },
+  { icon: HiCommandLine, labelKey: "development", href: "/website-development" },
+  { icon: HiMegaphone, labelKey: "marketing", href: "/growth-marketing" },
+  { icon: HiCpuChip, labelKey: "automation", href: "/ai-automation" },
 ];
 
 const languages = ["EN", "FR", "DE", "ES"];
@@ -40,19 +48,27 @@ interface NavLink {
   ctaText?: string;
 }
 
-const FALLBACK_NAV: NavLink[] = [
-  { label: "Home", href: "/" },
-  { label: "Services", href: "#services" },
-  { label: "Insights", href: "/insights" },
-  { label: "Work", href: "/portfolio" },
-  { label: "About", href: "/about" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", action: "contact" },
+interface FallbackNavItem {
+  labelKey: string;
+  href?: string;
+  action?: string;
+}
+
+const FALLBACK_NAV: FallbackNavItem[] = [
+  { labelKey: "home", href: "/" },
+  { labelKey: "services", href: "#services" },
+  { labelKey: "work", href: "/portfolio" },
+  { labelKey: "insights", href: "/insights" },
+  { labelKey: "testimonials", href: "/testimonials" },
+  { labelKey: "about", href: "/about" },
+  { labelKey: "faq", href: "#faq" },
+  { labelKey: "buy_business", href: "/buy-business" },
+  { labelKey: "contact", action: "contact" },
 ];
 
-const FALLBACK_SITE_NAME = "Stratifit";
-const FALLBACK_TAGLINE = "Digital Excellence";
-const FALLBACK_CTA = "Start Your Project";
+const FALLBACK_SITE_NAME_KEY = "stratifit";
+const FALLBACK_TAGLINE_KEY = "digital_excellence";
+const FALLBACK_CTA_KEY = "start_project";
 const FALLBACK_LOGO_TEXT = "SF";
 
 export function Header() {
@@ -69,7 +85,9 @@ export function Header() {
     fallback: undefined,
   });
 
-  // Merge CMS nav with fallback
+  // Merge CMS nav with fallback. Fallback items are translated via tLabel()
+  // so the same code path serves both the unconfigured-Supabase case AND the
+  // active-language switcher on the static data.
   const navLinks: NavLink[] =
     cmsNavLinks && cmsNavLinks.length > 0
       ? [...cmsNavLinks]
@@ -82,14 +100,20 @@ export function Header() {
             isCta: l.is_cta,
             ctaText: t(l.cta_text, lang),
           }))
-      : FALLBACK_NAV;
+      : FALLBACK_NAV.map((item) => ({
+          label: tLabel(item.labelKey, lang),
+          href: item.href,
+          action: item.action,
+        }));
 
   // Separate CTA link from nav (only contact-modal CTAs get special treatment)
   const ctaLink = navLinks.find((l) => l.isCta && l.action === "contact");
   const displayNav = navLinks.filter((l) => !(l.isCta && l.action === "contact"));
-  const ctaText = ctaLink?.ctaText || FALLBACK_CTA;
-  const siteName = t(cmsSettings?.site_name, lang) || FALLBACK_SITE_NAME;
-  const tagline = t(cmsSettings?.site_tagline, lang) || FALLBACK_TAGLINE;
+  const ctaText = ctaLink?.ctaText || tLabel(FALLBACK_CTA_KEY, lang);
+  const siteName =
+    t(cmsSettings?.site_name, lang) || tLabel(FALLBACK_SITE_NAME_KEY, lang);
+  const tagline =
+    t(cmsSettings?.site_tagline, lang) || tLabel(FALLBACK_TAGLINE_KEY, lang);
   const logoText = cmsSettings?.logo_text || FALLBACK_LOGO_TEXT;
 
   const [isOpen, setIsOpen] = useState(false);
@@ -149,7 +173,7 @@ export function Header() {
               setIsOpen(true);
             }}
             className="lg:hidden p-3 -ml-3 text-white order-1 pointer-events-auto"
-            aria-label="Toggle menu"
+            aria-label={tLabel("toggle_menu", lang)}
           >
             <HiMenu size={24} />
           </button>
@@ -260,7 +284,7 @@ export function Header() {
             </Link>
               <button
                 onClick={() => setIsOpen(false)}
-                aria-label="Close menu"
+                aria-label={tLabel("close_menu", lang)}
                 className="p-3 -mr-3 text-white hover:text-amber transition-colors focus:outline-none"
               >
                 <HiX size={24} />
@@ -277,7 +301,7 @@ export function Header() {
                   className="group flex items-center justify-between py-3 border-b border-white/10"
                 >
                   <span className="text-2xl font-heading font-black text-white group-hover:text-amber transition-colors">
-                    Home
+                    {tLabel("home", lang)}
                   </span>
                 </Link>
 
@@ -288,7 +312,7 @@ export function Header() {
                     className="group w-full text-left pt-2 pb-3 flex items-center justify-between"
                   >
                     <span className="text-2xl font-heading font-black text-white group-hover:text-amber transition-colors">
-                      Services
+                      {tLabel("services", lang)}
                     </span>
                     <HiChevronUp
                       size={26}
@@ -305,13 +329,15 @@ export function Header() {
                       >
                         {serviceTiles.map((s) => (
                           <a
-                            key={s.label}
+                            key={s.labelKey}
                             href={s.href}
                             onClick={() => setIsOpen(false)}
                             className="snap-start flex-none w-[120px] bg-card-dark rounded-xl p-3 flex flex-col items-center justify-center gap-2 border border-white/5 hover:border-amber/50 transition-colors cursor-pointer"
                           >
                             <s.icon className="text-amber text-2xl" />
-                            <span className="text-xs font-medium text-white">{s.label}</span>
+                            <span className="text-xs font-medium text-white">
+                              {tLabel(s.labelKey, lang)}
+                            </span>
                           </a>
                         ))}
                       </div>
@@ -391,15 +417,15 @@ export function Header() {
               <div className="mb-2 text-center">
                 <p className="text-[0.7rem] text-white/70 font-medium tracking-wide">
                   <Link className="hover:text-white transition-colors" href="/privacy-policy">
-                    Privacy Policy
+                    {tLabel("privacy", lang)}
                   </Link>
                   <span className="mx-1">.</span>
                   <Link className="hover:text-white transition-colors" href="/terms-conditions">
-                    Terms of Service
+                    {tLabel("terms", lang)}
                   </Link>
                   <span className="mx-1">.</span>
                   <Link className="hover:text-white transition-colors" href="/cookie-policy">
-                    Cookie Policy
+                    {tLabel("cookies", lang)}
                   </Link>
                 </p>
               </div>

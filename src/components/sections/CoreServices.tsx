@@ -6,39 +6,36 @@ import { MdDiamond, MdDesignServices, MdCode, MdRocketLaunch } from "react-icons
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, ta, type CoreService } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 const services = [
   {
     icon: MdDiamond,
-    title: "Brand Design",
+    titleKey: "service_brand_title",
     href: "/brand-design",
-    description:
-      "Crafting unique identities that resonate and leave a lasting impression on your market.",
-    deliverables: ["Brand Strategy", "Logo Design", "Visual Identity", "Brand Guidelines"],
+    descKey: "service_brand_desc",
+    deliverablesKeys: ["service_brand_d1", "service_brand_d2", "service_brand_d3", "service_brand_d4"],
   },
   {
     icon: MdDesignServices,
-    title: "Website Development",
+    titleKey: "service_website_title",
     href: "/website-development",
-    description:
-      "High-performance websites and web apps engineered for speed, scale, and conversion.",
-    deliverables: ["Custom Websites", "E‑commerce", "Web Applications", "CMS Integration"],
+    descKey: "service_website_desc",
+    deliverablesKeys: ["service_website_d1", "service_website_d2", "service_website_d3", "service_website_d4"],
   },
   {
     icon: MdCode,
-    title: "AI & Automation",
+    titleKey: "service_ai_title",
     href: "/ai-automation",
-    description:
-      "Intelligent automation that streamlines operations, qualifies leads, and scales support 24/7.",
-    deliverables: ["AI Lead Qualification", "AI Chatbots", "Workflow Automation", "Custom APIs"],
+    descKey: "service_ai_desc",
+    deliverablesKeys: ["service_ai_d1", "service_ai_d2", "service_ai_d3", "service_ai_d4"],
   },
   {
     icon: MdRocketLaunch,
-    title: "Growth & Marketing",
+    titleKey: "service_growth_title",
     href: "/growth-marketing",
-    description:
-      "Data-driven campaigns that amplify your brand and drive measurable revenue growth.",
-    deliverables: ["Performance Marketing", "SEO & SEM", "Content Strategy", "Social Media"],
+    descKey: "service_growth_desc",
+    deliverablesKeys: ["service_growth_d1", "service_growth_d2", "service_growth_d3", "service_growth_d4"],
   },
 ];
 
@@ -87,14 +84,14 @@ export function CoreServices() {
           }))
       : services.map((s) => ({
           icon: s.icon,
-          title: s.title,
+          title: tLabel(s.titleKey, lang),
           href: s.href,
-          description: s.description,
-          deliverables: s.deliverables,
-          ctaText: "Learn More",
+          description: tLabel(s.descKey, lang),
+          deliverables: s.deliverablesKeys.map((k) => tLabel(k, lang)),
+          ctaText: tLabel("btn_learn_more", lang),
         }));
   return (
-    <section id="services" className="pt-2 pb-12 md:pt-4 md:pb-16">
+    <section id="services" className="py-24 md:py-32">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={false}
@@ -103,12 +100,12 @@ export function CoreServices() {
           transition={{ duration: 0.5 }}
           className="mb-10 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Services</p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">{tLabel("services_label", lang)}</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Our Core <span className="text-amber">Services</span>
+            {tLabel("services_title_prefix", lang)} <span className="text-amber">{tLabel("services_title_highlight", lang)}</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Strategic solutions engineered to scale your digital presence with precision and luxury.
+            {tLabel("services_subtitle", lang)}
           </p>
         </motion.div>
 
@@ -123,7 +120,7 @@ export function CoreServices() {
             <motion.div
               key={service.title}
               variants={cardVariants}
-              className="group bg-card-dark rounded-[32px] p-7 border border-white/5 relative overflow-hidden hover:border-amber/20 transition-all duration-500 shadow-xl shadow-black/50 flex flex-col"
+              className="group bg-card-dark rounded-[32px] p-6 md:p-8 border border-white/5 relative overflow-hidden hover:border-amber/20 transition-all duration-500 shadow-xl shadow-black/50 flex flex-col"
             >
               <div className="absolute -top-20 -right-20 w-40 h-40 bg-amber/5 rounded-full blur-3xl group-hover:bg-amber/10 transition-all duration-500 pointer-events-none" />
 
@@ -145,7 +142,7 @@ export function CoreServices() {
 
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-amber font-bold mb-4 opacity-90">
-                    Key Deliverables
+                    {tLabel("key_deliverables", lang)}
                   </p>
                   <ul className="space-y-3">
                     {service.deliverables.map((item) => (

@@ -12,6 +12,7 @@ import { staticFaq as fallbackFaq } from "@/data/static-faq";
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, type FaqEntry } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 interface FaqData {
   id: string;
@@ -69,16 +70,16 @@ export function FAQ() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-12 md:mb-16"
+          className="mb-10 md:mb-16"
         >
           <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4 text-center">
-            Support
+            {tLabel("support_label", lang)}
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3 text-center">
-            Frequently Asked <span className="text-amber">Questions</span>
+            {tLabel("faq_title_prefix", lang)} <span className="text-amber">{tLabel("faq_title_highlight", lang)}</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto text-center mt-3">
-            Clear answers to the most common questions we hear from clients.
+            {tLabel("faq_subtitle", lang)}
           </p>
         </motion.div>
 
@@ -158,10 +159,10 @@ export function FAQ() {
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-sm sm:text-lg md:text-xl font-heading font-black tracking-tight text-white">
-                Still have more <span className="text-amber">questions?</span>
+                {tLabel("still_have_questions", lang)} <span className="text-amber">{tLabel("still_have_questions_highlight", lang)}</span>
               </h3>
               <p className="text-[10px] sm:text-xs text-gray-500 truncate mt-0.5">
-                Chat with our FAQ AI bot — instant answers, 24/7.
+                {tLabel("faq_banner_subtitle", lang)}
               </p>
             </div>
           </button>
@@ -169,7 +170,7 @@ export function FAQ() {
             onClick={() => setFaqOpen(true)}
             className="w-full inline-flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-amber text-black font-bold rounded-full hover:bg-amber-light transition-all text-xs sm:text-sm active:scale-95 shadow-[0_0_18px_rgba(245,158,11,0.25)] group-hover:gap-3"
           >
-            Contact our team
+            {tLabel("contact_our_team", lang)}
             <HiArrowRight className="text-xs sm:text-sm group-hover:translate-x-0.5 transition-transform" />
           </button>
         </motion.div>

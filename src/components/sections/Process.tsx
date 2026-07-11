@@ -11,6 +11,7 @@ import {
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, type ProcessStep } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   HiMagnifyingGlass,
@@ -26,34 +27,33 @@ interface StepData {
   description: string;
 }
 
-const FALLBACK_STEPS: StepData[] = [
+// Fallback step data uses key references (resolved via tLabel at render time).
+// The StepData interface (used by the CMS branch) expects resolved strings,
+// so we deliberately leave this untyped to allow the alternate shape.
+const FALLBACK_STEPS = [
   {
     number: "01",
     icon: HiMagnifyingGlass,
-    title: "Discovery",
-    description:
-      "We dive deep into your business goals, audience, and challenges to build a rock-solid foundation for every decision.",
+    titleKey: "step_1_title",
+    descKey: "step_1_desc",
   },
   {
     number: "02",
     icon: HiLightBulb,
-    title: "Strategy",
-    description:
-      "We design a comprehensive plan covering brand, web, AI, and growth — aligned with your revenue targets.",
+    titleKey: "step_2_title",
+    descKey: "step_2_desc",
   },
   {
     number: "03",
     icon: HiWrenchScrewdriver,
-    title: "Build",
-    description:
-      "Our team implements systems, websites, automations, and campaigns with precision engineering.",
+    titleKey: "step_3_title",
+    descKey: "step_3_desc",
   },
   {
     number: "04",
     icon: HiRocketLaunch,
-    title: "Launch & Grow",
-    description:
-      "We optimize, scale, and measure everything. Continuous improvement is built into our DNA.",
+    titleKey: "step_4_title",
+    descKey: "step_4_desc",
   },
 ];
 
@@ -71,7 +71,12 @@ export function Process() {
             title: t(s.title, lang),
             description: t(s.description, lang),
           }))
-      : FALLBACK_STEPS;
+      : FALLBACK_STEPS.map((s) => ({
+          number: s.number,
+          icon: s.icon,
+          title: tLabel(s.titleKey, lang),
+          description: tLabel(s.descKey, lang),
+        }));
 
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const processRef = useRef<HTMLDivElement>(null);
@@ -102,12 +107,12 @@ export function Process() {
           transition={{ duration: 0.5 }}
           className="mb-10 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Process</p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">{tLabel("process_label", lang)}</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            How We <span className="text-amber">Work</span>
+            {tLabel("process_title_prefix", lang)} <span className="text-amber">{tLabel("process_title_highlight", lang)}</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            A proven framework that takes you from idea to scale — predictably and efficiently.
+            {tLabel("process_subtitle", lang)}
           </p>
         </motion.div>
 
@@ -122,11 +127,11 @@ export function Process() {
               transition={{ delay: i * 0.1, duration: 0.5 }}
               className="group relative"
             >
-              <div className="bg-card-dark rounded-2xl p-8 border border-white/5 hover:border-amber/20 transition-all duration-300 h-full relative overflow-hidden">
+              <div className="bg-card-dark rounded-2xl p-6 md:p-8 border border-white/5 hover:border-amber/20 transition-all duration-300 h-full relative overflow-hidden">
                 {/* STEP Badge */}
                 <div className="absolute top-0 right-0 px-3 py-1 bg-amber rounded-bl-xl">
                   <span className="text-[10px] font-black text-black uppercase tracking-widest">
-                    STEP {step.number}
+                    {tLabel("step_badge", lang)} {step.number}
                   </span>
                 </div>
 
@@ -165,7 +170,7 @@ export function Process() {
                 {/* STEP Badge */}
                 <div className="absolute top-0 right-0 px-3 py-1 bg-amber rounded-bl-xl">
                   <span className="text-[10px] font-black text-black uppercase tracking-widest">
-                    STEP {step.number}
+                    {tLabel("step_badge", lang)} {step.number}
                   </span>
                 </div>
 

@@ -7,6 +7,7 @@ import { openContactModal } from "@/components/contact/ContactModal";
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, ta, type ServicePackage } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 interface PackageData {
   name: string;
@@ -18,30 +19,33 @@ interface PackageData {
   cta: string;
 }
 
-const FALLBACK_PACKAGES: PackageData[] = [
+// Fallback package data uses key references (resolved via tLabel at render time).
+// The PackageData interface (used by the CMS branch) expects resolved strings,
+// so we deliberately leave this untyped to allow the alternate shape.
+const FALLBACK_PACKAGES = [
   {
-    name: "Launch", price: "$5,000", period: "/ project",
-    description: "Perfect for startups needing an MVP and brand foundation.",
-    features: ["Identity & Logo Design", "5-Page Responsive Website", "Basic SEO Setup", "2 Weeks of Support"],
-    popular: false, cta: "Get Started",
+    nameKey: "package_launch_name", price: "$5,000", period: "/ project",
+    descKey: "package_launch_desc",
+    featuresKeys: ["package_launch_f1", "package_launch_f2", "package_launch_f3", "package_launch_f4"],
+    popular: false, ctaKey: "package_launch_cta",
   },
   {
-    name: "Grow", price: "$12,000", period: "/ project",
-    description: "For brands ready to capture market share and scale.",
-    features: ["Full Brand System", "Custom Web App / E‑commerce", "CMS Integration", "3 Months Growth Marketing", "30 Days Post-Launch Support"],
-    popular: true, cta: "Get Started",
+    nameKey: "package_grow_name", price: "$12,000", period: "/ project",
+    descKey: "package_grow_desc",
+    featuresKeys: ["package_grow_f1", "package_grow_f2", "package_grow_f3", "package_grow_f4", "package_grow_f5"],
+    popular: true, ctaKey: "package_grow_cta",
   },
   {
-    name: "Scale", price: "$25,000", period: "/ project",
-    description: "Enterprise-grade solutions for established companies.",
-    features: ["Complex Systems Architecture", "Dedicated Product Team", "AI & Automation Suite", "Full Growth Engine Setup", "24/7 SLA Support"],
-    popular: false, cta: "Contact Sales",
+    nameKey: "package_scale_name", price: "$25,000", period: "/ project",
+    descKey: "package_scale_desc",
+    featuresKeys: ["package_scale_f1", "package_scale_f2", "package_scale_f3", "package_scale_f4", "package_scale_f5"],
+    popular: false, ctaKey: "package_scale_cta",
   },
   {
-    name: "Custom", price: "Let's Talk", period: "",
-    description: "Tailored solutions for unique challenges and enterprise scale.",
-    features: ["Custom Scope & Timeline", "Multi-Discipline Team", "Unlimited Revisions", "Dedicated Account Manager", "Priority Support"],
-    popular: false, cta: "Book a Call",
+    nameKey: "package_custom_name", price: "Let's Talk", period: "",
+    descKey: "package_custom_desc",
+    featuresKeys: ["package_custom_f1", "package_custom_f2", "package_custom_f3", "package_custom_f4", "package_custom_f5"],
+    popular: false, ctaKey: "package_custom_cta",
   },
 ];
 
@@ -63,7 +67,15 @@ export function Packages() {
             popular: p.is_popular,
             cta: t(p.cta_text, lang),
           }))
-      : FALLBACK_PACKAGES;
+      : FALLBACK_PACKAGES.map((p) => ({
+          name: tLabel(p.nameKey, lang),
+          price: p.price,
+          period: p.period,
+          description: tLabel(p.descKey, lang),
+          features: p.featuresKeys.map((k) => tLabel(k, lang)),
+          popular: p.popular,
+          cta: tLabel(p.ctaKey, lang),
+        }));
   const [activePackageIndex, setActivePackageIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -99,15 +111,14 @@ export function Packages() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-16"
+          className="mb-10 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Pricing</p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">{tLabel("pricing_label", lang)}</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Service <span className="text-amber">Packages</span>
+            {tLabel("pricing_title_prefix", lang)} <span className="text-amber">{tLabel("pricing_title_highlight", lang)}</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Transparent pricing for every stage of growth. Start where you are and scale with
-            confidence.
+            {tLabel("pricing_subtitle", lang)}
           </p>
         </motion.div>
 
@@ -120,7 +131,7 @@ export function Packages() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
-              className={`relative bg-card-dark rounded-2xl p-8 border flex flex-col ${
+              className={`relative bg-card-dark rounded-2xl p-6 md:p-8 border flex flex-col ${
                 pkg.popular
                   ? "border-amber shadow-[0_0_30px_rgba(245,158,11,0.15)]"
                   : "border-white/5 hover:border-amber/20"
@@ -128,7 +139,7 @@ export function Packages() {
             >
               {pkg.popular && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber text-black text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider whitespace-nowrap">
-                  Most Popular
+                  {tLabel("most_popular", lang)}
                 </div>
               )}
 
@@ -189,7 +200,7 @@ export function Packages() {
               >
                 {pkg.popular && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-amber text-black text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider whitespace-nowrap">
-                    Most Popular
+                    {tLabel("most_popular", lang)}
                   </div>
                 )}
 

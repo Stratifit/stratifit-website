@@ -6,6 +6,7 @@ import { HiArrowRight, HiChevronDown, HiEnvelope } from "react-icons/hi2";
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, ta, type ContactFormConfig, type SectionLabels } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 const FALLBACK_SERVICES = [
   "Brand Design",
@@ -42,12 +43,11 @@ export function Contact() {
   });
   const { data: cmsLabels } = useCms<SectionLabels>("section_labels");
 
-  const heading = t(cmsConfig?.heading, lang) || "Let's Talk";
+  const heading = t(cmsConfig?.heading, lang) || tLabel("contact_heading", lang);
   const subheading =
-    t(cmsConfig?.subheading, lang) ||
-    "Ready to start your project? Fill out the form and we'll get back to you within 24 hours.";
-  const successTitle = t(cmsConfig?.success_title, lang) || FALLBACK_SUCCESS_TITLE;
-  const successMessage = t(cmsConfig?.success_message, lang) || FALLBACK_SUCCESS_MESSAGE;
+    t(cmsConfig?.subheading, lang) || tLabel("contact_subheading", lang);
+  const successTitle = t(cmsConfig?.success_title, lang) || tLabel("success_title", lang);
+  const successMessage = t(cmsConfig?.success_message, lang) || tLabel("success_message", lang);
 
   const services = ta(cmsConfig?.services_list, lang).length
     ? ta(cmsConfig!.services_list, lang)
@@ -62,7 +62,7 @@ export function Contact() {
       : FALLBACK_BUDGETS;
 
   // Section heading pulled from section_labels (with safe fallback)
-  const sectionLabelText = t(cmsLabels?.contact_label, lang) || "Contact";
+  const sectionLabelText = t(cmsLabels?.contact_label, lang) || tLabel("contact_label", lang);
 
   const [formState, setFormState] = useState({
     name: "",
@@ -122,7 +122,7 @@ export function Contact() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-16"
+          className="mb-10 md:mb-16"
         >
           <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
             {sectionLabelText}
@@ -169,7 +169,7 @@ export function Contact() {
                       value={formState.name}
                       onChange={handleChange}
                       className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors"
-                      placeholder="Your name *"
+                      placeholder={tLabel("form_name", lang)}
                     />
                   </div>
                   <div>
@@ -181,7 +181,7 @@ export function Contact() {
                       value={formState.email}
                       onChange={handleChange}
                       className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors"
-                      placeholder="you@company.com *"
+                      placeholder={tLabel("form_email", lang)}
                     />
                   </div>
                 </div>
@@ -194,7 +194,7 @@ export function Contact() {
                     value={formState.company}
                     onChange={handleChange}
                     className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors"
-                    placeholder="Company name"
+                    placeholder={tLabel("form_company", lang)}
                   />
                 </div>
 
@@ -211,8 +211,8 @@ export function Contact() {
                       }
                     >
                       {selectedServices.length > 0
-                        ? `${selectedServices.length} service${selectedServices.length > 1 ? "s" : ""} selected`
-                        : "Select services you're interested in"}
+                        ? `${selectedServices.length} ${tLabel("form_services_selected", lang)}`
+                        : tLabel("form_select_services", lang)}
                     </span>
                     <HiChevronDown
                       className={`text-gray-500 transition-transform duration-200 ${
@@ -269,7 +269,7 @@ export function Contact() {
                 {/* Project Budget — Split: Dropdown + Custom */}
                 <div>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
-                    Project Budget
+                    {tLabel("form_project_budget", lang)}
                   </p>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -287,7 +287,7 @@ export function Contact() {
                         >
                           {selectedBudget
                             ? budgetRanges.find((r) => r.value === selectedBudget)?.label
-                            : "Select range"}
+                            : tLabel("form_select_range", lang)}
                         </span>
                         <HiChevronDown
                           className={`text-gray-500 text-sm shrink-0 ml-1 transition-transform duration-200 ${
@@ -329,7 +329,7 @@ export function Contact() {
                         value={customBudget}
                         onChange={(e) => setCustomBudget(e.target.value)}
                         className="w-full bg-card-dark border border-white/10 rounded-xl px-3 py-3 text-white text-xs placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors"
-                        placeholder="Custom budget"
+                        placeholder={tLabel("form_custom_budget", lang)}
                       />
                     </div>
                   </div>
@@ -344,7 +344,7 @@ export function Contact() {
                     value={formState.message}
                     onChange={handleChange}
                     className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors resize-none"
-                    placeholder="Tell us about your project *"
+                    placeholder={tLabel("form_message", lang)}
                   />
                 </div>
 
@@ -352,7 +352,7 @@ export function Contact() {
                   type="submit"
                   className="group w-full px-8 py-4 bg-amber text-black font-heading font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] active:scale-95"
                 >
-                  Send Message
+                  {tLabel("form_send_message", lang)}
                   <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </>

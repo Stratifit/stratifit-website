@@ -4,24 +4,25 @@ import { FaLinkedinIn, FaInstagram, FaXTwitter } from "react-icons/fa6";
 import { openContactModal } from "@/components/contact/ContactModal";
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
-import { t, ALL_LANGUAGES, type Language, type FooterContent } from "@/lib/cms-types";
+import { t, emptyTranslatableString, type Language, type FooterContent } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
-const footerLinks: Record<string, { label: string; href?: string; action?: string }[]> = {
-  Platform: [
-    { label: "Home", href: "/" },
-    { label: "Services", href: "/#services" },
-    { label: "Work", href: "/portfolio" },
-    { label: "Insights", href: "/insights" },
+const footerLinkKeys: Record<string, { labelKey: string; href?: string; action?: string }[]> = {
+  platform: [
+    { labelKey: "home", href: "/" },
+    { labelKey: "services", href: "/#services" },
+    { labelKey: "work", href: "/portfolio" },
+    { labelKey: "insights", href: "/insights" },
   ],
-  Company: [
-    { label: "About", href: "/about" },
-    { label: "Careers", href: "/about" },
-    { label: "Contact", action: "contact" },
+  company: [
+    { labelKey: "about", href: "/about" },
+    { labelKey: "careers", href: "/about" },
+    { labelKey: "contact", action: "contact" },
   ],
-  Legal: [
-    { label: "Privacy Policy", href: "/privacy-policy" },
-    { label: "Terms & Conditions", href: "/terms-conditions" },
-    { label: "Cookie Policy", href: "/cookie-policy" },
+  legal_col: [
+    { labelKey: "privacy", href: "/privacy-policy" },
+    { labelKey: "terms", href: "/terms-conditions" },
+    { labelKey: "cookies", href: "/cookie-policy" },
   ],
 };
 
@@ -30,28 +31,42 @@ export function Footer() {
   const { data: cmsFooter } = useCms<FooterContent>("footer_content", {
     fallback: {
       id: "",
-      tagline: Object.fromEntries(ALL_LANGUAGES.map((l) => [l, "Digital excellence, built from foundation to full scale."])) as Record<Language, string>,
+      // Empty so the `t() || tLabel("tagline", lang)` chain actually triggers
+      // for non-English languages (instead of returning the same English
+      // string for all 4 languages).
+      tagline: emptyTranslatableString(),
       columns: [],
       social_links: [],
     },
   });
 
-  const tagline = t(cmsFooter?.tagline, lang) || "Digital excellence, built from foundation to full scale.";
+  const tagline = t(cmsFooter?.tagline, lang) || tLabel("tagline", lang);
 
-  // Use CMS footer links if available, otherwise fall back to hardcoded
-  const columns = cmsFooter?.columns?.length
-    ? cmsFooter.columns.reduce<Record<string, { label: string; href?: string; action?: string }[]>>((acc, col) => {
-        const titleKey = t(col.title, lang) || col.title.en || "";
-        if (titleKey) {
-          acc[titleKey] = col.links.map((link) => ({
-            label: t(link.label, lang),
-            href: link.href,
-            action: link.action ?? undefined,
-          }));
-        }
-        return acc;
-      }, {})
-    : footerLinks;
+  // Use CMS footer links if available, otherwise fall back to the
+  // key-based static fallback (translated via tLabel()).
+  const columns: Record<string, { label: string; href?: string; action?: string }[]> =
+    cmsFooter?.columns?.length
+      ? cmsFooter.columns.reduce<Record<string, { label: string; href?: string; action?: string }[]>>((acc, col) => {
+          const titleKey = t(col.title, lang) || col.title.en || "";
+          if (titleKey) {
+            acc[titleKey] = col.links.map((link) => ({
+              label: t(link.label, lang),
+              href: link.href,
+              action: link.action ?? undefined,
+            }));
+          }
+          return acc;
+        }, {})
+      : Object.fromEntries(
+          Object.entries(footerLinkKeys).map(([titleKey, links]) => [
+            tLabel(titleKey, lang),
+            links.map((link) => ({
+              label: tLabel(link.labelKey, lang),
+              href: link.href,
+              action: link.action,
+            })),
+          ]),
+        );
   return (
     <footer id="site-footer" className="bg-[#0a0a0a] border-t border-white/5 relative">
       <div className="max-w-7xl mx-auto px-6 pt-16 pb-8">
@@ -124,13 +139,13 @@ export function Footer() {
             <div className="h-px w-full bg-amber/30" />
             <div className="flex items-center justify-between">
               <p className="text-[10px] text-gray-500 font-medium">
-                &copy; {new Date().getFullYear()} Stratifit. All rights reserved.
+                &copy; {new Date().getFullYear()} Stratifit. {tLabel("all_rights_reserved", lang)}.
               </p>
               <button
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 className="text-[10px] text-amber font-bold hover:text-white transition-colors uppercase tracking-wider"
               >
-                Back to Top
+                {tLabel("back_to_top", lang)}
               </button>
             </div>
           </div>

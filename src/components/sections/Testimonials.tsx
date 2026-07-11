@@ -8,6 +8,7 @@ import { testimonials as fallbackTestimonials } from "@/data/testimonials";
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, type TestimonialItem } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 interface TestimonialData {
   name: string;
@@ -78,16 +79,16 @@ export function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-16"
+          className="mb-10 md:mb-16"
         >
           <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">
-            Testimonials
+            {tLabel("testimonials_label", lang)}
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            What Our Clients <span className="text-amber">Say</span>
+            {tLabel("testimonials_title_prefix", lang)} <span className="text-amber">{tLabel("testimonials_title_highlight", lang)}</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Don&apos;t take our word for it — hear from the brands we&apos;ve helped scale.
+            {tLabel("testimonials_subtitle", lang)}
           </p>
         </motion.div>
 
@@ -164,7 +165,7 @@ export function Testimonials() {
             href="/testimonials"
             className="md:hidden absolute right-0 inline-flex items-center gap-1 text-amber text-[10px] font-bold uppercase tracking-wider hover:text-amber-light transition-colors"
           >
-            View All
+            {tLabel("view_all_testimonials", lang).split(" ").slice(-1)[0]}
             <HiArrowRight className="text-[10px]" />
           </Link>
         </div>
@@ -175,7 +176,7 @@ export function Testimonials() {
             href="/testimonials"
             className="inline-flex items-center gap-2 text-amber text-sm font-bold uppercase tracking-wider hover:text-amber-light transition-colors group"
           >
-            View All Testimonials
+            {tLabel("view_all_testimonials", lang)}
             <HiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

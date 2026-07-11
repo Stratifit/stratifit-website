@@ -8,6 +8,7 @@ import { insights as fallbackInsights } from "@/data/insights";
 import { useCms } from "@/lib/use-cms";
 import { useLanguage } from "@/lib/LanguageContext";
 import { t, type InsightItem } from "@/lib/cms-types";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 interface InsightData {
   slug: string;
@@ -74,12 +75,12 @@ export function Insights() {
           transition={{ duration: 0.5 }}
           className="mb-10 md:mb-16"
         >
-          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">Knowledge</p>
+          <p className="text-xs font-bold text-amber uppercase tracking-[0.2em] mb-4">{tLabel("knowledge_label", lang)}</p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black leading-tight md:leading-none tracking-tight mb-3">
-            Insights &amp; <span className="text-amber">Expertise</span>
+            {tLabel("insights_title_prefix", lang)} <span className="text-amber">{tLabel("insights_title_highlight", lang)}</span>
           </h2>
           <p className="text-gray-400 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl border-l-2 border-amber/50 pl-4 sm:pl-6 mt-3">
-            Thought leadership and industry perspectives from our team of strategists and engineers.
+            {tLabel("insights_subtitle", lang)}
           </p>
         </motion.div>
 
@@ -118,7 +119,7 @@ export function Insights() {
                   href={`/insights/${insight.slug}`}
                   className="inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider hover:text-amber-light transition-colors group/link"
                 >
-                  Read Insight
+                  {tLabel("read_insight", lang)}
                   <HiArrowRight className="text-sm group-hover/link:translate-x-1 transition-transform" />
                 </Link>
               </div>
@@ -132,7 +133,7 @@ export function Insights() {
             href="/insights"
             className="inline-flex items-center gap-2 text-amber text-sm font-bold uppercase tracking-wider hover:text-amber-light transition-colors group"
           >
-            View All Insights
+            {tLabel("view_all_insights", lang)}
             <HiArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
@@ -165,7 +166,7 @@ export function Insights() {
                   </span>
                 </div>
 
-                <div className="p-5 space-y-3 flex-1 flex flex-col">
+                <div className="p-6 space-y-3 flex-1 flex flex-col">
                   <h3 className="font-heading font-bold text-base text-white leading-snug">
                     {insight.title}
                   </h3>
@@ -176,7 +177,7 @@ export function Insights() {
                     href={`/insights/${insight.slug}`}
                     className="inline-flex items-center gap-2 text-amber text-xs font-bold uppercase tracking-wider hover:text-amber-light transition-colors group/link mt-auto"
                   >
-                    Read Insight
+                    {tLabel("read_insight", lang)}
                     <HiArrowRight className="text-sm group-hover/link:translate-x-1 transition-transform" />
                   </Link>
                 </div>
@@ -198,7 +199,7 @@ export function Insights() {
               href="/insights"
               className="absolute right-0 inline-flex items-center gap-1 text-amber text-[10px] font-bold uppercase tracking-wider hover:text-amber-light transition-colors"
             >
-              View All
+              {tLabel("view_all_insights", lang).split(" ").slice(-1)[0]}
               <HiArrowRight className="text-[10px]" />
             </Link>
           </div>

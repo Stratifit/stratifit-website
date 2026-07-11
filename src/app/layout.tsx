@@ -39,13 +39,18 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} antialiased`}>
       <body className="bg-black text-white min-h-screen flex flex-col">
-        {/* Set body.admin-active for /admin/* paths BEFORE any other body content
-             paints, so the marketing-chrome CSS hide rule suppresses the SSR
-             flash of Header / Footer / CookiePopup / ContactModal / DesktopChatbot. */}
+        {/* Set body.admin-active for /admin/* and /login paths BEFORE any other
+             body content paints. The matching CSS rule
+             `body.admin-active [data-marketing-chrome]` (in globals.css)
+             suppresses the SSR flash of any element tagged with
+             data-marketing-chrome (e.g. DesktopChatbot) on those routes.
+             Header / Footer / CookiePopup / ContactModal are suppressed
+             client-side by MarketingChrome's useIsPublicSite() returning
+             false for these paths. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "(function(){if(location.pathname&&location.pathname.indexOf('/admin')===0){document.body.classList.add('admin-active');}})();",
+              "(function(){var p=location.pathname||'';if(p.indexOf('/admin')===0||p==='/login'){document.body.classList.add('admin-active');}})();",
           }}
         />
         <SmoothScroll>
