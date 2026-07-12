@@ -575,7 +575,62 @@ BEGIN
   END IF;
 END $$;
 
--- ============================================================
---  Done. After running this migration, sign in at /admin, go to
--- /admin/content, and start filling each section in all 4 languages.
--- ============================================================
+/* ============================================================
+   30. supabase_realtime publication (Phase 4)
+
+   Supabase creates the `supabase_realtime` publication by default on
+   every new project. We explicitly add ONLY the 24 public-facing CMS
+   tables so the website can subscribe to live changes via
+   src/lib/use-cms.ts.
+
+   EXPLICITLY EXCLUDED (PII / admin-only):
+     - notify_subscribers  (email-list signups)
+     - email_log           (recipient + subject + body)
+     - llm_log             (chat queries + responses)
+     - leads               (name + email + project notes)
+     - lead_followups      (recipient + topic + scheduled body)
+
+   These tables must NEVER be added to a client-side publication \u2014
+   any anonymous visitor could otherwise stream every email address
+   and message body that flows through the app. If you add new PII
+   columns to the admin-only tables above, keep them out of this
+   publication; if you add new PUBLIC CMS tables, append them here.
+
+   Note: the current schema doesn't define RLS on these tables, so
+   Realtime publishes full row payloads to anon subscribers \u2014 same
+   data the public /api/cms/[section] route already returns. When
+   you add RLS, Realtime honors it automatically and stops leaking
+   rows that don't match the policy.
+   ============================================================ */
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE
+      site_settings,
+      header_nav_links,
+      footer_content,
+      hero_content,
+      core_services,
+      service_page_content,
+      process_steps,
+      why_choose_us_content,
+      why_choose_us_benefits,
+      about_page_content,
+      about_stats,
+      about_values,
+      service_packages,
+      testimonials,
+      faq_entries,
+      projects,
+      insights,
+      buy_business_niches,
+      niche_stats,
+      niche_inclusions,
+      buy_business_brands,
+      legal_pages,
+      contact_form_config,
+      section_labels;
+  ELSE
+    RAISE NOTICE 'supabase_realtime publication not found (non-Supabase host?). Skip Realtime setup.';
+  END IF;
+END $$;
