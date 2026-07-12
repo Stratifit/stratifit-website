@@ -438,6 +438,36 @@ CREATE INDEX IF NOT EXISTS email_log_status_idx
 CREATE INDEX IF NOT EXISTS email_log_template_idx
   ON email_log(template_name);
 
+/* ============================================================
+   27. llm_log (list — Groq chat-completion audit trail)
+   Append-only history of every LLM call from any chatbot.
+   status transitions: no_api_key | rate_limited | empty_response
+                       | timeout | error | ok | disabled
+   Indexes by created_at DESC (most recent first) + status + chatbot
+   so the admin viewer and rate-limit guardrail both read cheaply.
+   ============================================================ */
+CREATE TABLE IF NOT EXISTS llm_log (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  chatbot TEXT NOT NULL,
+  lang TEXT NOT NULL DEFAULT 'en',
+  query TEXT NOT NULL,
+  response TEXT,
+  model TEXT NOT NULL,
+  tokens_in INTEGER,
+  tokens_out INTEGER,
+  latency_ms INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'ok'
+    CHECK (status IN ('ok','no_api_key','rate_limited','empty_response','timeout','error','disabled')),
+  error TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS llm_log_created_at_idx
+  ON llm_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS llm_log_status_idx
+  ON llm_log(status);
+CREATE INDEX IF NOT EXISTS llm_log_chatbot_idx
+  ON llm_log(chatbot);
+
 -- ============================================================
 --  Done. After running this migration, sign in at /admin, go to
 --  /admin/content, and start filling each section in all 4 languages.

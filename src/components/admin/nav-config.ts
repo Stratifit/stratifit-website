@@ -18,6 +18,7 @@ import {
   HiPencilSquare,
   HiLanguage,
   HiPaperAirplane,
+  HiCpuChip,
 } from "react-icons/hi2";
 
 export type NavItem = {
@@ -81,6 +82,8 @@ export const navGroups: NavGroup[] = [
   {
     label: "System",
     items: [
+      { key: "email-log", href: "/admin/email-log", icon: HiPaperAirplane, label: "Email Log" },
+      { key: "llm-log", href: "/admin/llm-log", icon: HiCpuChip, label: "LLM Log" },
       { key: "analytics", href: "/admin/analytics", icon: HiChartBar, label: "Analytics" },
       { key: "team", href: "/admin/team", icon: HiUserGroup, label: "Team", badge: "5" },
       { key: "activity", href: "/admin/activity", icon: HiListBullet, label: "Activity" },
