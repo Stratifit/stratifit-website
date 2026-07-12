@@ -1,239 +1,172 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { HiPencil, HiXMark, HiPlus, HiCheck } from "react-icons/hi2";
+import { useState } from 'react';
+import type { Language } from '@/lib/cms-types';
+import { useCms, saveCmsData, createCmsItem, deleteCmsItem } from '@/lib/use-cms';
 
-const mockServices = [
-  {
-    id: "brand-design",
-    name: "Brand Design",
-    slug: "brand-design",
-    priceType: "starting",
-    priceValue: "$1,500",
-    description:
-      "Crafting unique identities that resonate and leave a lasting impression on your market.",
-  },
-  {
-    id: "website-development",
-    name: "Website Development",
-    slug: "website-development",
-    priceType: "starting",
-    priceValue: "$2,500",
-    description:
-      "High-performance websites and web apps engineered for speed, scale, and conversion.",
-  },
-  {
-    id: "ai-automation",
-    name: "AI & Automation",
-    slug: "ai-automation",
-    priceType: "starting",
-    priceValue: "$1,200",
-    description:
-      "Intelligent automation that streamlines operations and qualifies leads 24/7.",
-  },
-  {
-    id: "growth-marketing",
-    name: "Growth & Marketing",
-    slug: "growth-marketing",
-    priceType: "starting",
-    priceValue: "$3,000",
-    description:
-      "Data-driven campaigns that amplify your brand and drive measurable revenue growth.",
-  },
-  {
-    id: "buy-a-business",
-    name: "Buy a Business",
-    slug: "buy-a-business",
-    priceType: "one-time",
-    priceValue: "$9,000",
-    description:
-      "Acquire vetted, revenue-generating online businesses and skip the startup phase.",
-  },
-  {
-    id: "funnel-strategy",
-    name: "Funnel Strategy",
-    slug: "funnel-strategy",
-    priceType: "starting",
-    priceValue: "$1,800",
-    description:
-      "Conversion-optimized funnels and CRM workflows that turn visitors into loyal customers.",
-  },
-];
-
-const priceTypeOptions = ["starting", "one-time", "monthly", "custom"];
-
-export default function AdminServicesPage() {
-  const [editing, setEditing] = useState<(typeof mockServices)[number] | null>(null);
-
-  return (
-    <div className="space-y-8">
-      {/* Header */}
-      <header className="flex items-end justify-between flex-wrap gap-4">
-        <div>
-          <p className="text-[10px] font-bold text-amber uppercase tracking-[0.25em] mb-2">
-            Catalog
-          </p>
-          <h1 className="font-heading font-black text-3xl sm:text-4xl text-white tracking-tight leading-none">
-            Services
-          </h1>
-          <p className="text-sm text-gray-400 mt-2">
-            Manage service names, pricing, and descriptions.
-          </p>
-        </div>
-        <button className="inline-flex items-center gap-2 px-5 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all text-sm shadow-[0_0_20px_rgba(245,158,11,0.25)] active:scale-95">
-          <HiPlus className="text-base" /> New service
-        </button>
-      </header>
-
-      {/* Grid */}
-      <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mockServices.map((svc, i) => (
-          <motion.div
-            key={svc.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04 }}
-            className="group bg-card-dark rounded-2xl border border-white/5 hover:border-amber/20 transition-all p-6 relative overflow-hidden"
-          >
-            <div className="absolute -top-12 -right-12 w-40 h-40 bg-amber/5 rounded-full blur-3xl group-hover:bg-amber/10 transition-all pointer-events-none" />
-            <div className="relative z-10">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="font-heading font-black text-xl text-white tracking-tight mt-1">
-                    {svc.name}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setEditing(svc)}
-                  className="w-9 h-9 rounded-full bg-white/5 hover:bg-amber/15 border border-white/10 hover:border-amber/30 flex items-center justify-center text-gray-300 hover:text-amber transition-all"
-                  aria-label="Edit"
-                >
-                  <HiPencil className="text-sm" />
-                </button>
-              </div>
-              <p className="text-[9px] font-mono text-gray-600 mt-3">
-                =<span className="text-gray-400">{svc.slug}</span>
-              </p>
-              <p className="text-[10px] font-mono text-gray-500 mt-3">
-                {svc.description}
-              </p>
-              <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
-                <div>
-                  <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber/15 text-amber border border-amber/20 mt-1">
-                    {svc.priceType}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <p className="font-heading font-black text-lg text-white mt-1">
-                    {svc.priceValue}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </section>
-
-      {/* Edit modal */}
-      {editing && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative bg-card-dark rounded-2xl border border-amber/20 w-full max-w-lg overflow-hidden shadow-2xl"
-          >
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-amber/60 to-transparent bg-[length:200%_100%] animate-[shimmer_3s_ease-in-out_infinite]" />
-            <div className="p-6 sm:p-7">
-              <div className="flex items-start justify-between mb-5">
-                <div>
-                  <p className="text-[10px] font-bold text-amber uppercase tracking-[0.25em] mb-1">
-                    Edit Service
-                  </p>
-                  <h3 className="font-heading font-black text-xl text-white">
-                    {editing.name}
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setEditing(null)}
-                  className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white"
-                >
-                  <HiXMark />
-                </button>
-              </div>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setEditing(null);
-                }}
-                className="space-y-3"
-              >
-                <Field
-                  defaultValue={editing.name}
-                  placeholder="Service name"
-                />
-                <Field
-                  defaultValue={editing.description}
-                  placeholder="Description"
-                  multiline
-                />
-                <div className="grid grid-cols-2 gap-3">
-                  <select
-                    defaultValue={editing.priceType}
-                    className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-amber/50 focus:outline-none cursor-pointer"
-                    aria-label="Service price type"
-                  >
-                    {priceTypeOptions.map((o) => (
-                      <option key={o} value={o} className="bg-black text-white">
-                        {o}
-                      </option>
-                    ))}
-                  </select>
-                  <Field
-                    defaultValue={editing.priceValue}
-                    placeholder="e.g. $1,500"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.25)] text-sm mt-2"
-                >
-                  <HiCheck /> Save changes
-                </button>
-              </form>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </div>
-  );
+interface ServiceRow {
+  id: string;
+  sort_order: number;
+  icon: string;
+  title: Record<Language,string> | string;
+  description: Record<Language,string> | string;
+  features: Array<Record<Language,string>>;
+  accent: string;
 }
 
-function Field({
-  defaultValue,
-  placeholder,
-  multiline,
-}: {
-  defaultValue?: string;
-  placeholder?: string;
-  multiline?: boolean;
-}) {
+const LANGUAGES: Language[] = ['en','de','fr','es'];
+
+function t(v: unknown, lang: Language): string {
+  if (!v) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object') return (v as Record<string,string>)[lang] ?? (v as Record<string,string>).en ?? '';
+  return '';
+}
+
+const EMPTY: Omit<ServiceRow,'id'> = {
+  sort_order: 99,
+  icon: 'sparkles',
+  title: { en:'', de:'', fr:'', es:'' },
+  description: { en:'', de:'', fr:'', es:'' },
+  features: [{ en:'', de:'', fr:'', es:'' }],
+  accent: '#4ECDC4',
+};
+
+export default function ServicesAdminPage() {
+  const { data, loading, error, mutate } = useCms<ServiceRow[]>('services');
+  const [editing, setEditing] = useState<ServiceRow | null>(null);
+  const [draft, setDraft] = useState<Omit<ServiceRow,'id'>>(EMPTY);
+  const [saving, setSaving] = useState(false);
+
+  const startCreate = () => { setEditing({ id: '__new__', ...EMPTY } as ServiceRow); setDraft({ ...EMPTY }); };
+  const startEdit = (row: ServiceRow) => {
+    setEditing(row);
+    setDraft({
+      sort_order: row.sort_order ?? 99,
+      icon: row.icon ?? '',
+      title: typeof row.title === 'object' && row.title !== null && !Array.isArray(row.title) ? row.title as Record<Language,string> : { en: String(row.title ?? ''), de:' ', fr:' ', es:' ' },
+      description: typeof row.description === 'object' && row.description !== null && !Array.isArray(row.description) ? row.description as Record<Language,string> : { en: String(row.description ?? ''), de:' ', fr:' ', es:' ' },
+      features: row.features ?? [],
+      accent: row.accent ?? '#4ECDC4',
+    });
+  };
+  const cancel = () => { setEditing(null); setDraft(EMPTY); };
+
+  const save = async () => {
+    if (!editing) return;
+    setSaving(true);
+    try {
+      if (editing.id === '__new__') await createCmsItem('services', draft);
+      else await saveCmsData('services', { id: editing.id, ...draft });
+      await mutate();
+      cancel();
+    } catch (e) { alert('Save failed: ' + (e as Error).message); }
+    finally { setSaving(false); }
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm('Delete this service?')) return;
+    setSaving(true);
+    try { await deleteCmsItem('services', id); await mutate(); }
+    finally { setSaving(false); }
+  };
+
+  const updateLangField = (field: 'title'|'description', lang: Language, val: string) => setDraft(prev => {
+    const cur = prev[field] as Record<Language,string>;
+    return { ...prev, [field]: { ...cur, [lang]: val } };
+  });
+
+  const setFeature = (idx: number, lang: Language, val: string) => setDraft(prev => {
+    const arr = prev.features.map(f => ({ ...f }));
+    arr[idx] = { ...(arr[idx] ?? { en:'',de:'',fr:'',es:'' }), [lang]: val };
+    return { ...prev, features: arr };
+  });
+  const addFeature = () => setDraft(prev => ({ ...prev, features: [...prev.features, { en:'',de:'',fr:'',es:'' }] }));
+  const removeFeature = (idx: number) => setDraft(prev => ({ ...prev, features: prev.features.filter((_,i) => i !== idx) }));
+
+  if (loading) return <div className="p-6 text-gray-400">Loading services...</div>;
+  if (error) return <div className="p-6 text-red-400">Error: {error}</div>;
+
   return (
-    <div>
-      {multiline ? (
-        <textarea
-          rows={3}
-          defaultValue={defaultValue}
-          placeholder={placeholder}
-          className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none resize-none"
-        />
-      ) : (
-        <input
-          defaultValue={defaultValue}
-          placeholder={placeholder}
-          className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none"
-        />
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">Services</h1>
+          <p className="text-sm text-gray-400">Core services shown on the homepage.</p>
+        </div>
+        <button onClick={startCreate} className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:opacity-90">+ New service</button>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {(data ?? []).map(row => (
+          <div key={row.id} className="rounded-lg border border-white/10 bg-white/5 p-4 space-y-2">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{row.icon}</span>
+              <div className="text-base font-semibold text-white">{t(row.title,'en')}</div>
+            </div>
+            <p className="text-sm text-gray-400">{t(row.description,'en')}</p>
+            <ul className="text-sm text-gray-300 list-disc pl-5 space-y-0.5">
+              {(row.features ?? []).map((f,i) => <li key={i}>{t(f,'en')}</li>)}
+            </ul>
+            <div className="flex gap-2 pt-2">
+              <button onClick={() => startEdit(row)} className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10">Edit</button>
+              <button onClick={() => remove(row.id)} disabled={saving} className="rounded-md border border-red-500/30 px-3 py-1.5 text-xs text-red-300 hover:bg-red-500/10">Delete</button>
+            </div>
+          </div>
+        ))}
+        {(data ?? []).length === 0 && <div className="text-sm text-gray-400 col-span-2">No services yet.</div>}
+      </div>
+
+      {editing && (
+        <div className="rounded-lg border border-white/10 bg-black/40 p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">{editing.id === '__new__' ? 'New service' : 'Edit service'}</h2>
+            <button onClick={cancel} className="text-xs text-gray-400 hover:text-white">Cancel</button>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-3">
+            <label className="space-y-1"><div className="text-xs text-gray-400">Icon (emoji)</div>
+              <input value={draft.icon} onChange={e => setDraft(d => ({ ...d, icon: e.target.value }))} className="w-full rounded-md bg-white/5 border border-white/10 px-2 py-1.5 text-sm text-white" /></label>
+            <label className="space-y-1"><div className="text-xs text-gray-400">Sort order</div>
+              <input type="number" value={draft.sort_order} onChange={e => setDraft(d => ({ ...d, sort_order: Number(e.target.value) }))} className="w-full rounded-md bg-white/5 border border-white/10 px-2 py-1.5 text-sm text-white" /></label>
+            <label className="space-y-1"><div className="text-xs text-gray-400">Accent</div>
+              <input value={draft.accent} onChange={e => setDraft(d => ({ ...d, accent: e.target.value }))} className="w-full rounded-md bg-white/5 border border-white/10 px-2 py-1.5 text-sm text-white" /></label>
+          </div>
+
+          <div>
+            <div className="text-xs text-gray-400 mb-1">Title</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {LANGUAGES.map(lang => <input key={lang} placeholder={lang.toUpperCase()} value={(draft.title as Record<string,string>)[lang] ?? ''} onChange={e => updateLangField('title', lang, e.target.value)} className="rounded-md bg-black/30 border border-white/10 px-2 py-1 text-sm text-white" />)}
+            </div>
+          </div>
+          <div>
+            <div className="text-xs text-gray-400 mb-1">Description</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {LANGUAGES.map(lang => <textarea key={lang} placeholder={lang.toUpperCase()} rows={3} value={(draft.description as Record<string,string>)[lang] ?? ''} onChange={e => updateLangField('description', lang, e.target.value)} className="rounded-md bg-black/30 border border-white/10 px-2 py-1 text-sm text-white" />)}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-xs text-gray-400 mb-2">Features</div>
+            {draft.features.map((feature, idx) => (
+              <div key={idx} className="rounded-md border border-white/10 bg-white/5 p-2 mb-2 space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-gray-400">Feature {idx+1}</div>
+                  <button onClick={() => removeFeature(idx)} className="text-xs text-red-300">Remove</button>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {LANGUAGES.map(lang => <input key={lang} placeholder={lang.toUpperCase()} value={feature[lang] ?? ''} onChange={e => setFeature(idx, lang, e.target.value)} className="rounded-md bg-black/30 border border-white/10 px-2 py-1 text-xs text-white" />)}
+                </div>
+              </div>
+            ))}
+            <button onClick={addFeature} className="text-xs text-primary">+ Add feature</button>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <button onClick={cancel} className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-white hover:bg-white/10">Cancel</button>
+            <button onClick={save} disabled={saving} className="rounded-md bg-primary px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50">{saving ? 'Saving...' : 'Save'}</button>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import type { Language } from "@/lib/cms-types";
+import { pickRequestLanguage } from "@/lib/lang";
+import { sendLeadConfirmation } from "@/lib/email";
 
 /* ------------------------------------------------------------------ */
 /*  POST /api/leads/public                                            */
@@ -46,14 +49,13 @@ const emailDedupe = new Map<string, number>();
 // Conservative email regex — RFC-pragmatic, blocks obvious garbage.
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-type Lang = "en" | "de" | "fr" | "es";
-function pickLang(input: unknown): Lang {
-  if (typeof input === "string") {
-    const v = input.toLowerCase().slice(0, 2);
-    if (v === "en" || v === "de" || v === "fr" || v === "es") return v;
-  }
-  return "en";
-}
+/**
+ * Lead language resolution is centralized in src/lib/lang.ts so the cron
+ * `/api/cron/followups` route can rely on `leads.lang` always being a
+ * value that `pickRequestLanguage` would have accepted. Adding a new
+ * language requires only extending `SUPPORTED_LANGUAGES` + the templates
+ * in `src/lib/email.ts`.
+ */
 
 function clientIp(req: NextRequest): string {
   const xff = req.headers.get("x-forwarded-for");
@@ -189,7 +191,7 @@ export async function POST(req: NextRequest) {
   const budgetCustom =
     typeof body.budgetCustom === "string" ? body.budgetCustom.slice(0, 80) : "";
   const budget = budgetRange || budgetCustom;
-  const lang = pickLang(body.lang);
+  const lang: Language = pickRequestLanguage(body.lang, req.headers.get("accept-language"));
 
   // 7. Structured `notes` stamp. Keep the raw message at the end so manual
   //    editing in /admin/leads/[id] still works, and so the parser in
@@ -242,6 +244,25 @@ export async function POST(req: NextRequest) {
   }
 
   const leadId = lead.id as string;
+
+  // 8b. Fire INSTANT localized confirmation email. Separate from the
+  //     cron-dispatched 1-hour check-in (LEAD_FOLLOWUP_CHECKIN below),
+  //     so the user gets immediate acknowledgment that their message
+  //     landed even if the cron sweep is delayed or paused. sendEmail
+  //     never throws and writes a 'queued'/'failed' row to email_log.
+  //     We don't gate the response on its result — lead acceptance is
+  //     the user's #1 expectation; the email is a courtesy.
+  void sendLeadConfirmation({
+    to: email,
+    lang,
+    leadName: name,
+    topic: services[0] ?? (message.slice(0, 80) || "your project"),
+    relatedLeadId: leadId,
+  }).catch((err) => {
+    console.warn(
+      `[leads/public] confirmation send unexpected throw: ${(err as Error)?.message ?? err}`,
+    );
+  });
 
   // 9. Insert a scheduled follow-up row. scheduled_for is UTC ISO so the
   //    cron can compare directly against `now()` server-side.

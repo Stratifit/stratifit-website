@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -15,11 +16,17 @@ import {
   HiPencilSquare,
   HiCodeBracket,
   HiRocketLaunch,
+  HiSparkles,
 } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
 import type { ElementType } from "react";
-import type { Project } from "@/data/projects";
+import { type Project, projects as fallbackProjects } from "@/data/projects";
 import { testimonials } from "@/data/testimonials";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { type ProjectItem } from "@/lib/cms-types";
+import { adaptProject } from "@/lib/cms-adapters";
+import { type LangCode } from "@/lib/buy-business-ui";
 
 const overviewFields = [
   { label: "Client", icon: HiUser },
@@ -39,8 +46,59 @@ const staticProcessSteps: Array<{ icon: ElementType; title: string; desc: string
   { icon: HiRocketLaunch, title: "Launch", desc: "Deploy, measure, and continue to optimize." },
 ];
 
-export function CaseStudyContent({ project }: { project: Project }) {
+export function CaseStudyContent({ slug }: { slug: string }) {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const langCode = (lang as LangCode) ?? "en";
+
+  /* Live CMS data. Realtime subscription on `projects` is automatic. */
+  const { data: cmsProjects, loading: cmsLoading } = useCms<ProjectItem[]>(
+    "projects",
+    { fallback: [] },
+  );
+
+  /* ── Resolution priority ────────────────────────────────────────
+     1. CMS row with matching slug AND is_active (live path)
+     2. Static row with matching slug (local-dev / pre-seed fallback)
+     3. Inline 404 UI  */
+  const cmsRow = (cmsProjects ?? []).find(
+    (p) => p.slug === slug && p.is_active,
+  );
+  const staticRow = cmsRow
+    ? null
+    : fallbackProjects.find((p) => p.slug === slug);
+
+  /* CMS-only misses → /not-found, but only after the fetch settles. */
+  useEffect(() => {
+    if (cmsLoading) return;
+    if (cmsRow || staticRow) return;
+    router.replace("/not-found");
+  }, [cmsLoading, cmsRow, staticRow, router]);
+
+  if (!cmsRow && !staticRow) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center px-6">
+          <HiSparkles className="text-amber text-4xl mx-auto mb-4" />
+          <h1 className="text-3xl font-heading font-black text-white mb-3">
+            Case study not found
+          </h1>
+          <p className="text-gray-400 text-sm mb-6 max-w-md">
+            We couldn{"’"}t find a case study at <code className="text-amber">/portfolio/{slug}</code>.
+          </p>
+          <Link
+            href="/portfolio"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all text-sm"
+          >
+            <HiArrowLeft /> Back to all case studies
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  const project: Project = cmsRow ? adaptProject(cmsRow, langCode) : (staticRow as Project);
+
   const testimonial = testimonials.find((t) => {
     const role = t.role.toLowerCase();
     const client = project.client.toLowerCase().split(/[\s(]/)[0] ?? "";

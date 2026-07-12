@@ -113,7 +113,7 @@ export default function AdminNotificationsPage() {
                   {n.unread && <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse" />}
                 </p>
                 <p className="text-sm text-gray-400 mt-1">{n.body}</p>
-                <p className="text-[10px] text-gray-500 mt-1 font-mono">{n.time}</p>
+                <p className="text-[10px] text-gray-500 mt-1">{n.time}</p>
               </div>
               {n.cta && (
                 <a

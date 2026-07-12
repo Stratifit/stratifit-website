@@ -4,11 +4,65 @@ import { motion } from "framer-motion";
 import { HiArrowRight, HiArrowLeft, HiGlobeAlt } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { nicheList } from "@/data/buy-business";
+import { nicheList as fallbackNicheList } from "@/data/buy-business";
 import { openContactModal } from "@/components/contact/ContactModal";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import {
+  type BuyBusinessBrand,
+  type BuyBusinessNiche,
+  type Language,
+} from "@/lib/cms-types";
+import { resolveLocalized } from "@/lib/buy-business-ui";
+
+/* Display shape consumed by the JSX — derived from either CMS rows or
+   the static fallback. */
+type DisplayNiche = {
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  image: string;
+  brandCount: number;
+  avgRevenue: string;
+  avgMargin: string;
+};
 
 export default function BuyBusinessPage() {
   const router = useRouter();
+  const { lang } = useLanguage();
+
+  const { data: cmsNiches } = useCms<BuyBusinessNiche[]>("buy-business-niches", {
+    fallback: [],
+  });
+  const { data: cmsBrands } = useCms<BuyBusinessBrand[]>("buy-business-brands", {
+    fallback: [],
+  });
+
+  const hasCms = (cmsNiches ?? []).length > 0 && (cmsBrands ?? []).length > 0;
+
+  /* ── Build the per-niche summary from whichever data source is live. ── */
+  const displayNiches: DisplayNiche[] = hasCms
+    ? (cmsNiches ?? []).map((n) => {
+        const brandsInNiche = (cmsBrands ?? []).filter(
+          (b) => b.is_active && b.niche_id === n.id,
+        );
+        return {
+          slug: n.slug,
+          title: resolveLocalized(n.title, lang) || n.slug,
+          description: resolveLocalized(n.description, lang) || "",
+          icon: n.icon,
+          image: n.image,
+          brandCount: brandsInNiche.length,
+          // "Avg revenue" / "avg margin" — pick the first 2 brand revenue
+          // strings we have. Cheap heuristic; admins can populate these as
+          // dedicated per-niche summary fields later (niche_stats covers the
+          // detail page already).
+          avgRevenue: brandsInNiche[0]?.revenue || "—",
+          avgMargin: brandsInNiche[0]?.profit || "—",
+        };
+      })
+    : (fallbackNicheList as DisplayNiche[]);
 
   return (
     <main className="min-h-screen bg-black">
@@ -53,7 +107,7 @@ export default function BuyBusinessPage() {
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {nicheList.map((niche, i) => (
+            {displayNiches.map((niche, i) => (
               <motion.div
                 key={niche.slug}
                 initial={{ opacity: 0, y: 20 }}

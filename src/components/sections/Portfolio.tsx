@@ -45,7 +45,10 @@ export function Portfolio() {
           .sort((a, b) => a.sort_order - b.sort_order)
           .map((p) => ({
             id: p.id,
-            slug: p.id,
+            // Use the human-readable slug (not the UUID) so the link
+            // resolves on the detail page, which now looks up by slug
+            // via useCms('projects').
+            slug: p.slug,
             title: t(p.title, lang),
             category: p.category,
             description: t(p.description, lang),

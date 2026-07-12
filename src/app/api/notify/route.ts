@@ -6,7 +6,7 @@ import {
   getNotifyWelcomeEmail,
   getNotifyAlreadySubscribedEmail,
 } from "@/lib/email";
-import type { Language } from "@/lib/cms-types";
+import { pickRequestLanguage } from "@/lib/lang";
 
 /* ------------------------------------------------------------------ */
 /*  POST /api/notify                                                  */
@@ -49,9 +49,7 @@ export async function POST(req: NextRequest) {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  const safeLang = (
-    ["en", "de", "fr", "es"].includes(String(lang)) ? lang : "en"
-  ) as Language;
+  const safeLang = pickRequestLanguage(lang, req.headers.get("accept-language"));
   const safeSource = typeof source === "string" && source.length <= 64 ? source : "coming_soon_page";
 
   // Check whether the email is already on the list so the UI can show a

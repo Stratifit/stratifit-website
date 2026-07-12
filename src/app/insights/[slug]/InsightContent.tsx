@@ -1,12 +1,81 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { HiArrowLeft } from "react-icons/hi2";
+import { HiArrowLeft, HiSparkles } from "react-icons/hi2";
 import { useRouter } from "next/navigation";
-import type { Insight } from "@/data/insights";
+import Link from "next/link";
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { type InsightItem } from "@/lib/cms-types";
+import { type Insight, insights as fallbackInsights } from "@/data/insights";
+import { adaptInsight } from "@/lib/cms-adapters";
+import { type LangCode } from "@/lib/buy-business-ui";
 
-export function InsightContent({ insight }: { insight: Insight }) {
+export function InsightContent({ slug }: { slug: string }) {
   const router = useRouter();
+  const { lang } = useLanguage();
+  const langCode = (lang as LangCode) ?? "en";
+
+  /* Live CMS data. `useCms` already subscribes to Supabase Realtime
+     postgres_changes on the `insights` table, so an admin publish
+     lands on this page without a refresh. */
+  const { data: cmsInsights, loading: cmsLoading } = useCms<InsightItem[]>(
+    "insights",
+    { fallback: [] },
+  );
+
+  /* ── Resolution priority ────────────────────────────────────────
+     1. CMS row with matching slug AND is_published (the live path)
+     2. Static row with matching slug (graceful fallback for local
+        dev or before admin seeds Supabase)
+     3. Inline 404 UI  */
+  const cmsRow = (cmsInsights ?? []).find(
+    (i) => i.slug === slug && i.is_published,
+  );
+  const staticRow = cmsRow
+    ? null
+    : fallbackInsights.find((i) => i.slug === slug);
+
+  /* Once we have a definitive answer (CMS or static miss) and we're
+     no longer loading, navigate CMS-only misses to /not-found. We
+     deliberately wait for the CMS fetch to settle so we don't 404
+     a freshly-seeded insight during the initial network roundtrip. */
+  useEffect(() => {
+    if (cmsLoading) return;
+    if (cmsRow || staticRow) return;
+    router.replace("/not-found");
+  }, [cmsLoading, cmsRow, staticRow, router]);
+
+  if (!cmsRow && !staticRow) {
+    return (
+      <main className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center px-6">
+          <HiSparkles className="text-amber text-4xl mx-auto mb-4" />
+          <h1 className="text-3xl font-heading font-black text-white mb-3">
+            Insight not found
+          </h1>
+          <p className="text-gray-400 text-sm mb-6 max-w-md">
+            We couldn&apos;t find an insight at <code className="text-amber">/insights/{slug}</code>.
+          </p>
+          <Link
+            href="/insights"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all text-sm"
+          >
+            <HiArrowLeft /> Back to all insights
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  /* The detail-page JSX was originally written against the static
+     `Insight` shape. `adaptInsight` normalizes a CMS row into the
+     same shape so the JSX below is source-agnostic. */
+  const insight: Insight = cmsRow
+    ? adaptInsight(cmsRow, langCode)
+    : (staticRow as Insight);
+
   return (
     <main className="min-h-screen bg-black">
       <section className="relative h-[40vh] md:h-[50vh] overflow-hidden">

@@ -6,16 +6,26 @@ import { HiArrowRight, HiArrowLeft, HiGlobeAlt, HiShieldCheck } from "react-icon
 import Link from "next/link";
 import {
   allBrands,
-  niches,
-  productEmojis,
-  nicheCtaLabel,
-  getBrandAccent,
-  getBrandBadge,
+  niches as fallbackNiches,
+  productEmojis as fallbackEmojis,
+  nicheCtaLabel as fallbackCtaLabel,
+  getBrandAccent as fallbackAccent,
+  getBrandBadge as fallbackBadge,
 } from "@/data/buy-business";
-import { slugify } from "@/lib/slugify";
 import { openContactModal } from "@/components/contact/ContactModal";
-
-const nicheFilters = ["All", ...niches.map((n) => n.title)];
+import { useCms } from "@/lib/use-cms";
+import { useLanguage } from "@/lib/LanguageContext";
+import { type BuyBusinessBrand, type BuyBusinessNiche } from "@/lib/cms-types";
+import {
+  getAccentFor,
+  getBadgeStyleFor,
+  getProductEmojis,
+  getNicheCtaLabel,
+  getTrustBadges,
+  resolveLocalized,
+  resolveLocalizedArray,
+  type LangCode,
+} from "@/lib/buy-business-ui";
 
 const badgeClasses: Record<string, string> = {
   pill: "rounded-full",
@@ -25,7 +35,55 @@ const badgeClasses: Record<string, string> = {
 };
 
 export function BuyBusinessSection() {
+  const { lang } = useLanguage();
+  const langCode = (lang as LangCode) ?? "en";
+
+  // Live CMS rows. Fallback to [] so the hook still tries to read.
+  const { data: cmsNichesData } = useCms<BuyBusinessNiche[]>("buy-business-niches", {
+    fallback: [],
+  });
+  const { data: cmsBrandsData } = useCms<BuyBusinessBrand[]>("buy-business-brands", {
+    fallback: [],
+  });
+
+  const cmsNiches = cmsNichesData ?? [];
+  const cmsBrands = cmsBrandsData ?? [];
+  /* Gate on niches only: if Supabase is configured and niches are seeded,
+     the CMS branch wins even when brands is empty. The empty case then
+     renders the in-component "No businesses found" state instead of
+     silently masking it with the static demo. */
+  const hasCms = cmsNiches.length > 0;
+
+  // Build niche lookup once per render. With CMS data, the filter chips are
+  // the niche titles (English) so the chip label matches what /admin sees.
+  const nicheById = new Map(cmsNiches.map((n) => [n.id, n]));
+
+  // ─── Filter chips ────────────────────────────────────────────────
+  // CMS path: ["All", ...cmsNiches (en title)]. Falls back to the
+  // original 7-niche static list when Supabase has no rows yet.
+  const nicheFilters: string[] = hasCms
+    ? ["All", ...cmsNiches.map((n) => resolveLocalized(n.title, "en") || n.slug)]
+    : ["All", ...fallbackNiches.map((n) => n.title)];
+
+  // ─── Brands for the active filter ────────────────────────────────
   const [activeFilter, setActiveFilter] = useState("All");
+
+  const filteredBrands = hasCms
+    ? cmsBrands
+        .filter((b) => b.is_active)
+        .filter((b) => {
+          if (activeFilter === "All") return true;
+          const niche = nicheById.get(b.niche_id);
+          if (!niche) return false;
+          const title = resolveLocalized(niche.title, "en") || niche.slug;
+          return title === activeFilter;
+        })
+        .sort((a, b) => a.sort_order - b.sort_order)
+    : activeFilter === "All"
+      ? allBrands
+      : allBrands.filter((b) => b.niche === activeFilter);
+
+  // ─── Carousel state (unchanged) ──────────────────────────────────
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -41,9 +99,6 @@ export function BuyBusinessSection() {
       behavior: "smooth",
     });
   };
-
-  const filteredBrands =
-    activeFilter === "All" ? allBrands : allBrands.filter((b) => b.niche === activeFilter);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -63,202 +118,56 @@ export function BuyBusinessSection() {
     return () => el.removeEventListener("scroll", handleScroll);
   }, [filteredBrands.length, activeFilter]);
 
-  const BrandCard = ({
-    brand,
-    i,
-    isMobile,
-  }: {
-    brand: (typeof allBrands)[0];
-    i: number;
-    isMobile: boolean;
-  }) => {
-    const nicheSlug = slugify(brand.niche);
-    const emojis = productEmojis[brand.niche] || ["📦", "⭐", "🔧"];
-    const accent = getBrandAccent(brand, i);
-    const badge = getBrandBadge(brand, i);
+  /* ---------------------------------------------------------------- */
+  /*  Unified card view: consumes either a CMS row or a static row.    */
+  /* ---------------------------------------------------------------- */
 
-    return (
-      <motion.div
-        initial={false}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: Math.min(i * 0.03, 0.3), duration: 0.4 }}
-        className={`group bg-card-dark rounded-2xl overflow-hidden border border-white/5 hover:border-amber/20 transition-all duration-300 flex flex-col ${
-          isMobile ? "shrink-0 w-[300px] sm:w-[340px] md:w-[380px] snap-center" : ""
-        }`}
-      >
-        {/* ── Browser Chrome ── */}
-        <div className="bg-[#1a1a1a] px-3 py-2 flex items-center gap-1.5 border-b border-white/5">
-          <div className="flex items-center gap-1 shrink-0">
-            <span className="w-2 h-2 rounded-full bg-red-500/60" />
-            <span className="w-2 h-2 rounded-full bg-yellow-500/60" />
-            <span className="w-2 h-2 rounded-full bg-green-500/60" />
-          </div>
-          <div className="flex-1 mx-2 bg-[#0d0d0d] rounded px-2 py-1 flex items-center gap-1 border border-white/5 min-w-0">
-            <HiGlobeAlt className="text-gray-600 text-[8px] shrink-0" />
-            <span className="text-[8px] text-gray-500 truncate">
-              {brand.websiteUrl.replace("https://", "")}
-            </span>
-          </div>
-          <span
-            className="text-[8px] font-bold px-1.5 py-0.5 shrink-0 uppercase tracking-wider"
-            style={{
-              color: "#fff",
-              background: accent + "30",
-              borderColor: accent + "50",
-              border: "1px solid",
-              borderRadius: badge === "square" ? "4px" : "9999px",
-            }}
-          >
-            {brand.niche}
-          </span>
-        </div>
+  type CardView = {
+    key: string;
+    slug: string;
+    name: string;
+    nicheSlug: string;
+    nicheTitle: string;
+    description: string;
+    image: string;
+    websiteUrl: string;
+    logo: string;
+    tags: string[];
+    highlights: string[];
+    trustBadges: readonly string[];
+    accent: string;
+    badgeStyle: "pill" | "square" | "glass" | "dot";
+    productEmojis: readonly string[];
+    ctaLabel: string;
+    price: string;
+  };
 
-        {/* ── Mini Website Navigation ── */}
-        <div className="bg-[#141414] px-4 py-1.5 flex items-center justify-between border-b border-white/5">
-          <div className="flex items-center gap-1">
-            <span className="text-base">{brand.logo}</span>
-            <span className="text-[9px] font-bold text-gray-300 ml-0.5">{brand.name}</span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span
-              className="text-[7px] sm:text-[8px] text-gray-600 font-medium uppercase tracking-wider"
-              aria-hidden="true"
-            >
-              Home
-            </span>
-            <span
-              className="text-[7px] sm:text-[8px] text-gray-600 font-medium uppercase tracking-wider"
-              aria-hidden="true"
-            >
-              About
-            </span>
-            <span
-              className="text-[7px] sm:text-[8px] text-gray-600 font-medium uppercase tracking-wider"
-              aria-hidden="true"
-            >
-              Products
-            </span>
-            <span
-              className="text-[7px] sm:text-[8px] text-amber/60 font-medium uppercase tracking-wider"
-              aria-hidden="true"
-            >
-              Contact
-            </span>
-          </div>
-        </div>
-
-        {/* ── Hero Banner ── */}
-        <div className="relative h-28 sm:h-32 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity duration-500"
-            style={{ backgroundImage: `url(${brand.image})` }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ background: `linear-gradient(to top, ${accent}40, transparent 60%)` }}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div
-              className={`w-12 h-12 sm:w-14 sm:h-14 bg-black/60 backdrop-blur-sm border flex items-center justify-center group-hover:scale-110 transition-all duration-500 ${badgeClasses[badge] || "rounded-xl"}`}
-              style={{ borderColor: accent + "50", boxShadow: `0 0 25px ${accent}15` }}
-            >
-              <span className="text-2xl sm:text-3xl">{brand.logo}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Website Body Content ── */}
-        <div
-          className="relative overflow-hidden flex flex-col items-center text-center px-4 sm:px-5 pt-5 pb-4 flex-1"
-          style={{ background: "linear-gradient(180deg, #0d0d0d 0%, #111 40%, #0d0d0d 100%)" }}
-        >
-          <h3 className="relative z-10 font-heading font-black text-white tracking-tight text-lg sm:text-xl mb-2 group-hover:text-white transition-colors duration-300">
-            {brand.name}
-          </h3>
-          <p className="relative z-10 text-gray-400 leading-relaxed text-[10px] sm:text-[11px] max-w-[260px] line-clamp-2 mt-1 opacity-70">
-            {brand.description}
-          </p>
-
-          <div className="relative z-10 flex flex-wrap justify-center gap-1 mt-3 mb-4">
-            {brand.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="text-[7px] sm:text-[8px] font-medium text-gray-500 bg-white/[0.03] border border-white/[0.06] rounded-full px-2 py-0.5"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          <div className="relative z-10 w-full max-w-[250px] mb-4">
-            <div className="grid grid-cols-3 gap-1.5">
-              {emojis.map((emoji, idx) => (
-                <div
-                  key={idx}
-                  className="aspect-square rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-amber/10 transition-colors duration-300"
-                >
-                  <span className="text-sm sm:text-base opacity-40 group-hover:opacity-60 transition-opacity">
-                    {emoji}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative z-10 w-full max-w-[220px] mb-3">
-            <span className="block w-full py-1.5 rounded-lg bg-amber/10 border border-amber/20 text-amber text-[8px] sm:text-[9px] font-bold text-center group-hover:bg-amber/15 transition-colors">
-              {nicheCtaLabel[brand.niche] || "Learn More →"}
-            </span>
-          </div>
-
-          <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap w-full max-w-[250px]">
-            {brand.trustBadges.slice(0, 3).map((b) => (
-              <span
-                key={b}
-                className="flex items-center gap-0.5 text-[7px] sm:text-[8px] text-gray-500 font-medium"
-              >
-                <HiShieldCheck className="text-[8px] sm:text-[9px] text-amber/30" />
-                {b}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Action Section ── */}
-        <div className="border-t border-white/5">
-          <div className="px-4 sm:px-5 pt-3 pb-2 flex items-center justify-between">
-            <span className="font-heading font-black text-amber text-sm sm:text-base tracking-tight">
-              {brand.price}
-            </span>
-            <Link
-              href={`/buy-business/niches/${nicheSlug}/${brand.slug}`}
-              className="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-400 font-bold hover:text-amber transition-colors group/link"
-            >
-              View Full Detail
-              <HiArrowRight className="text-[10px] sm:text-xs group-hover/link:translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-          <div className="px-4 sm:px-5 pb-3 flex items-center gap-2">
-            <a
-              href={brand.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-amber text-black font-bold rounded-lg hover:bg-amber-light transition-all shadow-[0_0_12px_rgba(245,158,11,0.12)] active:scale-95 text-xs sm:text-sm"
-            >
-              <HiGlobeAlt className="text-sm sm:text-base" />
-              Visit Site
-            </a>
-            <button
-              onClick={openContactModal}
-              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-amber/30 text-amber font-bold rounded-lg hover:bg-amber/10 transition-all active:scale-95 text-xs sm:text-sm"
-            >
-              Buy Business
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    );
+  const toCardView = (
+    i: number,
+    brand: BuyBusinessBrand,
+  ): CardView => {
+    const niche = nicheById.get(brand.niche_id);
+    const nicheSlug = niche?.slug ?? "";
+    const nicheTitle = niche ? resolveLocalized(niche.title, "en") || niche.slug : "";
+    return {
+      key: brand.id,
+      slug: brand.slug,
+      name: brand.name,
+      nicheSlug,
+      nicheTitle,
+      description: resolveLocalized(brand.description, langCode),
+      image: brand.image,
+      websiteUrl: brand.website_url,
+      logo: brand.logo,
+      tags: resolveLocalizedArray(brand.tags, langCode),
+      highlights: resolveLocalizedArray(brand.highlights, langCode),
+      trustBadges: getTrustBadges(nicheSlug),
+      accent: getAccentFor(nicheSlug, brand.slug),
+      badgeStyle: getBadgeStyleFor(nicheSlug, brand.slug),
+      productEmojis: getProductEmojis(nicheSlug),
+      ctaLabel: getNicheCtaLabel(nicheSlug),
+      price: brand.price,
+    };
   };
 
   return (
@@ -321,9 +230,211 @@ export function BuyBusinessSection() {
                 ref={scrollRef}
                 className="flex overflow-x-auto gap-4 md:gap-6 pb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 snap-x snap-mandatory menu-scroll"
               >
-                {filteredBrands.map((brand, i) => (
-                  <BrandCard key={brand.slug} brand={brand} i={i} isMobile={true} />
-                ))}
+                {filteredBrands.map((raw, i) => {
+                  // Use the registry helper for CMS data, fallback helpers
+                  // for the static branch. Either way `view` is the same
+                  // shape the card JSX consumes below.
+                  const view: CardView = hasCms
+                    ? toCardView(i, raw as BuyBusinessBrand)
+                    : (() => {
+                        const b = raw as (typeof allBrands)[number];
+                        return {
+                          key: b.slug,
+                          slug: b.slug,
+                          name: b.name,
+                          nicheSlug: b.niche.toLowerCase().replace(/\s+/g, "-"),
+                          nicheTitle: b.niche,
+                          description: b.description,
+                          image: b.image,
+                          websiteUrl: b.websiteUrl,
+                          logo: b.logo,
+                          tags: b.tags,
+                          highlights: b.highlights,
+                          trustBadges: b.trustBadges,
+                          accent: fallbackAccent(b, i),
+                          badgeStyle: fallbackBadge(b, i),
+                          productEmojis:
+                            fallbackEmojis[b.niche] ?? ["📦", "⭐", "🔧"],
+                          ctaLabel: fallbackCtaLabel[b.niche] ?? "Learn More →",
+                          price: b.price,
+                        } satisfies CardView;
+                      })();
+
+                  const badge =
+                    (badgeClasses[view.badgeStyle] || "rounded-xl").trim();
+
+                  return (
+                    <motion.div
+                      key={view.key}
+                      initial={false}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: Math.min(i * 0.03, 0.3), duration: 0.4 }}
+                      className="group bg-card-dark rounded-2xl overflow-hidden border border-white/5 hover:border-amber/20 transition-all duration-300 flex flex-col shrink-0 w-[300px] sm:w-[340px] md:w-[380px] snap-center"
+                    >
+                      {/* ── Browser Chrome ── */}
+                      <div className="bg-[#1a1a1a] px-3 py-2 flex items-center gap-1.5 border-b border-white/5">
+                        <div className="flex items-center gap-1 shrink-0">
+                          <span className="w-2 h-2 rounded-full bg-red-500/60" />
+                          <span className="w-2 h-2 rounded-full bg-yellow-500/60" />
+                          <span className="w-2 h-2 rounded-full bg-green-500/60" />
+                        </div>
+                        <div className="flex-1 mx-2 bg-[#0d0d0d] rounded px-2 py-1 flex items-center gap-1 border border-white/5 min-w-0">
+                          <HiGlobeAlt className="text-gray-600 text-[8px] shrink-0" />
+                          <span className="text-[8px] text-gray-500 truncate">
+                            {view.websiteUrl.replace("https://", "")}
+                          </span>
+                        </div>
+                        <span
+                          className="text-[8px] font-bold px-1.5 py-0.5 shrink-0 uppercase tracking-wider"
+                          style={{
+                            color: "#fff",
+                            background: view.accent + "30",
+                            borderColor: view.accent + "50",
+                            border: "1px solid",
+                            borderRadius: view.badgeStyle === "square" ? "4px" : "9999px",
+                          }}
+                        >
+                          {view.nicheTitle}
+                        </span>
+                      </div>
+
+                      {/* ── Mini Website Navigation ── */}
+                      <div className="bg-[#141414] px-4 py-1.5 flex items-center justify-between border-b border-white/5">
+                        <div className="flex items-center gap-1">
+                          <span className="text-base">{view.logo}</span>
+                          <span className="text-[9px] font-bold text-gray-300 ml-0.5">
+                            {view.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <span className="text-[7px] sm:text-[8px] text-gray-600 font-medium uppercase tracking-wider" aria-hidden="true">Home</span>
+                          <span className="text-[7px] sm:text-[8px] text-gray-600 font-medium uppercase tracking-wider" aria-hidden="true">About</span>
+                          <span className="text-[7px] sm:text-[8px] text-gray-600 font-medium uppercase tracking-wider" aria-hidden="true">Products</span>
+                          <span className="text-[7px] sm:text-[8px] text-amber/60 font-medium uppercase tracking-wider" aria-hidden="true">Contact</span>
+                        </div>
+                      </div>
+
+                      {/* ── Hero Banner ── */}
+                      <div className="relative h-28 sm:h-32 overflow-hidden">
+                        <div
+                          className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-40 transition-opacity duration-500"
+                          style={{ backgroundImage: `url(${view.image})` }}
+                        />
+                        <div
+                          className="absolute inset-0"
+                          style={{ background: `linear-gradient(to top, ${view.accent}40, transparent 60%)` }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-black/60 backdrop-blur-sm border flex items-center justify-center group-hover:scale-110 transition-all duration-500 ${badge}`}
+                            style={{
+                              borderColor: view.accent + "50",
+                              boxShadow: `0 0 25px ${view.accent}15`,
+                              borderRadius:
+                                view.badgeStyle === "glass"
+                                  ? "16px"
+                                  : view.badgeStyle === "square"
+                                    ? "12px"
+                                    : "16px",
+                            }}
+                          >
+                            <span className="text-2xl sm:text-3xl">{view.logo}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* ── Website Body Content ── */}
+                      <div
+                        className="relative overflow-hidden flex flex-col items-center text-center px-4 sm:px-5 pt-5 pb-4 flex-1"
+                        style={{ background: "linear-gradient(180deg, #0d0d0d 0%, #111 40%, #0d0d0d 100%)" }}
+                      >
+                        <h3 className="relative z-10 font-heading font-black text-white tracking-tight text-lg sm:text-xl mb-2 group-hover:text-white transition-colors duration-300">
+                          {view.name}
+                        </h3>
+                        <p className="relative z-10 text-gray-400 leading-relaxed text-[10px] sm:text-[11px] max-w-[260px] line-clamp-2 mt-1 opacity-70">
+                          {view.description}
+                        </p>
+
+                        <div className="relative z-10 flex flex-wrap justify-center gap-1 mt-3 mb-4">
+                          {view.tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag}
+                              className="text-[7px] sm:text-[8px] font-medium text-gray-500 bg-white/[0.03] border border-white/[0.06] rounded-full px-2 py-0.5"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="relative z-10 w-full max-w-[250px] mb-4">
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {view.productEmojis.map((emoji, idx) => (
+                              <div
+                                key={idx}
+                                className="aspect-square rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-center justify-center group-hover:border-amber/10 transition-colors duration-300"
+                              >
+                                <span className="text-sm sm:text-base opacity-40 group-hover:opacity-60 transition-opacity">
+                                  {emoji}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="relative z-10 w-full max-w-[220px] mb-3">
+                          <span className="block w-full py-1.5 rounded-lg bg-amber/10 border border-amber/20 text-amber text-[8px] sm:text-[9px] font-bold text-center group-hover:bg-amber/15 transition-colors">
+                            {view.ctaLabel}
+                          </span>
+                        </div>
+
+                        <div className="relative z-10 flex items-center justify-center gap-1.5 sm:gap-2 flex-wrap w-full max-w-[250px]">
+                          {view.trustBadges.slice(0, 3).map((b) => (
+                            <span
+                              key={b}
+                              className="flex items-center gap-0.5 text-[7px] sm:text-[8px] text-gray-500 font-medium"
+                            >
+                              <HiShieldCheck className="text-[8px] sm:text-[9px] text-amber/30" />
+                              {b}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* ── Action Section ── */}
+                      <div className="border-t border-white/5">
+                        <div className="px-4 sm:px-5 pt-3 pb-2 flex items-center justify-between">
+                          <span className="font-heading font-black text-amber text-sm sm:text-base tracking-tight">
+                            {view.price}
+                          </span>
+                          <Link
+                            href={`/buy-business/niches/${view.nicheSlug}/${view.slug}`}
+                            className="flex items-center gap-1.5 text-[10px] sm:text-xs text-gray-400 font-bold hover:text-amber transition-colors group/link"
+                          >
+                            View Full Detail
+                            <HiArrowRight className="text-[10px] sm:text-xs group-hover/link:translate-x-0.5 transition-transform" />
+                          </Link>
+                        </div>
+                        <div className="px-4 sm:px-5 pb-3 flex items-center gap-2">
+                          <a
+                            href={view.websiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-amber text-black font-bold rounded-lg hover:bg-amber-light transition-all shadow-[0_0_12px_rgba(245,158,11,0.12)] active:scale-95 text-xs sm:text-sm"
+                          >
+                            <HiGlobeAlt className="text-sm sm:text-base" />
+                            Visit Site
+                          </a>
+                          <button
+                            onClick={openContactModal}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 border border-amber/30 text-amber font-bold rounded-lg hover:bg-amber/10 transition-all active:scale-95 text-xs sm:text-sm"
+                          >
+                            Buy Business
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </div>
               {/* Desktop: Left/Right Scroll Arrows */}
               <button

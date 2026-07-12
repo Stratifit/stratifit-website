@@ -224,9 +224,7 @@ function ComingSoonGate({ onUnlock }: { onUnlock: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          lang: typeof window !== "undefined"
-            ? (document.documentElement.lang || "en")
-            : "en",
+          lang,
           source: "coming_soon_page",
         }),
       });

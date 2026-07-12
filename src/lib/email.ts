@@ -525,3 +525,86 @@ export function getNotifyWelcomeEmail(lang: Language): LocalizedTemplate {
 export function getNotifyAlreadySubscribedEmail(lang: Language): LocalizedTemplate {
   return NOTIFY_ALREADY[lang] ?? NOTIFY_ALREADY.en;
 }
+
+/* ------------------------------------------------------------------ */
+/*  Instant lead-confirmation template — sent by /api/leads/public    */
+/*  the moment a contact-form submission is accepted. Distinct from   */
+/*  the 1-hour cron check-in (LEAD_FOLLOWUP_CHECKIN) so the user has   */
+/*  immediate acknowledgment that the message landed, even before the */
+/*  follow-up queue picks it up. Vars: { lead_name, topic }.          */
+/* ------------------------------------------------------------------ */
+const LEAD_CONFIRMATION: Record<Language, LocalizedTemplate> = {
+  en: makeFollowup("en", {
+    subject: "We’ve got your note about {{topic}} ✓",
+    preview: "Your message is in our queue.",
+    intro: "Thanks for reaching out about {{topic}} — your note just landed in our queue.",
+    next: "A senior team member will reply within one business day. You’ll also get a short follow-up in the next hour with a couple of time-slots to move things forward.",
+  }),
+  de: makeFollowup("de", {
+    subject: "Wir haben deine Anfrage zu {{topic}} ✓",
+    preview: "Deine Nachricht ist in unserer Queue.",
+    intro: "Danke für deine Anfrage zu {{topic}} — deine Nachricht ist gerade in unserer Queue gelandet.",
+    next: "Ein Senior-Teammitglied antwortet dir innerhalb eines Werktags. Außerdem bekommst du in der nächsten Stunde ein kurzes Follow-up mit ein paar Zeitfenstern, um voranzukommen.",
+  }),
+  fr: makeFollowup("fr", {
+    subject: "Nous avons bien reçu votre demande — {{topic}} ✓",
+    preview: "Votre message est dans notre file.",
+    intro: "Merci pour votre demande concernant {{topic}} — votre message vient d’arriver dans notre file.",
+    next: "Un membre senior de l’équipe vous répondra sous un jour ouvré. Vous recevrez aussi un court suivi dans l’heure avec quelques créneaux pour avancer.",
+  }),
+  es: makeFollowup("es", {
+    subject: "Recibimos tu nota sobre {{topic}} ✓",
+    preview: "Tu mensaje está en nuestra cola.",
+    intro: "Gracias por contactarnos sobre {{topic}} — tu mensaje acaba de entrar en nuestra cola.",
+    next: "Un miembro senior del equipo te responderá dentro de un día hábil. También recibirás un breve seguimiento en la próxima hora con algunas franjas para avanzar.",
+  }),
+};
+
+export function getLeadConfirmationEmail(
+  lang: Language,
+  vars: FollowupVars,
+): LocalizedTemplate {
+  const tpl = LEAD_CONFIRMATION[lang] ?? LEAD_CONFIRMATION.en;
+  return {
+    subject: renderVars(tpl.subject, vars),
+    preview: renderVars(tpl.preview, vars),
+    bodyHtml: renderVars(tpl.bodyHtml, vars),
+    bodyText: renderVars(tpl.bodyText, vars),
+  };
+}
+
+/**
+ * sendLeadConfirmation — instant localized acknowledgment fired by
+ * /api/leads/public right after a contact-form submission is accepted.
+ * Separate from the 1-hour cron check-in (LEAD_FOLLOWUP_CHECKIN), so the
+ * user gets immediate confirmation even if the cron is delayed, paused,
+ * or the email queue is backed up.
+ *
+ * Never throws. Failures are recorded in `email_log` so admins can
+ * diagnose via /admin/email-log. Defaults are safe — if the lang is
+ * missing or Resend is not configured, the worst case is a 'failed'
+ * email_log row and a graceful continue.
+ */
+export async function sendLeadConfirmation(input: {
+  to: string;
+  lang: Language;
+  leadName: string;
+  topic: string;
+  relatedLeadId?: string;
+}): Promise<SendEmailResult> {
+  const tpl = getLeadConfirmationEmail(input.lang, {
+    lead_name: input.leadName,
+    topic: input.topic,
+    // Confirmation emails do not carry scheduled_for — the body still
+    // renders because renderVars leaves unknown keys intact.
+    scheduled_for: "right now",
+  });
+  return sendEmail({
+    to: input.to,
+    subject: tpl.subject,
+    template: "lead_confirmation",
+    bodyHtml: tpl.bodyHtml,
+    bodyText: tpl.bodyText,
+    relatedSubscriberId: input.relatedLeadId,
+  });
+}

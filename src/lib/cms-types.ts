@@ -271,6 +271,10 @@ export interface FaqEntry {
 export interface ProjectItem {
   id: string;
   sort_order: number;
+  /** URL slug used by /portfolio/[slug]. Sourced from the
+   *  `projects.slug` TEXT column added in cms-migration.sql.
+   *  Backfilled in the admin form from `slugify(title.en)` on create. */
+  slug: string;
   title: TranslatableString;
   category: string;
   description: TranslatableString;
