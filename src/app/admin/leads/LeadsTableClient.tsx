@@ -59,25 +59,31 @@ export function LeadsTableClient({ leads }: { leads: LeadRow[] }) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [serviceFilter, setServiceFilter] = useState<string>("all");
 
-  // Row-level delete (admin-gated server route).
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Row-level delete — confirmation modal prevents accidental one-clicks
+  // (the prior version fired DELETE on first click). The pattern mirrors
+  // the delete modal in LeadDetailClient.tsx: pending row + busy flag +
+  // inline error, so the table view and the detail page behave identically.
+  const [pendingDelete, setPendingDelete] = useState<LeadRow | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [deleteErr, setDeleteErr] = useState<string | null>(null);
 
-  async function confirmDelete(id: string) {
+  async function confirmDelete() {
+    if (!pendingDelete || deleting) return;
     setDeleteErr(null);
-    setDeletingId(id);
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/leads/${pendingDelete.id}`, { method: "DELETE" });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setDeleteErr(data.error || `Delete failed (${res.status})`);
         return;
       }
       router.refresh();
+      setPendingDelete(null);
     } catch (err) {
       setDeleteErr(err instanceof Error ? err.message : "Network error");
     } finally {
-      setDeletingId(null);
+      setDeleting(false);
     }
   }
 
@@ -268,9 +274,10 @@ export function LeadsTableClient({ leads }: { leads: LeadRow[] }) {
                           View <HiArrowRight className="text-sm" />
                         </Link>
                         <button
-                          onClick={() => confirmDelete(lead.id)}
-                          disabled={deletingId === lead.id}
+                          onClick={() => setPendingDelete(lead)}
+                          disabled={Boolean(pendingDelete)}
                           aria-label={`Delete lead ${lead.email}`}
+                          title="Delete lead"
                           className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <HiTrash className="text-sm" />
@@ -285,11 +292,84 @@ export function LeadsTableClient({ leads }: { leads: LeadRow[] }) {
         </div>
       )}
 
-      {deleteErr && (
+      {deleteErr && !pendingDelete && (
         <div className="px-6 py-3 border-t border-red-500/20 bg-red-500/5">
           <p className="text-xs text-red-300">
             Delete failed: {deleteErr}
           </p>
+        </div>
+      )}
+
+      {pendingDelete && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative bg-card-dark rounded-2xl border border-red-500/30 w-full max-w-md overflow-hidden shadow-2xl"
+          >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-red-500/60 to-transparent bg-[length:200%_100%] animate-[shimmer_3s_ease-in-out_infinite]" />
+            <div className="p-6 sm:p-7">
+              <div className="flex items-start justify-between mb-5">
+                <div>
+                  <p className="text-[10px] font-bold text-red-400 uppercase tracking-[0.25em] mb-1">
+                    Danger
+                  </p>
+                  <h3 className="font-heading font-black text-xl text-white">
+                    Delete this lead?
+                  </h3>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Permanently removes{" "}
+                    <span className="font-bold text-white">
+                      {pendingDelete.name || pendingDelete.email.split("@")[0]}
+                    </span>{" "}
+                    <span className="font-mono text-[11px] text-gray-500">
+                      ({pendingDelete.email})
+                    </span>{" "}
+                    and every scheduled follow-up linked to them. This cannot be undone.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    if (deleting) return;
+                    setPendingDelete(null);
+                    setDeleteErr(null);
+                  }}
+                  disabled={deleting}
+                  className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Close delete confirmation"
+                >
+                  <HiXMark />
+                </button>
+              </div>
+
+              {deleteErr && (
+                <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-4">
+                  {deleteErr}
+                </p>
+              )}
+
+              <div className="flex flex-col-reverse sm:flex-row gap-2 justify-end">
+                <button
+                  onClick={() => {
+                    setPendingDelete(null);
+                    setDeleteErr(null);
+                  }}
+                  disabled={deleting}
+                  className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-xl transition-all disabled:opacity-60"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="px-4 py-2.5 bg-red-500 text-black text-sm font-bold rounded-xl hover:bg-red-400 transition-all disabled:opacity-60 inline-flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                >
+                  <HiTrash />
+                  {deleting ? "Deleting…" : "Delete lead"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
         </div>
       )}
     </div>
