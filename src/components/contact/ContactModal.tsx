@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiArrowRight, HiChevronDown, HiEnvelope, HiXMark } from "react-icons/hi2";
+import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 // ── Module-level event emitter ──────────────────────────────────────────────
 let _openCb: (() => void) | null = null;
@@ -40,6 +42,7 @@ const budgetRanges = [
 // ── Component ───────────────────────────────────────────────────────────────
 export function ContactModal() {
   const [open, setOpen] = useState(false);
+  const { lang } = useLanguage();
 
   // Register the open handler
   useEffect(() => {
@@ -183,7 +186,7 @@ export function ContactModal() {
                         value={formState.name}
                         onChange={handleChange}
                         className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors"
-                        placeholder="Your name *"
+                        placeholder={tLabel("form_name", lang)}
                       />
                       <input
                         type="email"
@@ -192,7 +195,7 @@ export function ContactModal() {
                         value={formState.email}
                         onChange={handleChange}
                         className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors"
-                        placeholder="you@company.com *"
+                        placeholder={tLabel("form_email", lang)}
                       />
                     </div>
 
@@ -203,7 +206,7 @@ export function ContactModal() {
                       value={formState.company}
                       onChange={handleChange}
                       className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors"
-                      placeholder="Company name"
+                      placeholder={tLabel("form_company", lang)}
                     />
 
                     {/* Services Dropdown */}

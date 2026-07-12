@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/lib/LanguageContext";
+import { tLabel } from "@/lib/stratifit-i18n";
 
 /**
  * Admin auth guard wrapper.
- *
- *   {{admin_auth_guard}}
  *
  * On mount, calls GET /api/admin/session which reads the signed
  * httpOnly cookie server-side. If the cookie is present and valid, the
@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
  */
 export function AdminGuard({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<"loading" | "authed">("loading");
+  const { lang } = useLanguage();
 
   useEffect(() => {
     let cancelled = false;
@@ -55,7 +56,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         >
           <div className="w-10 h-10 rounded-full border-2 border-amber/30 border-t-amber animate-spin" />
           <p className="text-xs font-mono text-gray-500">
-            {"{{admin_auth_guard}} verifying session"}
+            {tLabel("admin_guard_verifying_session", lang)}
           </p>
         </motion.div>
       </div>

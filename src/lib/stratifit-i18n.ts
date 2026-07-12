@@ -237,6 +237,9 @@ const labelTranslations: Record<string, Record<Language, string>> = {
   form_custom_budget: { en: "Custom budget", fr: "Budget personnalisé", de: "Individuelles Budget", es: "Presupuesto personalizado" },
   form_send_message: { en: "Send Message", fr: "Envoyer le Message", de: "Nachricht Senden", es: "Enviar Mensaje" },
 
+  /* ---------- Admin guard (loading state on /admin/*) ---------- */
+  admin_guard_verifying_session: { en: "Verifying session\u2026", fr: "V\u00e9rification de la session\u2026", de: "Sitzung wird \u00fcberpr\u00fcft\u2026", es: "Verificando sesi\u00f3n\u2026" },
+
   /* ============================================================
      Coming Soon page
      Used by the ComingSoonGate (src/app/page.tsx) and rendered

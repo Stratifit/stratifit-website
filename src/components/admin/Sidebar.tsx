@@ -25,9 +25,6 @@ export function Sidebar() {
         <h2 className="font-heading font-black text-xl text-white tracking-tight">
           Dashboard
         </h2>
-        <p className="text-[10px] text-gray-600 mt-1 font-mono tracking-tight">
-          {"{{admin_auth_guard}}"}
-        </p>
       </div>
 
       {/* Nav — grouped */}

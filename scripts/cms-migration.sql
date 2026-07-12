@@ -2,6 +2,55 @@
 -- Run this once in the Supabase SQL editor. It creates all 24 tables
 -- used by the /api/cms/[section] route + admin/content editor.
 
+/* ============================================================
+   ARCHITECTURAL DOC (maintained for Phase 5)
+
+   Schema naming rationale:
+     The codebase uses GRANULAR, PER-SECTION table names
+     (e.g. `hero_content`, `about_page_content`,
+      `buy_business_niches`) rather than:
+       (a) a single generic `cms_sections` table with JSONB
+           payloads — rejected: loses FK integrity, type
+           safety, and per-section indexing,
+       (b) a `website_*` prefix (e.g. `website_hero_content`) —
+           rejected: redundant with the schema being
+           stratifit-specific.
+
+     Each table mirrors one CMS editor section in
+     src/lib/content-editor-config.tsx (see the
+     `sectionEditorConfigs[<key>].table` mapping) so the
+     editor and the read path always speak to a known shape.
+
+   Table families:
+     1. CMS content tables (24, all in `supabase_realtime`):
+        site_settings, header_nav_links, footer_content,
+        hero_content, core_services, service_page_content,
+        process_steps, why_choose_us_content,
+        why_choose_us_benefits, about_page_content,
+        about_stats, about_values, service_packages,
+        testimonials, faq_entries, projects, insights,
+        buy_business_niches, niche_stats, niche_inclusions,
+        buy_business_brands, legal_pages, contact_form_config,
+        section_labels.
+     2. Operational / PII tables (5, NEVER in the realtime
+        publication):
+        notify_subscribers (email-list subscribes),
+        email_log (Resend recipient + subject + body),
+        llm_log (chat queries + responses),
+        leads (name + email + project notes),
+        lead_followups (queued admin emails).
+
+   Lineage (audit trail):
+     Phase 1 — added email_log + Resend pipeline.
+     Phase 2 — added llm_log + Groq AI brain.
+     Phase 3 — added leads + lead_followups + Vercel cron.
+     Phase 4 — added `supabase_realtime` publication on the
+               24 public CMS tables.
+     Phase 5 — pure cleanup pass: docs only, no schema
+               changes from this migration; edits are in
+               src/components and docs/.
+   ============================================================ */
+
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 /* ============================================================
