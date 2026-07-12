@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   HiChatBubbleLeftRight,
@@ -108,7 +109,7 @@ function ComingSoonHeader() {
     <div className="sticky top-0 left-0 right-0 z-50 bg-black border-b border-white/5 pointer-events-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 lg:h-20 flex items-center justify-between">
         {/* Left: logo icon (no label) */}
-        <a
+        <Link
           href="/"
           aria-label="Stratifit home"
           className="pointer-events-auto flex items-center group shrink-0"
@@ -116,7 +117,7 @@ function ComingSoonHeader() {
           <div className="w-9 h-9 bg-amber rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
             <span className="text-black font-black text-xs tracking-tighter">{logoText}</span>
           </div>
-        </a>
+        </Link>
         {/* Right: language dropdown (compact, matches mobile header style) */}
         <div className="pointer-events-auto">
           <LanguageDropdown size="sm" />

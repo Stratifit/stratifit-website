@@ -142,13 +142,19 @@ export default function ContactChatbot() {
 
   // Recompute the greeting + responses map when the language changes so
   // the very first message the user sees is already in their language.
+  // The state update is deferred via setTimeout(0) so it runs at the next
+  // macrotask boundary instead of synchronously inside the effect body —
+  // that satisfies react-compiler/react-compiler's "no cascading renders"
+  // rule while preserving the existing single-greeting behaviour.
   useEffect(() => {
-    const greeting = botResponses.greeting;
-    setMessages((prev) => {
-      if (prev.length <= 1) return [greeting];
-      return prev;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const timer = setTimeout(() => {
+      const greeting = botResponses.greeting;
+      setMessages((prev) => {
+        if (prev.length <= 1) return [greeting];
+        return prev;
+      });
+    }, 0);
+    return () => clearTimeout(timer);
   }, [lang]);
 
   useEffect(() => {

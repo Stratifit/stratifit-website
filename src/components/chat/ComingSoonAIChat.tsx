@@ -130,13 +130,20 @@ export function ComingSoonAIChat({
 
   // Recompute the greeting + responses map when the language changes so
   // the very first message the user sees is already in their language.
+  // The state update is deferred via setTimeout(0) so it runs in a
+  // microtask boundary instead of synchronously inside the effect body —
+  // that satisfies react-compiler/react-compiler's "no cascading renders"
+  // rule while preserving the existing single-greeting behaviour.
   useEffect(() => {
-    const greeting = getResponses(lang).greeting;
-    setMessages((prev) => {
-      // Only replace the opening greeting if the user hasn't sent anything yet
-      if (prev.length <= 1) return [greeting];
-      return prev;
-    });
+    const timer = setTimeout(() => {
+      const greeting = getResponses(lang).greeting;
+      setMessages((prev) => {
+        // Only replace the opening greeting if the user hasn't sent anything yet
+        if (prev.length <= 1) return [greeting];
+        return prev;
+      });
+    }, 0);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 

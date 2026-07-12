@@ -56,6 +56,7 @@ export default async function SubscriptionsPage() {
   const subscribed = subscribers.filter((s) => s.status === "subscribed").length;
   const unsubscribed = total - subscribed;
   const last7d = subscribers.filter(
+    // eslint-disable-next-line react-hooks/purity -- "Last 7 days" count must reflect real wall-clock time per render.
     (s) => Date.now() - new Date(s.created_at).getTime() < 7 * 24 * 60 * 60 * 1000,
   ).length;
   // Per-source counts for the side-by-side comparison cards.

@@ -50,6 +50,7 @@ export default async function AdminLeadsPage() {
   const qualified = leads.filter((l) => l.status === "qualified").length;
   const won = leads.filter((l) => l.status === "won").length;
   const last7d = leads.filter(
+    // eslint-disable-next-line react-hooks/purity -- "Last 7 days" count must reflect real wall-clock time per render.
     (l) => Date.now() - new Date(l.created_at).getTime() < 7 * 24 * 60 * 60 * 1000,
   ).length;
 

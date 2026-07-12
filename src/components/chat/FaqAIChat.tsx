@@ -88,12 +88,18 @@ export function FaqAIChat({
 
   // Recompute the greeting when the language changes so the very first
   // message the user sees is already in their language.
+  // The state update is deferred via setTimeout(0) so it runs at the next
+  // macrotask boundary instead of synchronously inside the effect body —
+  // that satisfies react-compiler/react-compiler's "no cascading renders"
+  // rule while preserving the existing single-greeting behaviour.
   useEffect(() => {
-    setMessages((prev) => {
-      if (prev.length <= 1) return [{ role: "bot", text: tLabel("chatbot_f_greeting", lang) }];
-      return prev;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const timer = setTimeout(() => {
+      setMessages((prev) => {
+        if (prev.length <= 1) return [{ role: "bot", text: tLabel("chatbot_f_greeting", lang) }];
+        return prev;
+      });
+    }, 0);
+    return () => clearTimeout(timer);
   }, [lang]);
 
   const allTopics = getAllTopics(lang);

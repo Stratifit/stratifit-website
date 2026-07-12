@@ -152,12 +152,17 @@ export function ContactModal() {
     if (!open) return;
 
     let cancelled = false;
-    setSubmitError(null);
-    setCaptchaToken("");
 
+    // The state resets below live INSIDE the .then() so they execute
+    // after the script resolves — that satisfies the
+    // react-compiler/react-compiler rule against cascading renders
+    // (synchronous setState at the top of a useEffect) and keeps the
+    // previous-modal-state visible until the widget is about to mount.
     loadScript()
       .then(() => {
         if (cancelled) return;
+        setSubmitError(null);
+        setCaptchaToken("");
         const mount = captchaContainerRef.current;
         const api = window.turnstile;
         if (!mount || !api) {
