@@ -57,26 +57,26 @@ export default function AdminCaseStudyDetail({ params }: { params: { slug: strin
 
       <section className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card title="{{case.title}}" eyebrow="Title">
+          <Card eyebrow="Title">
             <input defaultValue={base.title} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none" />
           </Card>
-          <Card title="{{case.slug}}" eyebrow="Slug">
+          <Card eyebrow="Slug">
             <input defaultValue={params.slug} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-l-2 focus:border-l-amber focus:outline-none" />
           </Card>
-          <Card title="{{case.description}}" eyebrow="Description">
+          <Card eyebrow="Description">
             <textarea rows={4} defaultValue={base.description} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none resize-none" />
           </Card>
-          <Card title="{{case.challenges}}" eyebrow="Challenges">
+          <Card eyebrow="Challenges">
             {[0, 1, 2].map((i) => (
               <textarea key={i} rows={2} placeholder={`Challenge ${i + 1}`} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none resize-none mb-2" />
             ))}
           </Card>
-          <Card title="{{case.solutions}}" eyebrow="Solutions">
+          <Card eyebrow="Solutions">
             {[0, 1, 2].map((i) => (
               <textarea key={i} rows={2} placeholder={`Solution ${i + 1}`} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none resize-none mb-2" />
             ))}
           </Card>
-          <Card title="{{case.results}}" eyebrow="Results">
+          <Card eyebrow="Results">
             {[0, 1, 2].map((i) => (
               <textarea key={i} rows={2} placeholder={`Result ${i + 1}`} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none resize-none mb-2" />
             ))}
@@ -84,7 +84,7 @@ export default function AdminCaseStudyDetail({ params }: { params: { slug: strin
         </div>
 
         <aside className="space-y-6">
-          <Card title="{{case.category}}" eyebrow="Category">
+          <Card eyebrow="Category">
             <select defaultValue={base.category} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer">
               {["Brand Design", "Website Development", "AI Automation", "Growth Marketing", "Buy a Business"].map((c) => (
                 <option key={c} value={c} className="bg-black text-white">
@@ -93,13 +93,13 @@ export default function AdminCaseStudyDetail({ params }: { params: { slug: strin
               ))}
             </select>
           </Card>
-          <Card title="{{case.metric}}" eyebrow="Highlight metric">
+          <Card eyebrow="Highlight metric">
             <input defaultValue={base.metric} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none" />
           </Card>
-          <Card title="{{case.tags}}" eyebrow="Tags (comma separated)">
+          <Card eyebrow="Tags (comma separated)">
             <input defaultValue={base.tags.join(", ")} placeholder="Brand, Web, CRO" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-l-2 focus:border-l-amber focus:outline-none" />
           </Card>
-          <Card title="{{case.status}}" eyebrow="Status">
+          <Card eyebrow="Status">
             <select defaultValue={base.status} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer">
               {["draft", "scheduled", "published", "archived"].map((s) => (
                 <option key={s} value={s} className="bg-black text-white">
@@ -113,7 +113,7 @@ export default function AdminCaseStudyDetail({ params }: { params: { slug: strin
 
       <section>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-[10px] font-mono text-gray-500">{"{{case.gallery}}"} — image list</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-amber">Gallery</p>
           <button className="text-xs text-amber font-bold flex items-center gap-1 hover:gap-2 transition-all">
             <HiPlus className="text-sm" /> Add image
           </button>
@@ -121,14 +121,14 @@ export default function AdminCaseStudyDetail({ params }: { params: { slug: strin
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[0, 1, 2, 3].map((i) => (
             <div key={i} className="aspect-[4/3] rounded-xl bg-card-dark border border-white/5 flex items-center justify-center text-[10px] font-mono text-gray-600">
-              {"{{case.image_"}{i + 1}{"} }}"}
+              Image {i + 1}
             </div>
           ))}
         </div>
       </section>
 
       <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-card-dark rounded-2xl border border-amber/15 p-6 text-center">
-        <p className="text-[10px] font-mono text-gray-500 mb-1">{"{{case.preview}}"}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-amber mb-1">Preview</p>
         <h2 className="font-heading font-black text-2xl text-white mb-1">{base.title}</h2>
         <p className="text-sm text-gray-400">{base.description || "—"}</p>
       </motion.section>
@@ -136,10 +136,9 @@ export default function AdminCaseStudyDetail({ params }: { params: { slug: strin
   );
 }
 
-function Card({ title, eyebrow, children }: { title: string; eyebrow: string; children: React.ReactNode }) {
+function Card({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
   return (
     <div className="bg-card-dark rounded-2xl border border-white/5 p-5">
-      <p className="text-[9px] font-mono text-gray-600 mb-1 pl-1">{title}</p>
       <p className="text-[10px] font-bold uppercase tracking-wider text-amber mb-3">{eyebrow}</p>
       {children}
     </div>

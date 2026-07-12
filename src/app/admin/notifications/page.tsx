@@ -18,7 +18,7 @@ const notifications = [
   { id: "n-2", title: "Payment received", body: "Subscription renewed — net +34 subscribers this week.", time: "32m ago", unread: true, type: "billing", cta: { label: "View subscriptions", href: "/admin/subscriptions" } },
   { id: "n-3", title: "AI chatbot escalated", body: "Sample user couldn't resolve — needs human review.", time: "1h ago", unread: true, type: "chat", cta: { label: "Open thread", href: "/admin/leads/SAMPLE-2" } },
   { id: "n-4", title: "Insight draft needs review", body: "Mira saved \"Design Systems That Convert\" as draft.", time: "3h ago", unread: false, type: "content", cta: { label: "Review draft", href: "/admin/insights" } },
-  { id: "n-5", title: "Supabase sync completed", body: "{{supabase.sync_stripe}} payment data mirrored to read-only DB.", time: "6h ago", unread: false, type: "system" },
+  { id: "n-5", title: "Supabase sync completed", body: "Stripe payment data mirrored to read-only DB.", time: "6h ago", unread: false, type: "system" },
   { id: "n-6", title: "New testimonial suggested", body: "Linnea Couture left 5★ feedback. Ready to publish?", time: "1d ago", unread: false, type: "content", cta: { label: "Review", href: "/admin/testimonials" } },
 ];
 

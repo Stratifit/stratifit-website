@@ -63,26 +63,26 @@ export default function AdminInsightDetail({ params }: { params: { slug: string 
       <section className="grid lg:grid-cols-3 gap-6">
         {/* Form */}
         <div className="lg:col-span-2 bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5">
-          <Row label="{{insight.title}}">
+          <Row label="Title">
             <input defaultValue={base.title} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none transition-all" />
           </Row>
-          <Row label="{{insight.slug}}">
+          <Row label="Slug">
             <input defaultValue={params.slug} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-l-2 focus:border-l-amber focus:outline-none transition-all" />
           </Row>
-          <Row label="{{insight.excerpt}}">
+          <Row label="Excerpt">
             <textarea rows={3} defaultValue={base.excerpt} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none resize-none transition-all" />
           </Row>
-          <Row label="{{insight.content}}">
+          <Row label="Content">
             <textarea rows={10} defaultValue={found?.content ?? ""} placeholder="Markdown or rich-text content..." className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-l-2 focus:border-l-amber focus:outline-none resize-y transition-all" />
           </Row>
-          <Row label="{{insight.image}}">
+          <Row label="Image URL">
             <input defaultValue={base.image} placeholder="/insights/your-image.jpg" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-l-2 focus:border-l-amber focus:outline-none transition-all" />
           </Row>
         </div>
 
         {/* Side meta */}
         <aside className="bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5">
-          <Row label="{{insight.category}}">
+          <Row label="Category">
             <select defaultValue={base.category} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer transition-all">
               {["Strategy", "Design", "Growth", "Tech", "Other"].map((c) => (
                 <option key={c} value={c} className="bg-black text-white">
@@ -91,7 +91,7 @@ export default function AdminInsightDetail({ params }: { params: { slug: string 
               ))}
             </select>
           </Row>
-          <Row label="{{insight.status}}">
+          <Row label="Status">
             <select defaultValue={derivedStatus} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer transition-all">
               {["draft", "scheduled", "published", "archived"].map((s) => (
                 <option key={s} value={s} className="bg-black text-white">
@@ -100,13 +100,13 @@ export default function AdminInsightDetail({ params }: { params: { slug: string 
               ))}
             </select>
           </Row>
-          <Row label="{{insight.read_time}}">
+          <Row label="Read time">
             <input defaultValue={base.readTime} placeholder="5 min" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none transition-all" />
           </Row>
-          <Row label="{{insight.author}}">
+          <Row label="Author">
             <input defaultValue={base.author} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none transition-all" />
           </Row>
-          <Row label="{{insight.date}}">
+          <Row label="Date">
             <input defaultValue={base.date} placeholder="YYYY-MM-DD" className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono focus:border-l-2 focus:border-l-amber focus:outline-none transition-all" />
           </Row>
         </aside>
@@ -114,8 +114,8 @@ export default function AdminInsightDetail({ params }: { params: { slug: string 
 
       {/* Preview */}
       <section className="bg-card-dark rounded-2xl border border-white/5 p-6">
-        <p className="text-[10px] font-mono text-gray-500 mb-3">
-          {"{{insight.preview}}"} — replacement title/excerpt render here
+        <p className="text-[10px] font-bold uppercase tracking-wider text-amber mb-3">
+          Live preview
         </p>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-amber/15 bg-black/40 p-6">
           <div className="flex items-center gap-2 text-[10px] font-mono text-amber mb-3">
