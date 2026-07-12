@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   HiMagnifyingGlass,
@@ -9,6 +10,7 @@ import {
   HiXMark,
   HiArrowRight,
   HiUsers,
+  HiTrash,
 } from "react-icons/hi2";
 
 export interface LeadRow {
@@ -52,9 +54,32 @@ function initials(name: string, email: string): string {
 }
 
 export function LeadsTableClient({ leads }: { leads: LeadRow[] }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [serviceFilter, setServiceFilter] = useState<string>("all");
+
+  // Row-level delete (admin-gated server route).
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteErr, setDeleteErr] = useState<string | null>(null);
+
+  async function confirmDelete(id: string) {
+    setDeleteErr(null);
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/leads/${id}`, { method: "DELETE" });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setDeleteErr(data.error || `Delete failed (${res.status})`);
+        return;
+      }
+      router.refresh();
+    } catch (err) {
+      setDeleteErr(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   const services = useMemo(() => {
     const set = new Set<string>();
@@ -235,18 +260,36 @@ export function LeadsTableClient({ leads }: { leads: LeadRow[] }) {
                       {formatDate(lead.created_at)}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Link
-                        href={`/admin/leads/${lead.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-amber hover:gap-2 transition-all"
-                      >
-                        View Lead <HiArrowRight className="text-sm" />
-                      </Link>
+                      <div className="inline-flex items-center gap-1">
+                        <Link
+                          href={`/admin/leads/${lead.id}`}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-amber hover:gap-2 transition-all whitespace-nowrap"
+                        >
+                          View <HiArrowRight className="text-sm" />
+                        </Link>
+                        <button
+                          onClick={() => confirmDelete(lead.id)}
+                          disabled={deletingId === lead.id}
+                          aria-label={`Delete lead ${lead.email}`}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <HiTrash className="text-sm" />
+                        </button>
+                      </div>
                     </td>
                   </motion.tr>
                 );
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {deleteErr && (
+        <div className="px-6 py-3 border-t border-red-500/20 bg-red-500/5">
+          <p className="text-xs text-red-300">
+            Delete failed: {deleteErr}
+          </p>
         </div>
       )}
     </div>
