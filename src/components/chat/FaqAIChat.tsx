@@ -26,6 +26,7 @@ import {
 import { openContactModal } from "@/components/contact/ContactModal";
 import { useLanguage } from "@/lib/LanguageContext";
 import { tLabel } from "@/lib/stratifit-i18n";
+import { askLlm } from "@/lib/chat-llm-client";
 import type { Language } from "@/lib/cms-types";
 
 export type FaqChatRole = "bot" | "user";
@@ -125,14 +126,42 @@ export function FaqAIChat({
           { role: "bot", text: matched.aiAnswer, matchedFaqId: matched.id },
         ]);
       } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "bot",
-            text: tLabel("chatbot_f_fallback", lang),
-            matchedFaqId: "__fallback__",
-          },
-        ]);
+        // No FAQ match — route to Groq via /api/chat/llm. The active
+        // topic is passed as scope so the LLM prefers answers in that
+        // category. Falls back to canned chatbot_f_fallback if
+        // GROQ_API_KEY is missing or the call fails.
+        askLlm({ chatbot: "faq", query: q, lang, scope: activeTopic })
+          .then((r) => {
+            if (r.ok && r.text) {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "bot",
+                  text: r.text as string,
+                  matchedFaqId: "__llm__",
+                },
+              ]);
+            } else {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "bot",
+                  text: tLabel("chatbot_f_fallback", lang),
+                  matchedFaqId: "__fallback__",
+                },
+              ]);
+            }
+          })
+          .catch(() => {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "bot",
+                text: tLabel("chatbot_f_fallback", lang),
+                matchedFaqId: "__fallback__",
+              },
+            ]);
+          });
       }
     }, 600);
   };

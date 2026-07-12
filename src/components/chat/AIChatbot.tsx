@@ -16,6 +16,7 @@ import {
 } from "react-icons/hi2";
 import { useLanguage } from "@/lib/LanguageContext";
 import { tLabel } from "@/lib/stratifit-i18n";
+import { askLlm } from "@/lib/chat-llm-client";
 import type { Language } from "@/lib/cms-types";
 
 type Category = {
@@ -287,9 +288,38 @@ export function AIChatbot() {
       lower.includes("team") || lower.includes("hilfe") ||
       lower.includes("equipo") || lower.includes("ayuda")
     ) botResponse = responses.team;
-    else botResponse = responses.greeting;
+    else {
+      // No keyword match — route to Groq via /api/chat/llm. Falls back
+      // to canned responses.greeting if GROQ_API_KEY is missing or the
+      // call fails. The sync flow below is bypassed via `return`.
+      askLlm({ chatbot: "ai", query: text, lang })
+        .then((r) => {
+          if (r.ok && r.text) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "bot",
+                text: r.text as string,
+                quickReplies: [
+                  tLabel("chatbot_ai_qr_speak", lang),
+                  tLabel("chatbot_ai_cat_pricing", lang),
+                ],
+              },
+            ]);
+          } else {
+            setMessages((prev) => [...prev, responses.greeting]);
+          }
+          setIsTyping(false);
+          if (!isOpenRef.current) setShowBadge(true);
+        })
+        .catch(() => {
+          setMessages((prev) => [...prev, responses.greeting]);
+          setIsTyping(false);
+        });
+      return;
+    }
 
-    // Simulate typing delay
+    // Simulate typing delay (only reached on the keyword fast-path)
     const delay = Math.min(botResponse.text.length * 20, 1500);
     setTimeout(() => {
       setIsTyping(false);
