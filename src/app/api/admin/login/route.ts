@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error:
-              "Admin auth is not configured on this server. Set ADMIN_EMAIL and ADMIN_PASSWORD in .env.local and restart.",
+              "Admin auth is not configured on this server. Set ADMIN_EMAIL, ADMIN_PASSWORD, and ADMIN_SESSION_SECRET as environment variables in your hosting platform's dashboard (e.g. Vercel \u2192 Project \u2192 Settings \u2192 Environment Variables), then redeploy. Note: .env.local is only loaded in local development \u2014 it is ignored in production deployments.",
           },
           { status: 503 },
         );
