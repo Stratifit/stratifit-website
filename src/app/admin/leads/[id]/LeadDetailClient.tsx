@@ -50,6 +50,11 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
   const router = useRouter();
   const [status, setStatus] = useState(lead.status);
   const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+  const [emailErr, setEmailErr] = useState<string | null>(null);
+  const [emailSentId, setEmailSentId] = useState<string | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleTopic, setScheduleTopic] = useState("Follow-up");
   const [scheduleTemplate, setScheduleTemplate] = useState<(typeof FOLLOWUP_TEMPLATES)[number]["key"]>("lead_followup_checkin");
@@ -129,6 +134,37 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
       setNotesErr(err instanceof Error ? err.message : "Network error");
     } finally {
       setSavingNotes(false);
+    }
+  }
+
+  async function submitEmail(e: React.FormEvent) {
+    e.preventDefault();
+    if (emailSending) return;
+    if (!emailSubject.trim() || !emailBody.trim()) return;
+    setEmailSending(true);
+    setEmailErr(null);
+    try {
+      const res = await fetch(`/api/leads/${lead.id}/email`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ subject: emailSubject, body: emailBody }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        success?: boolean;
+        emailLogId?: string | null;
+        error?: string;
+      };
+      if (!res.ok || !data.success) {
+        setEmailErr(data.error || `Send failed (${res.status})`);
+        return;
+      }
+      setEmailSentId(data.emailLogId ?? null);
+      setEmailSubject("");
+      setEmailBody("");
+    } catch (err) {
+      setEmailErr(err instanceof Error ? err.message : "Network error");
+    } finally {
+      setEmailSending(false);
     }
   }
 
@@ -450,46 +486,115 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
                   </h3>
                 </div>
                 <button
-                  onClick={() => setEmailModalOpen(false)}
+                  onClick={() => {
+                    setEmailModalOpen(false);
+                    setEmailErr(null);
+                    setEmailSentId(null);
+                    setEmailSubject("");
+                    setEmailBody("");
+                  }}
                   className="p-2 rounded-full hover:bg-white/5 text-gray-400 hover:text-white"
+                  aria-label="Close email modal"
                 >
                   <HiXMark />
                 </button>
               </div>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setEmailModalOpen(false);
-                }}
-                className="space-y-3"
-              >
-                <input
-                  defaultValue={lead.email}
-                  placeholder="Recipient"
-                  className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none"
-                />
-                <input
-                  placeholder="Subject"
-                  className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none"
-                />
-                <textarea
-                  rows={5}
-                  placeholder="Body"
-                  className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none resize-none"
-                />
-                <button
-                  type="submit"
-                  disabled
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber/40 text-black/60 font-bold rounded-xl cursor-not-allowed text-sm relative"
-                  title="Manual one-off emails ship in the next Vercel cron release."
-                >
-                  <HiEnvelope /> Send via Resend
-                  <span className="absolute -top-2 -right-2 bg-blue-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow-sm">
-                    Coming soon
-                  </span>
-                </button>
-              </form>
+              {emailSentId ? (
+                <div className="text-center py-4">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
+                    <HiCheckCircle className="text-3xl text-emerald-300" />
+                  </div>
+                  <p className="font-heading font-black text-lg text-white">
+                    Email sent
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1 font-mono">
+                    log_id: {emailSentId}
+                  </p>
+                  <p className="text-[10px] text-gray-500 mt-3">
+                    Recipient: <span className="font-mono text-gray-300">{lead.email}</span>
+                  </p>
+                  <div className="flex gap-2 mt-5">
+                    <button
+                      onClick={() => setEmailSentId(null)}
+                      className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-xl transition-all"
+                    >
+                      Send another
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEmailModalOpen(false);
+                        setEmailSentId(null);
+                        setEmailSubject("");
+                        setEmailBody("");
+                      }}
+                      className="flex-1 px-4 py-2.5 bg-amber text-black text-sm font-bold rounded-xl hover:bg-amber-light transition-all"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={submitEmail} className="space-y-3">
+                  <label className="block">
+                    <span className="text-[9px] font-mono text-gray-600 block mb-1">
+                      Recipient (locked to lead)
+                    </span>
+                    <input
+                      value={lead.email}
+                      readOnly
+                      title="Recipient is locked to the lead's email server-side."
+                      className="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-3 text-sm text-white/60 cursor-not-allowed focus:outline-none font-mono"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-[9px] font-mono text-gray-600 block mb-1">
+                      Subject {emailSubject.length}/200
+                    </span>
+                    <input
+                      placeholder="Subject"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      disabled={emailSending}
+                      required
+                      maxLength={200}
+                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none disabled:opacity-50"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-[9px] font-mono text-gray-600 block mb-1">
+                      Body (plain text) {emailBody.length}/4000
+                    </span>
+                    <textarea
+                      rows={6}
+                      placeholder="Hey {name}, just following up on your project…"
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      disabled={emailSending}
+                      required
+                      maxLength={4000}
+                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-amber/50 focus:outline-none resize-y disabled:opacity-50"
+                    />
+                  </label>
+
+                  {emailErr && (
+                    <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                      {emailErr}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={
+                      emailSending || !emailSubject.trim() || !emailBody.trim()
+                    }
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.25)] active:scale-95 text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                  >
+                    <HiEnvelope />
+                    {emailSending ? "Sending…" : "Send via Resend"}
+                  </button>
+                </form>
+              )}
             </div>
           </motion.div>
         </div>
