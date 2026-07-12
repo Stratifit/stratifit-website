@@ -654,31 +654,39 @@ END $$;
 DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE
-      site_settings,
-      header_nav_links,
-      footer_content,
-      hero_content,
-      core_services,
-      service_page_content,
-      process_steps,
-      why_choose_us_content,
-      why_choose_us_benefits,
-      about_page_content,
-      about_stats,
-      about_values,
-      service_packages,
-      testimonials,
-      faq_entries,
-      projects,
-      insights,
-      buy_business_niches,
-      niche_stats,
-      niche_inclusions,
-      buy_business_brands,
-      legal_pages,
-      contact_form_config,
-      section_labels;
+    -- Idempotent guard: ALTER PUBLICATION ... ADD TABLE raises duplicate_object
+    -- (SQLSTATE 42710) when one or more of the listed tables is already a member
+    -- of the publication. The sub-BEGIN/EXCEPTION block scopes the catch so we
+    -- silently no-op on re-runs while still propagating any other error.
+    BEGIN
+      ALTER PUBLICATION supabase_realtime ADD TABLE
+        site_settings,
+        header_nav_links,
+        footer_content,
+        hero_content,
+        core_services,
+        service_page_content,
+        process_steps,
+        why_choose_us_content,
+        why_choose_us_benefits,
+        about_page_content,
+        about_stats,
+        about_values,
+        service_packages,
+        testimonials,
+        faq_entries,
+        projects,
+        insights,
+        buy_business_niches,
+        niche_stats,
+        niche_inclusions,
+        buy_business_brands,
+        legal_pages,
+        contact_form_config,
+        section_labels;
+    EXCEPTION
+      WHEN duplicate_object THEN NULL;
+    END;
   ELSE
     RAISE NOTICE 'supabase_realtime publication not found (non-Supabase host?). Skip Realtime setup.';
   END IF;
