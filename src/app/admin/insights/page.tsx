@@ -105,20 +105,12 @@ export default function AdminInsightsPage() {
             className="w-full bg-black border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
           />
         </label>
-        <FilterSelect label="Category" placeholder="{{filter_category}}" value={cat} options={categories} onChange={setCat} />
-        <FilterSelect label="Status" placeholder="{{filter_status}}" value={status} options={statuses} onChange={setStatus} />
+        <FilterSelect label="Category" value={cat} options={categories} onChange={setCat} />
+        <FilterSelect label="Status" value={status} options={statuses} onChange={setStatus} />
       </section>
 
       {/* Table */}
       <section className="bg-card-dark rounded-2xl border border-white/5 overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-          <p className="text-[10px] font-mono text-gray-500">
-            {"{{insight.title}} · {{insight.category}} · {{insight.status}} · {{insight.date}}"}
-          </p>
-          <p className="text-xs text-gray-400">
-            <span className="text-white font-bold">{mockInsights.length}</span> posts
-          </p>
-        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -179,10 +171,9 @@ export default function AdminInsightsPage() {
   );
 }
 
-function FilterSelect({ label, placeholder, value, options, onChange }: { label: string; placeholder: string; value: string; options: string[]; onChange: (v: string) => void }) {
+function FilterSelect({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
   return (
     <div className="relative lg:min-w-[200px]">
-      <p className="text-[9px] font-mono text-gray-600 mb-0.5 pl-1">{placeholder}</p>
       <p className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-gray-500 uppercase tracking-wider pointer-events-none z-10">{label}</p>
       <div className="relative">
         <select

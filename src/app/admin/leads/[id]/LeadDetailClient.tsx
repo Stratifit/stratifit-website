@@ -105,15 +105,11 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
             {lead.name || lead.email.split("@")[0]}
           </h1>
           <p className="text-sm text-gray-400 mt-2">
-            <span className="font-mono text-[10px] text-gray-600 mr-2">{"{{lead_email}}"}</span>
             <span className="font-mono">{lead.email}</span>
           </p>
           <p className="text-[10px] font-mono text-gray-600 mt-1">id: {lead.id}</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-right">
-            <p className="text-[9px] font-mono text-gray-600">{"{{status_dropdown}}"}</p>
-          </div>
           <div className="relative">
             <select
               value={status}
@@ -149,7 +145,6 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
           <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
             <div>
               <h2 className="font-heading font-bold text-base text-white">Notes</h2>
-              <p className="text-[10px] font-mono text-gray-500 mt-0.5">{"{{message_list}}"}</p>
             </div>
           </div>
           <div className="p-6 text-sm text-gray-300">
@@ -166,7 +161,6 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
             <h2 className="font-heading font-bold text-base text-white flex items-center gap-2">
               <HiClock className="text-amber" /> Follow-ups
             </h2>
-            <p className="text-[10px] font-mono text-gray-500 mt-0.5">{"{{followup_list}}"}</p>
           </div>
           <ul className="divide-y divide-white/5 max-h-96 overflow-y-auto">
             {followups.length === 0 ? (
@@ -186,13 +180,11 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[9px] font-mono text-gray-600">{`{{followup_status}}="${f.status}"`}</p>
+                    <span className="inline-block text-[9px] uppercase tracking-wider text-gray-500 border border-white/10 rounded px-1.5 py-0.5">
+                      {f.status}
+                    </span>
                     <p className="text-sm font-bold text-white mt-1">{f.topic}</p>
                     <p className="text-xs text-gray-400">
-                      <span className="font-mono text-[9px] text-gray-600 mr-1">
-                        {/* {{followup_scheduled_for}} */}
-                        {"{{followup_scheduled_for}}"}
-                      </span>
                       {formatDateTime(f.scheduled_for)}
                     </p>
                     {f.last_error && (
@@ -229,8 +221,7 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
               <div className="flex items-start justify-between mb-5">
                 <div>
                   <p className="text-[10px] font-bold text-amber uppercase tracking-[0.25em] mb-1">
-                    {/* {{manual_email_modal}} */}
-                    {"{{manual_email_modal}}"}
+                    Manual Email
                   </p>
                   <h3 className="font-heading font-black text-xl text-white">
                     Send Email (Resend)

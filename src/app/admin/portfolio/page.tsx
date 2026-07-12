@@ -50,7 +50,6 @@ export default function AdminPortfolioPage() {
           />
         </label>
         <div className="relative lg:min-w-[200px]">
-          <p className="text-[9px] font-mono text-gray-600 mb-0.5 pl-1">{"{{filter_category}}"}</p>
           <div className="relative">
             <select value={cat} onChange={(e) => setCat(e.target.value)} className="w-full appearance-none bg-black border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm text-white focus:border-amber/50 focus:outline-none cursor-pointer">
               {categories.map((c) => (
@@ -65,11 +64,6 @@ export default function AdminPortfolioPage() {
       </section>
 
       <section className="bg-card-dark rounded-2xl border border-white/5 overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/5">
-          <p className="text-[10px] font-mono text-gray-500">
-            {"{{case.title}} · {{case.category}} · {{case.metric}} · {{case.status}}"}
-          </p>
-        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

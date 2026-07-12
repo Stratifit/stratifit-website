@@ -100,10 +100,6 @@ export default function AdminServicesPage() {
             <div className="relative z-10">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-[9px] font-mono text-gray-600">
-                    {/* {{service_name}} */}
-                    {"{{service_name}}"}
-                  </p>
                   <h3 className="font-heading font-black text-xl text-white tracking-tight mt-1">
                     {svc.name}
                   </h3>
@@ -117,28 +113,18 @@ export default function AdminServicesPage() {
                 </button>
               </div>
               <p className="text-[9px] font-mono text-gray-600 mt-3">
-                {/* {{service_slug}} */}
-                <span className="mr-1">{"{{service_slug}}"}</span>=<span className="text-gray-400">{svc.slug}</span>
+                =<span className="text-gray-400">{svc.slug}</span>
               </p>
               <p className="text-[10px] font-mono text-gray-500 mt-3">
-                {/* {{service_description}} */}
                 {svc.description}
               </p>
               <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
                 <div>
-                  <p className="text-[9px] font-mono text-gray-600">
-                    {/* {{service_price_type}} */}
-                    {"{{service_price_type}}"}
-                  </p>
                   <span className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber/15 text-amber border border-amber/20 mt-1">
                     {svc.priceType}
                   </span>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] font-mono text-gray-600">
-                    {/* {{service_price_value}} */}
-                    {"{{service_price_value}}"}
-                  </p>
                   <p className="font-heading font-black text-lg text-white mt-1">
                     {svc.priceValue}
                   </p>
@@ -184,34 +170,27 @@ export default function AdminServicesPage() {
                 className="space-y-3"
               >
                 <Field
-                  label="{{edit_service_name}}"
                   defaultValue={editing.name}
                   placeholder="Service name"
                 />
                 <Field
-                  label="{{edit_service_description}}"
                   defaultValue={editing.description}
                   placeholder="Description"
                   multiline
                 />
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <p className="text-[9px] font-mono text-gray-600 mb-1 pl-1">
-                      {"{{edit_service_price_type}}"}
-                    </p>
-                    <select
-                      defaultValue={editing.priceType}
-                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-amber/50 focus:outline-none cursor-pointer"
-                    >
-                      {priceTypeOptions.map((o) => (
-                        <option key={o} value={o} className="bg-black text-white">
-                          {o}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    defaultValue={editing.priceType}
+                    className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-amber/50 focus:outline-none cursor-pointer"
+                    aria-label="Service price type"
+                  >
+                    {priceTypeOptions.map((o) => (
+                      <option key={o} value={o} className="bg-black text-white">
+                        {o}
+                      </option>
+                    ))}
+                  </select>
                   <Field
-                    label="{{edit_service_price_value}}"
                     defaultValue={editing.priceValue}
                     placeholder="e.g. $1,500"
                   />
@@ -232,19 +211,16 @@ export default function AdminServicesPage() {
 }
 
 function Field({
-  label,
   defaultValue,
   placeholder,
   multiline,
 }: {
-  label: string;
   defaultValue?: string;
   placeholder?: string;
   multiline?: boolean;
 }) {
   return (
     <div>
-      <p className="text-[9px] font-mono text-gray-600 mb-1 pl-1">{label}</p>
       {multiline ? (
         <textarea
           rows={3}

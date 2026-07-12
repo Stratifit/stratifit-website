@@ -57,9 +57,6 @@ export default function AdminBuyBusinessPage() {
 
       {/* Niche Tab strip */}
       <section className="bg-card-dark rounded-2xl border border-white/5 p-4">
-        <p className="text-[10px] font-mono text-gray-500 mb-3">
-          {"{{niche.name}} · {{niche.count}}"} — synced from src/data/buy-business.ts
-        </p>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setNiche("all")}
@@ -95,7 +92,6 @@ export default function AdminBuyBusinessPage() {
           />
         </label>
         <div className="relative lg:min-w-[200px]">
-          <p className="text-[9px] font-mono text-gray-600 mb-0.5 pl-1">{"{{filter_status}}"}</p>
           <div className="relative">
             <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full appearance-none bg-black border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm text-white focus:border-amber/50 focus:outline-none cursor-pointer">
               {statuses.map((s) => (
@@ -111,11 +107,6 @@ export default function AdminBuyBusinessPage() {
 
       {/* Listings table */}
       <section className="bg-card-dark rounded-2xl border border-white/5 overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/5">
-          <p className="text-[10px] font-mono text-gray-500">
-            {"{{listing.title}} · {{listing.price}} · {{listing.mrr}} · {{listing.multiplier}} · {{listing.status}}"}
-          </p>
-        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>

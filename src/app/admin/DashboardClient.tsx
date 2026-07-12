@@ -28,12 +28,14 @@ const trafficBars = [
   { day: "Mon", v: 62 }, { day: "Tue", v: 78 }, { day: "Wed", v: 54 },
   { day: "Thu", v: 88 }, { day: "Fri", v: 71 }, { day: "Sat", v: 41 }, { day: "Sun", v: 49 },
 ];
+// Activity feed is hard-coded for now (no `activity_log` Supabase table yet).
+// When the real audit log lands, swap this array for the Supabase query result.
 const activity = [
-  { id: "A-1", user: "admin@stratifit.com", verb: "published", target: '{{insight.title}} "How to Scale AI"', when: "2h ago", type: "publish" },
+  { id: "A-1", user: "admin@stratifit.com", verb: "published", target: '"How to Scale AI"', when: "2h ago", type: "publish" },
   { id: "A-2", user: "lead-bot", verb: "captured", target: "new lead from Coming-soon Notify form", when: "3h ago", type: "lead" },
-  { id: "A-3", user: "system", verb: "synced", target: "{{supabase.sync_stripe}} payment data", when: "5h ago", type: "sync" },
-  { id: "A-4", user: "admin@stratifit.com", verb: "edited", target: "{{service.name}} Website Development pricing", when: "1d ago", type: "edit" },
-  { id: "A-5", user: "lead-bot", verb: "replied", target: "lead via Resend {{email.subject}}", when: "2d ago", type: "email" },
+  { id: "A-3", user: "system", verb: "synced Stripe payment data", target: "", when: "5h ago", type: "sync" },
+  { id: "A-4", user: "admin@stratifit.com", verb: "edited", target: "Website Development pricing", when: "1d ago", type: "edit" },
+  { id: "A-5", user: "lead-bot", verb: "replied to a lead via Resend", target: "", when: "2d ago", type: "email" },
 ];
 const topServices = [
   { name: "Brand Design", count: 18, share: 0.42 },
@@ -45,15 +47,17 @@ const topServices = [
 export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFollowups: UpcomingFollowup[]; leadCounts: LeadCounts }) {
   const maxBar = Math.max(...trafficBars.map((b) => b.v));
 
+  // TODO(admin): wire Subscriptions / Insights / Buy-a-Business / Testimonials tiles
+  // to live Supabase counts. Currently they show static illustrative numbers.
   const tiles = [
-    { key: "leads", label: "Leads \u00b7 This Month", value: String(leadCounts.total), delta: leadCounts.newCount > 0 ? `+${leadCounts.newCount} new` : "\u2014", href: "/admin/leads", placeholder: "{{nav_leads}}", accent: "amber" as const, icon: HiUsers },
-    { key: "subs", label: "Subscriptions", value: "248", delta: "+18 wk", href: "/admin/subscriptions", placeholder: "{{nav_subscriptions}}", accent: "amber" as const, icon: HiEnvelope },
-    { key: "services", label: "Active Services", value: "6", delta: "All live", href: "/admin/services", placeholder: "{{nav_services}}", accent: "amber" as const, icon: HiSparkles },
-    { key: "portfolio", label: "Case Studies", value: "8", delta: "+1 mo", href: "/admin/portfolio", placeholder: "{{nav_portfolio}}", accent: "amber" as const, icon: HiBriefcase },
-    { key: "insights", label: "Insights Published", value: "14", delta: "+2 wk", href: "/admin/insights", placeholder: "{{nav_insights}}", accent: "amber" as const, icon: HiNewspaper },
-    { key: "buy", label: "Buy-a-Business \u00b7 Listings", value: "23", delta: "+5 mo", href: "/admin/buy-business", placeholder: "{{nav_buy_business}}", accent: "amber" as const, icon: HiShoppingBag },
-    { key: "testimonials", label: "Testimonials", value: "32", delta: "+4 mo", href: "/admin/testimonials", placeholder: "{{nav_testimonials}}", accent: "amber" as const, icon: HiChatBubbleLeftRight },
-    { key: "followups", label: "Follow-ups This Week", value: String(leadCounts.scheduledFollowupsThisWeek), delta: "via cron", href: "/admin/leads", placeholder: "{{followup_scheduled_for}}", accent: "amber" as const, icon: HiClock },
+    { key: "leads", label: "Leads \u00b7 This Month", value: String(leadCounts.total), delta: leadCounts.newCount > 0 ? `+${leadCounts.newCount} new` : "\u2014", href: "/admin/leads", accent: "amber" as const, icon: HiUsers },
+    { key: "subs", label: "Subscriptions", value: "248", delta: "+18 wk", href: "/admin/subscriptions", accent: "amber" as const, icon: HiEnvelope },
+    { key: "services", label: "Active Services", value: "6", delta: "All live", href: "/admin/services", accent: "amber" as const, icon: HiSparkles },
+    { key: "portfolio", label: "Case Studies", value: "8", delta: "+1 mo", href: "/admin/portfolio", accent: "amber" as const, icon: HiBriefcase },
+    { key: "insights", label: "Insights Published", value: "14", delta: "+2 wk", href: "/admin/insights", accent: "amber" as const, icon: HiNewspaper },
+    { key: "buy", label: "Buy-a-Business \u00b7 Listings", value: "23", delta: "+5 mo", href: "/admin/buy-business", accent: "amber" as const, icon: HiShoppingBag },
+    { key: "testimonials", label: "Testimonials", value: "32", delta: "+4 mo", href: "/admin/testimonials", accent: "amber" as const, icon: HiChatBubbleLeftRight },
+    { key: "followups", label: "Follow-ups This Week", value: String(leadCounts.scheduledFollowupsThisWeek), delta: "via cron", href: "/admin/leads", accent: "amber" as const, icon: HiClock },
   ];
 
   return (
@@ -84,7 +88,6 @@ export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFol
                   <HiArrowUpRight className="text-gray-500 group-hover:text-amber group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all text-base" />
                 </div>
                 <div className="relative z-10">
-                  <p className="text-[9px] font-mono text-gray-500 mb-1">{tile.placeholder}</p>
                   <h3 className="font-heading font-black text-2xl text-white tracking-tight">{tile.value}</h3>
                   <p className="text-[11px] text-gray-400 mt-1 truncate">{tile.label}</p>
                   <p className="text-[10px] text-emerald-400 mt-2 font-medium">{tile.delta}</p>
@@ -99,7 +102,6 @@ export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFol
         <div className="lg:col-span-2 bg-card-dark rounded-2xl border border-white/5 p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <p className="text-[10px] font-mono text-gray-500 mb-1">{"{{stat_leads_7d}}"}</p>
               <h2 className="font-heading font-bold text-base text-white">Weekly Activity</h2>
               <p className="text-xs text-gray-400 mt-0.5">Visitors &amp; leads \u00b7 last 7 days</p>
             </div>
@@ -135,9 +137,6 @@ export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFol
               <h2 className="font-heading font-bold text-base text-white flex items-center gap-2">
                 <HiClock className="text-amber" /> Recent Activity
               </h2>
-              <p className="text-[10px] font-mono text-gray-500 mt-0.5">
-                {"{{activity_log}}"}
-              </p>
             </div>
             <Link
               href="/admin/activity"
@@ -149,13 +148,9 @@ export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFol
           <ul className="divide-y divide-white/5 max-h-96 overflow-y-auto">
             {activity.map((a) => (
               <li key={a.id} className="px-5 py-3.5">
-                <p className="text-[10px] font-mono text-gray-600"></p>
                 <p className="text-[12px] text-white mt-1 leading-snug">
-                  <span className="font-mono text-[10px] text-amber mr-1">
-                    {"{{activity_user}}"}
-                  </span>
                   {a.user} <span className="text-gray-400">{a.verb}</span>{" "}
-                  <span className="text-gray-200">{a.target}</span>
+                  {a.target && <span className="text-gray-200">{a.target}</span>}
                 </p>
                 <p className="text-[10px] text-gray-500 mt-1">{a.when}</p>
               </li>
@@ -172,8 +167,8 @@ export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFol
               <h2 className="font-heading font-bold text-base text-white">
                 Top Services
               </h2>
-              <p className="text-[10px] font-mono text-gray-500 mt-0.5">
-                {"{{lead_service}} \u00b7 count"}
+              <p className="text-[10px] text-gray-500 mt-0.5">
+                Lead services \u00b7 count (static demo)
               </p>
             </div>
             <Link
@@ -210,9 +205,8 @@ export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFol
             <h2 className="font-heading font-bold text-base text-white flex items-center gap-2">
               <HiClock className="text-amber" /> Upcoming Follow-ups
             </h2>
-            <p className="text-[10px] font-mono text-gray-500 mt-0.5">
-              {/* Live timestamp \u2014 read from lead_followups.scheduled_for */}
-              {"{{followup_scheduled_for}}"}
+            <p className="text-[10px] text-gray-500 mt-0.5">
+              Live timestamp \u00b7 read from lead_followups.scheduled_for
             </p>
           </div>
           <ul className="divide-y divide-white/5">
@@ -225,21 +219,21 @@ export function DashboardClient({ upcomingFollowups, leadCounts }: { upcomingFol
             ) : (
               upcomingFollowups.map((f) => (
                 <li key={f.id} className="px-6 py-4">
-                  <p className="text-[10px] font-mono text-gray-600">
-                    {/* {{followup_status}} */}
-                    {`{{followup_status}}="${f.status}"`}
-                  </p>
                   <p className="text-sm text-white font-bold mt-1">{f.topic}</p>
                   <p className="text-xs text-gray-400">
-                    <span className="font-mono text-[10px] text-gray-600 mr-2">
-                      {/* {{lead_name}} */}
-                      {"{{lead_name}}"}
-                    </span>
                     {f.lead_name}
+                    {f.lead_email && (
+                      <span className="font-mono text-[10px] text-gray-600 ml-2">
+                        {f.lead_email}
+                      </span>
+                    )}
                   </p>
                   <p className="text-[10px] text-amber mt-2 font-medium">
                     {formatDateTime(f.scheduled_for)}
                   </p>
+                  <span className="inline-block mt-1 text-[10px] uppercase tracking-wider text-gray-500 border border-white/10 rounded px-1.5 py-0.5">
+                    {f.status}
+                  </span>
                 </li>
               ))
             )}
