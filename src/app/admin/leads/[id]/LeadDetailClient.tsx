@@ -152,8 +152,10 @@ export function LeadDetailClient({ lead, followups }: { lead: LeadDetail; follow
               <p className="text-[10px] font-mono text-gray-500 mt-0.5">{"{{message_list}}"}</p>
             </div>
           </div>
-          <div className="p-6 text-sm text-gray-300 whitespace-pre-wrap">
-            {lead.notes || (
+          <div className="p-6 text-sm text-gray-300">
+            {lead.notes ? (
+              <NotesView notes={lead.notes} />
+            ) : (
               <span className="text-gray-500 italic">No notes yet. Conversation history will land here once the chatbot-to-lead bridge ships.</span>
             )}
           </div>
@@ -385,4 +387,84 @@ function formatDateTime(iso: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+/* ------------------------------------------------------------------ */
+/*  NotesView \u2014 renders leads.notes as a stream of timestamped       */
+/*  event cards when the public leads route (or future sources)       */
+/*  stamp structured "[ISO] label" entries. Falls back to a plain     */
+/*  <pre> block when no structured entries are detected so manually   */
+/*  edited notes still display correctly.                              */
+/* ------------------------------------------------------------------ */
+const NOTE_HEADER_RE = /^\[(\d{4}-\d{2}-\d{2}T[\d:.\-Z]+)\]\s+(.+)$/;
+const NOTE_TIMESTAMP_PRESENT_RE = /\[\d{4}-\d{2}-\d{2}T[\d:.\-Z]+\]/;
+
+interface ParsedNoteBlock {
+  timestamp: string;
+  title: string;
+  detail: string;
+}
+
+function parseNoteEntries(notes: string): {
+  structured: ParsedNoteBlock[] | null;
+  trailing: string;
+} {
+  if (!NOTE_TIMESTAMP_PRESENT_RE.test(notes)) return { structured: null, trailing: notes };
+
+  const lines = notes.split("\n");
+  const blocks: ParsedNoteBlock[] = [];
+  let current: ParsedNoteBlock | null = null;
+  const trailingChunks: string[] = [];
+
+  for (const line of lines) {
+    const m = line.match(NOTE_HEADER_RE);
+    if (m) {
+      if (current) blocks.push(current);
+      current = { timestamp: m[1], title: m[2].trim(), detail: "" };
+    } else if (current) {
+      // Belongs to the current structured block.
+      current.detail += (current.detail ? "\n" : "") + line;
+    } else {
+      trailingChunks.push(line);
+    }
+  }
+  if (current) blocks.push(current);
+
+  return { structured: blocks, trailing: trailingChunks.join("\n").trim() };
+}
+
+function NotesView({ notes }: { notes: string }) {
+  const { structured, trailing } = parseNoteEntries(notes);
+  if (!structured || structured.length === 0) {
+    return <div className="whitespace-pre-wrap">{notes}</div>;
+  }
+  return (
+    <div className="space-y-3">
+      {structured.map((b, idx) => (
+        <div
+          key={`${b.timestamp}-${idx}`}
+          className="rounded-lg border border-white/5 bg-black/40 px-4 py-3"
+        >
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-[10px] font-mono text-gray-500">
+              {b.timestamp}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber">
+              {b.title}
+            </span>
+          </div>
+          {b.detail.trim() && (
+            <div className="text-xs font-mono text-gray-400 whitespace-pre-wrap pl-3 border-l border-amber/30">
+              {b.detail.trim()}
+            </div>
+          )}
+        </div>
+      ))}
+      {trailing && (
+        <div className="text-sm text-gray-300 whitespace-pre-wrap pt-2 border-t border-white/5">
+          {trailing}
+        </div>
+      )}
+    </div>
+  );
 }

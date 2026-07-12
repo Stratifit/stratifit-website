@@ -14,7 +14,8 @@
 | 2     | `7631004` | Chatbot wiring #2 (FaqAIChat + AIChatbot)               |
 | 3     | `61826a6` | Vercel-cron follow-up dispatch + leads/followups schema |
 | 4     | `6a767f2` | Supabase Realtime for live CMS updates                  |
-| 5     | (this)    | Cleanup pass + system audit                            |
+| 5     | `676ac81` | Cleanup pass + system audit                            |
+| 6     | (F1)      | Public POST `/api/leads/public` (contact form → DB)    |
 
 ## Per-requirement verdict
 
@@ -25,6 +26,7 @@
 | 3 | Supabase = single source of truth                                          | ✅ PASS | `src/lib/supabase.ts` (`getSupabase` anon + `getSupabaseAdmin` service-role) + `src/lib/use-cms.ts` reads through `/api/cms/[section]`. Migration creates 29 tables in `scripts/cms-migration.sql`.                                                                                                     |
 | 4 | Live updates without rebuild                                               | ✅ PASS | Phase 4 — Supabase Realtime publication in `cms-migration.sql` + `use-cms.ts` `client.channel(`public:${table}`).on('postgres_changes')` subscription. Verified by commit `6a767f2`.                                                                                                                   |
 | 5 | CMS API routes CRUD                                                        | ✅ PASS | `src/app/api/cms/[section]/route.ts` (GET/PUT/POST/DELETE whitelist) + `src/app/api/admin/{login,session}/route.ts` (HMAC cookies). All writes gated by `getAdminSession()`.                                                                                                                              |
+| 5b | Public leads ingest (contact form → DB)                                  | ✅ PASS | `src/app/api/leads/public/route.ts` — POST-only. Cloudflare Turnstile server-verified (with documented always-pass test secret fallback in dev), per-IP rate-limit (5/10 min), per-email dedupe (60s), honeypot field. Inserts `leads` row (`source='contact_form'`, `status='new'`) + `lead_followups` row (`template='lead_followup_checkin'`, `scheduled_for = NOW()+1h`). Structured `[ISO] Contact form submission …` event stamped into `notes` for `/admin/leads/[id]` display. |
 | 6 | Translatable field editor                                                  | ✅ PASS | `src/components/admin/TranslatableFieldEditor.tsx` (4-language tabs used on `/admin/content/[section]`).                                                                                                                                                                                            |
 | 7 | Per-section placeholders format `{{key}}`                                  | ✅ PASS | All leftover `{{...}}` literals removed in Phase 5 cleanup. JSX text placeholders now use `placeholder={tLabel(\"form_name\", lang)}` pattern; admin scaffolding `\u007b\u007badmin_auth_guard\u007d\u007d` deleted from `Sidebar.tsx` + `AdminGuard.tsx`.                                       |
 | 8 | Cookie-signed admin auth, env-aware                                        | ✅ PASS | `src/lib/admin-auth.ts` (HMAC-SHA256, `ADMIN_SESSION_SECRET` → `SUPABASE_SERVICE_ROLE_KEY` → dev fallback). `/api/admin/login` issues `stratifit_admin` httpOnly cookie. `isAdminAuthConfigured()` populated for the login UI.                                                                               |
@@ -55,10 +57,12 @@
 
 | # | Follow-up                                                                | Why deferred                                                    |
 |---|--------------------------------------------------------------------------|------------------------------------------------------------------|
-| F1 | Public `POST /api/leads` (from contact form → `leads` table)             | Phase 3 shipped admin-manual lead entry; user-driven capture is the next slice. |
-| F2 | `notifies_subscribers` RLS policy                                        | RLS should be added before any anon-key reading of the table lands. Today nothing reads it from the public client. |
+| F1 | Public `POST /api/leads` (from contact form → `leads` table)             | **Shipped (Phase / commit landed with the F1 fix).** Captcha-gated, honeypot-gated, per-IP + per-email throttled. |
+| F2 | `notify_subscribers` RLS policy                                          | RLS should be added before any anon-key reading of the table lands. Today nothing reads it from the public client. |
 | F3 | Per-`lead_followups` retry strategy                                      | Currently single-shot. A retry-with-attempts counter was scaffolded (`attempts INTEGER`) but not exercised. |
 | F4 | Wire Vitest + Playwright                                                  | CI today runs typecheck + reviewer. UI smoke tests + suite coverage would harden the surface further. |
+| F5 | Move IP/email rate-limit state from in-memory `Map` to Upstash Redis     | Today's in-process `Map` resets on cold start (acceptable for a contact form, but a high-traffic deploy would benefit from shared state). |
+| F6 | Turnstile widget mount on `/coming-soon` ContactChatbot compose path     | Public DOM mutation is now gated; the AI-chat inline subscribe channel should also be re-evaluated for spam. |
 
 ## How to re-verify
 

@@ -6,6 +6,31 @@ import { HiArrowRight, HiChevronDown, HiEnvelope, HiXMark } from "react-icons/hi
 import { useLanguage } from "@/lib/LanguageContext";
 import { tLabel } from "@/lib/stratifit-i18n";
 
+// ── Turnstile script + widget types (loaded on demand by the modal) ───────
+type TurnstileRenderOptions = {
+  sitekey: string;
+  callback: (token: string) => void;
+  "error-callback"?: () => void;
+  "expired-callback"?: () => void;
+  theme?: "light" | "dark" | "auto";
+};
+interface TurnstileApi {
+  render: (container: string | HTMLElement, options: TurnstileRenderOptions) => string;
+  remove: (widgetId: string) => void;
+  reset: (widgetId: string) => void;
+}
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
+
+// Cloudflare's documented always-pass test keys. See
+// https://developers.cloudflare.com/turnstile/troubleshooting/testing/.
+// Used only when NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset (local dev path).
+const TURNSTILE_TEST_SITEKEY = "1x00000000000000000000AA";
+const TURNSTILE_SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+
 // ── Module-level event emitter ──────────────────────────────────────────────
 let _openCb: (() => void) | null = null;
 export function openContactModal() {
@@ -76,6 +101,13 @@ export function ContactModal() {
   const servicesRef = useRef<HTMLDivElement>(null);
   const budgetRef = useRef<HTMLDivElement>(null);
 
+  // ── Submit / Turnstile state ──────────────────────────────────────────
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string>("");
+  const captchaContainerRef = useRef<HTMLDivElement>(null);
+  const captchaWidgetIdRef = useRef<string | null>(null);
+
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -87,15 +119,145 @@ export function ContactModal() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // ── Lazy-load Turnstile script + render widget when modal opens ────────
+  useEffect(() => {
+    // Load script lazily so non-modal visitors never pay the ~50 KB.
+    const loadScript = (): Promise<void> =>
+      new Promise((resolve, reject) => {
+        if (typeof window === "undefined") {
+          reject(new Error("no-window"));
+          return;
+        }
+        if (window.turnstile) {
+          resolve();
+          return;
+        }
+        const existing = document.querySelector<HTMLScriptElement>(
+          `script[src="${TURNSTILE_SCRIPT_SRC}"]`,
+        );
+        if (existing) {
+          existing.addEventListener("load", () => resolve());
+          existing.addEventListener("error", () => reject(new Error("turnstile-script-error")));
+          return;
+        }
+        const s = document.createElement("script");
+        s.src = TURNSTILE_SCRIPT_SRC;
+        s.async = true;
+        s.defer = true;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("turnstile-script-error"));
+        document.head.appendChild(s);
+      });
+
+    if (!open) return;
+
+    let cancelled = false;
+    setSubmitError(null);
+    setCaptchaToken("");
+
+    loadScript()
+      .then(() => {
+        if (cancelled) return;
+        const mount = captchaContainerRef.current;
+        const api = window.turnstile;
+        if (!mount || !api) {
+          // Server has captcha disabled — leave widget area empty and let
+          // the submit handler surface "captcha_required" on click.
+          return;
+        }
+        // Pick real site key when provided, else fall back to test key
+        // (local dev only — server enforces the test secret in dev too).
+        const siteKey =
+          process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITEKEY;
+        const id = api.render(mount, {
+          sitekey: siteKey,
+          theme: "dark",
+          callback: (token) => setCaptchaToken(token),
+          "error-callback": () => setCaptchaToken(""),
+          "expired-callback": () => setCaptchaToken(""),
+        });
+        captchaWidgetIdRef.current = id;
+      })
+      .catch(() => {
+        // Turnstile script failed to load (network blip). Leave captcha
+        // disabled and let submit error surface; admin will see traffic
+        // spikes and can diagnose.
+        if (!cancelled) setSubmitError("turnstile_unavailable");
+      });
+
+    return () => {
+      cancelled = true;
+      const id = captchaWidgetIdRef.current;
+      if (id && window.turnstile) {
+        try {
+          window.turnstile.remove(id);
+        } catch {
+          /* ignore — widget may already be gone */
+        }
+      }
+      captchaWidgetIdRef.current = null;
+    };
+  }, [open]);
+
   const toggleService = (service: string) => {
     setSelectedServices((prev) =>
       prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service],
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const resetCaptcha = useCallback(() => {
+    const id = captchaWidgetIdRef.current;
+    if (id && window.turnstile) {
+      try {
+        window.turnstile.reset(id);
+      } catch {
+        /* ignore */
+      }
+    }
+    setCaptchaToken("");
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitError(null);
+    if (isSubmitting) return;
+    if (!captchaToken) {
+      setSubmitError("captcha_required");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await fetch("/api/leads/public", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formState.name,
+          email: formState.email,
+          company: formState.company,
+          message: formState.message,
+          services: selectedServices,
+          budgetRange: selectedBudget,
+          budgetCustom: customBudget,
+          lang,
+          captchaToken,
+        }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        success?: boolean;
+        error?: string;
+      };
+      if (!res.ok || !data.success) {
+        resetCaptcha();
+        setSubmitError(data.error || "server_error");
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      resetCaptcha();
+      setSubmitError("network_error");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -347,15 +509,50 @@ export function ContactModal() {
                       value={formState.message}
                       onChange={handleChange}
                       className="w-full bg-card-dark border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:border-amber/50 focus:outline-none transition-colors resize-none"
-                      placeholder="Tell us about your project *"
+                      placeholder={tLabel("form_message", lang)}
                     />
+
+                    {/* Honeypot — hidden from humans; bots that auto-fill any
+                        input get rejected by /api/leads/public. */}
+                    <div style={{ display: "none" }} aria-hidden="true">
+                      <label>
+                        Company website (leave blank)
+                        <input
+                          type="text"
+                          name="company_website"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value=""
+                          readOnly
+                        />
+                      </label>
+                    </div>
+
+                    {/* Turnstile widget — rendered lazily when modal opens. */}
+                    <div className="flex justify-center">
+                      <div
+                        ref={captchaContainerRef}
+                        className="cf-turnstile min-h-[65px]"
+                      />
+                    </div>
+
+                    {/* Submit error (inline, preserves user's input). */}
+                    {submitError && (
+                      <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                        {tLabel(`lead_public_error_${submitError}`, lang) ||
+                          submitError}
+                      </p>
+                    )}
 
                     {/* Submit */}
                     <button
                       type="submit"
-                      className="group w-full px-8 py-4 bg-amber text-black font-heading font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] active:scale-95 text-sm"
+                      disabled={isSubmitting}
+                      className="group w-full px-8 py-4 bg-amber text-black font-heading font-bold rounded-xl flex items-center justify-center gap-3 hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.2)] active:scale-95 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      Send Message
+                      {isSubmitting
+                        ? tLabel("form_sending", lang)
+                        : tLabel("form_send_message", lang)}
                       <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
                     </button>
                   </form>

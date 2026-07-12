@@ -236,6 +236,21 @@ const labelTranslations: Record<string, Record<Language, string>> = {
   form_select_range: { en: "Select range", fr: "Sélectionner une plage", de: "Bereich auswählen", es: "Seleccionar rango" },
   form_custom_budget: { en: "Custom budget", fr: "Budget personnalisé", de: "Individuelles Budget", es: "Presupuesto personalizado" },
   form_send_message: { en: "Send Message", fr: "Envoyer le Message", de: "Nachricht Senden", es: "Enviar Mensaje" },
+  form_sending: { en: "Sending\u2026", fr: "Envoi\u2026", de: "Wird gesendet\u2026", es: "Enviando\u2026" },
+
+  /* ---------- Contact form submit errors (Phase 6 / F1) ----------
+     Keys are appended with the `lead_public_error_` prefix and looked
+     up by the modal using the server's `error` JSON field. Add a key
+     here whenever the public leads route introduces a new error code. */
+  lead_public_error_captcha_required: { en: "Please complete the security check.", fr: "Veuillez compl\u00e9ter le contr\u00f4le de s\u00e9curit\u00e9.", de: "Bitte schlie\u00dfen Sie die Sicherheits\u00fcberpr\u00fcfung ab.", es: "Completa el control de seguridad." },
+  lead_public_error_captcha_failed: { en: "Security check failed. Please try again.", fr: "\u00c9chec du contr\u00f4le de s\u00e9curit\u00e9. Veuillez r\u00e9essayer.", de: "Sicherheits\u00fcberpr\u00fcfung fehlgeschlagen. Bitte erneut versuchen.", es: "El control de seguridad fall\u00f3. Int\u00e9ntalo de nuevo." },
+  lead_public_error_captcha_not_configured: { en: "Our security check is offline right now. Please try again shortly or email hello@stratifit.com.", fr: "Notre contr\u00f4le de s\u00e9curit\u00e9 est momentan\u00e9ment indisponible. R\u00e9essayez ou \u00e9crivez \u00e0 hello@stratifit.com.", de: "Unsere Sicherheits\u00fcberpr\u00fcfung ist gerade offline. Bitte sp\u00e4ter erneut versuchen oder hello@stratifit.com schreiben.", es: "Nuestro control de seguridad est\u00e1 fuera de l\u00ednea. Int\u00e9ntalo pronto o escribe a hello@stratifit.com." },
+  lead_public_error_turnstile_unavailable: { en: "Could not load the security check. Please refresh and try again.", fr: "Impossible de charger le contr\u00f4le. Veuillez rafra\u00eechir et r\u00e9essayer.", de: "Sicherheits\u00fcberpr\u00fcfung konnte nicht geladen werden. Bitte aktualisieren und erneut versuchen.", es: "No se pudo cargar el control de seguridad. Actualiza e int\u00e9ntalo de nuevo." },
+  lead_public_error_rate_limited: { en: "You're sending too quickly. Please wait a minute and try again.", fr: "Vous envoyez trop vite. Attendez une minute, puis r\u00e9essayez.", de: "Sie senden zu schnell. Bitte eine Minute warten und erneut versuchen.", es: "Est\u00e1s enviando demasiado r\u00e1pido. Espera un minuto e int\u00e9ntalo de nuevo." },
+  lead_public_error_invalid_email: { en: "Please double-check your name, email, and message.", fr: "V\u00e9rifiez votre nom, e-mail et message.", de: "Bitte \u00fcberpr\u00fcfen Sie Name, E-Mail und Nachricht.", es: "Verifica tu nombre, correo y mensaje." },
+  lead_public_error_spam: { en: "Submission rejected. Please contact us directly at hello@stratifit.com.", fr: "Envoi refus\u00e9. Contactez-nous directement \u00e0 hello@stratifit.com.", de: "Einsendung abgelehnt. Bitte direkt an hello@stratifit.com schreiben.", es: "Env\u00edo rechazado. Escr\u00edbenos directamente a hello@stratifit.com." },
+  lead_public_error_network_error: { en: "Network error. Check your connection and try again.", fr: "Erreur r\u00e9seau. V\u00e9rifiez votre connexion et r\u00e9essayez.", de: "Netzwerkfehler. Bitte Verbindung pr\u00fcfen und erneut versuchen.", es: "Error de red. Verifica tu conexi\u00f3n e int\u00e9ntalo de nuevo." },
+  lead_public_error_server_error: { en: "Something went wrong on our end. Please try again in a moment.", fr: "Quelque chose a c\u00f4t\u00e9 de nous. Veuillez r\u00e9essayer dans un instant.", de: "Bei uns ist etwas schiefgelaufen. Bitte gleich erneut versuchen.", es: "Algo sali\u00f3 mal de nuestro lado. Int\u00e9ntalo en un momento." },
 
   /* ---------- Admin guard (loading state on /admin/*) ---------- */
   admin_guard_verifying_session: { en: "Verifying session\u2026", fr: "V\u00e9rification de la session\u2026", de: "Sitzung wird \u00fcberpr\u00fcft\u2026", es: "Verificando sesi\u00f3n\u2026" },
