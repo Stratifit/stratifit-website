@@ -464,11 +464,118 @@ CREATE TABLE IF NOT EXISTS llm_log (
 CREATE INDEX IF NOT EXISTS llm_log_created_at_idx
   ON llm_log(created_at DESC);
 CREATE INDEX IF NOT EXISTS llm_log_status_idx
-  ON llm_log(status);
-CREATE INDEX IF NOT EXISTS llm_log_chatbot_idx
+  ON llm_log(status);CREATE INDEX IF NOT EXISTS llm_log_chatbot_idx
   ON llm_log(chatbot);
+
+/* ============================================================
+   28. leads (list — captured leads)
+   Lifecycle status = 'new' | 'qualified' | 'in-review' | 'won' | 'lost'.
+   NOT used by the cron directly — cron reads lead_followups (below).
+   ============================================================ */
+CREATE TABLE IF NOT EXISTS leads (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL,
+  service TEXT DEFAULT '',
+  source TEXT DEFAULT 'admin_manual',
+  status TEXT NOT NULL DEFAULT 'new'
+    CHECK (status IN ('new','qualified','in-review','won','lost')),
+  budget TEXT DEFAULT '',
+  lang TEXT DEFAULT 'en',
+  metadata JSONB NOT NULL DEFAULT '{}',
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS leads_status_idx
+  ON leads(status);
+CREATE INDEX IF NOT EXISTS leads_created_at_idx
+  ON leads(created_at DESC);
+CREATE INDEX IF NOT EXISTS leads_email_idx
+  ON leads(email);
+
+/* ============================================================
+   29. lead_followups (list — scheduled outbound emails per lead)
+   Cron reads WHERE status='scheduled' AND scheduled_for <= NOW(),
+   atomically claims rows by flipping status='processing', dispatches
+   Resend, then flips to 'completed' or 'failed'. This is the actual
+   table the Phase 3 cron operates on.
+   ============================================================ */
+CREATE TABLE IF NOT EXISTS lead_followups (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  lead_id UUID NOT NULL REFERENCES leads(id) ON DELETE CASCADE,
+  topic TEXT NOT NULL DEFAULT 'Check-in',
+  -- which email template to render
+  template TEXT NOT NULL DEFAULT 'lead_followup_checkin'
+    CHECK (template IN (
+      'lead_followup_checkin',
+      'lead_followup_welcome',
+      'lead_followup_proposal',
+      'lead_followup_thanks'
+    )),
+  lang TEXT NOT NULL DEFAULT 'en',
+  status TEXT NOT NULL DEFAULT 'scheduled'
+    CHECK (status IN ('scheduled','processing','completed','failed','cancelled')),
+  scheduled_for TIMESTAMPTZ NOT NULL,
+  sent_at TIMESTAMPTZ,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT,
+  email_log_id UUID,
+  -- who/what scheduled it (admin email, 'contact_form', 'import', etc.)
+  scheduled_by TEXT DEFAULT 'admin',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+-- Cron hot path: "find rows ready to fire that no one is currently working on"
+CREATE INDEX IF NOT EXISTS lead_followups_due_idx
+  ON lead_followups(status, scheduled_for)
+  WHERE status = 'scheduled';
+CREATE INDEX IF NOT EXISTS lead_followups_lead_idx
+  ON lead_followups(lead_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS lead_followups_status_idx
+  ON lead_followups(status);
+
+/* ============================================================
+   Seed data — 2 leads + 2 follow-ups so the admin viewer shows
+   something on first run. Safe to re-run (no-op if rows exist).
+   ============================================================ */
+DO $$
+DECLARE
+  s1_id UUID;
+  s2_id UUID;
+  f1_id UUID;
+  f2_id UUID;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM leads WHERE email = 'ada@stratifit-seed.com') THEN
+    INSERT INTO leads (name, email, service, source, status, budget, lang, notes)
+    VALUES ('Ada Lovelace (seed)', 'ada@stratifit-seed.com', 'Brand Design', 'seed', 'qualified', '$3,000 – $5,000', 'en', 'Seed lead so the admin viewer shows something on first run.')
+    RETURNING id INTO s1_id;
+  ELSE
+    SELECT id INTO s1_id FROM leads WHERE email = 'ada@stratifit-seed.com';
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM leads WHERE email = 'grace@stratifit-seed.com') THEN
+    INSERT INTO leads (name, email, service, source, status, budget, lang, notes)
+    VALUES ('Grace Hopper (seed)', 'grace@stratifit-seed.com', 'AI Automation', 'seed', 'new', '$5,000 – $10,000', 'en', 'Seed lead so the cron / dashboard can show a scheduled follow-up in flight.')
+    RETURNING id INTO s2_id;
+  ELSE
+    SELECT id INTO s2_id FROM leads WHERE email = 'grace@stratifit-seed.com';
+  END IF;
+
+  IF s1_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM lead_followups WHERE lead_id = s1_id AND topic = 'Discovery call') THEN
+    INSERT INTO lead_followups (lead_id, topic, template, lang, status, scheduled_for, scheduled_by)
+    VALUES (s1_id, 'Discovery call', 'lead_followup_checkin', 'en', 'scheduled', NOW() + INTERVAL '2 hours', 'admin')
+    RETURNING id INTO f1_id;
+  END IF;
+
+  IF s2_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM lead_followups WHERE lead_id = s2_id AND topic = 'Welcome packet') THEN
+    INSERT INTO lead_followups (lead_id, topic, template, lang, status, scheduled_for, scheduled_by)
+    VALUES (s2_id, 'Welcome packet', 'lead_followup_welcome', 'en', 'scheduled', NOW() + INTERVAL '1 day', 'admin')
+    RETURNING id INTO f2_id;
+  END IF;
+END $$;
 
 -- ============================================================
 --  Done. After running this migration, sign in at /admin, go to
---  /admin/content, and start filling each section in all 4 languages.
+-- /admin/content, and start filling each section in all 4 languages.
 -- ============================================================

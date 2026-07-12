@@ -31,7 +31,12 @@ export type EmailTemplate =
   | "notify_welcome"
   | "notify_already_subscribed"
   | "lead_confirmation"
-  | "launch_announcement";
+  | "launch_announcement"
+  // Phase 3 \u2014 admin-scheduled follow-ups dispatched by /api/cron/followups.
+  | "lead_followup_welcome"
+  | "lead_followup_checkin"
+  | "lead_followup_proposal"
+  | "lead_followup_thanks";
 
 /* ------------------------------------------------------------------ */
 /*  Email log row shape — mirrors the Supabase table.                  */
@@ -331,6 +336,188 @@ const NOTIFY_ALREADY: Record<Language, LocalizedTemplate> = {
 /* ------------------------------------------------------------------ */
 /*  Public template builders                                          */
 /* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------ */
+/*  Phase 3 — 4-language templates for admin-scheduled                */
+/*  lead follow-ups. Dispatched by /api/cron/followups and             */
+/*  /api/leads/[id]/followups. Variables are passed in via            */
+/*  `vars` and substituted into the body before render.               */
+/* ------------------------------------------------------------------ */
+
+function renderVars(text: string, vars: Record<string, string | number>): string {
+  return text.replace(/\{\{\s*(\w+)\s*\}\}/g, (full, key) => {
+    const v = vars[key];
+    return v == null ? full : String(v);
+  });
+}
+
+export interface FollowupVars {
+  lead_name: string;
+  topic: string;
+  scheduled_for: string; // human-friendly, already formatted in caller
+  // Allow ad-hoc variables to pass through renderVars without exhaustive typing.
+  // Note: deliberately no `?:` markers here, since index signatures don't permit
+  // `undefined` members. Callers must always pass concrete string | number values.
+  [key: string]: string | number;
+}
+
+const LEAD_FOLLOWUP_WELCOME: Record<Language, LocalizedTemplate> = {
+  en: makeFollowup("en", {
+    subject: "{{lead_name}}, welcome to Stratifit \ud83d\ude80",
+    preview: "Your project is in motion.",
+    intro: "Thanks for reaching out about {{topic}}. We've added you to our system and someone from the team will get back to you shortly.",
+    next: "In the meantime, reply directly to this email with any project details or timeline constraints \u2014 the more we know, the better we can scope.",
+  }),
+  de: makeFollowup("de", {
+    subject: "{{lead_name}}, willkommen bei Stratifit \ud83d\ude80",
+    preview: "Dein Projekt ist in Bewegung.",
+    intro: "Danke f\u00fcr deine Anfrage zu {{topic}}. Wir haben dich in unserem System aufgenommen und jemand aus dem Team meldet sich in K\u00fcrze bei dir.",
+    next: "In der Zwischenzeit kannst du direkt auf diese E-Mail antworten \u2014 je mehr wir wissen, desto besser k\u00f6nnen wir den Umfang einsch\u00e4tzen.",
+  }),
+  fr: makeFollowup("fr", {
+    subject: "{{lead_name}}, bienvenue chez Stratifit \ud83d\ude80",
+    preview: "Votre projet est en marche.",
+    intro: "Merci pour votre demande concernant {{topic}}. Nous vous avons ajout\u00e9 \u00e0 notre syst\u00e8me et un membre de l'\u00e9quipe vous recontactera sous peu.",
+    next: "En attendant, r\u00e9pondez directement \u00e0 cet e-mail \u2014 plus nous en savons, mieux nous pouvons \u00e9valuer le p\u00e9rim\u00e8tre.",
+  }),
+  es: makeFollowup("es", {
+    subject: "{{lead_name}}, bienvenido a Stratifit \ud83d\ude80",
+    preview: "Tu proyecto est\u00e1 en marcha.",
+    intro: "Gracias por contactarnos sobre {{topic}}. Te hemos a\u00f1adido a nuestro sistema y alguien del equipo se pondr\u00e1 en contacto contigo en breve.",
+    next: "Mientras tanto, responde directamente a este correo \u2014 cuanto m\u00e1s sepamos, mejor podremos delimitar el alcance.",
+  }),
+};
+
+const LEAD_FOLLOWUP_CHECKIN: Record<Language, LocalizedTemplate> = {
+  en: makeFollowup("en", {
+    subject: "Quick check-in \u2014 {{topic}}",
+    preview: "Following up on your project.",
+    intro: "Just a quick note following up on {{topic}}. We wanted to make sure you have everything you need to move forward.",
+    next: "If a quick call would help unblock things, reply with two or three time slots that work this week.",
+  }),
+  de: makeFollowup("de", {
+    subject: "Kurzes Check-in \u2014 {{topic}}",
+    preview: "Nachfrage zu deinem Projekt.",
+    intro: "Nur eine kurze Nachfrage zu {{topic}}. Wir wollten sichergehen, dass du alles hast, um voranzukommen.",
+    next: "Falls ein kurzer Anruf helfen w\u00fcrde, antworte mit zwei oder drei Zeitfenstern, die diese Woche passen.",
+  }),
+  fr: makeFollowup("fr", {
+    subject: "Petit check-in \u2014 {{topic}}",
+    preview: "Suivi de votre projet.",
+    intro: "Un petit mot pour faire le point sur {{topic}}. Nous voulions nous assurer que tout est clair pour avancer.",
+    next: "Si un appel rapide aiderait \u00e0 d\u00e9bloquer, r\u00e9pondez avec deux ou trois cr\u00e9neaux qui conviendraient cette semaine.",
+  }),
+  es: makeFollowup("es", {
+    subject: "Peque\u00f1o check-in \u2014 {{topic}}",
+    preview: "Seguimiento de tu proyecto.",
+    intro: "Una nota r\u00e1pida para hacer un seguimiento de {{topic}}. Queremos asegurarnos de que tienes todo lo necesario para avanzar.",
+    next: "Si una llamada breve ayudara a desbloquear, responde con dos o tres franjas horarias que te vengan bien esta semana.",
+  }),
+};
+
+const LEAD_FOLLOWUP_PROPOSAL: Record<Language, LocalizedTemplate> = {
+  en: makeFollowup("en", {
+    subject: "Proposal ready for review \u2014 {{topic}}",
+    preview: "Your scoped proposal is attached.",
+    intro: "The proposed scope for {{topic}} is ready for review. Take a look and let us know what to adjust \u2014 line items, timeline, budget.",
+    next: "We'll plan a 20-minute walk-through once you've had a chance to read through.",
+  }),
+  de: makeFollowup("de", {
+    subject: "Angebot zur Pr\u00fcfung bereit \u2014 {{topic}}",
+    preview: "Dein Vorschlag ist erstellt.",
+    intro: "Der vorgeschlagene Umfang f\u00fcr {{topic}} liegt zur Pr\u00fcfung bereit. Sag uns, was angepasst werden soll \u2014 Positionen, Zeitplan, Budget.",
+    next: "Wir planen ein 20-min\u00fctiges Walk-through, sobald du die Gelegenheit hattest, alles zu lesen.",
+  }),
+  fr: makeFollowup("fr", {
+    subject: "Proposition pr\u00eate \u00e0 examiner \u2014 {{topic}}",
+    preview: "Votre proposition est pr\u00eate.",
+    intro: "Le p\u00e9rim\u00e8tre propos\u00e9 pour {{topic}} est pr\u00eat \u00e0 \u00eatre examin\u00e9. Dites-nous ce qu'il faut ajuster \u2014 postes, calendrier, budget.",
+    next: "Nous pr\u00e9voyons un walk-through de 20 minutes d\u00e8s que vous aurez eu le temps de lire.",
+  }),
+  es: makeFollowup("es", {
+    subject: "Propuesta lista para revisar \u2014 {{topic}}",
+    preview: "Tu propuesta est\u00e1 lista.",
+    intro: "El alcance propuesto para {{topic}} est\u00e1 listo para revisar. Dinos qu\u00e9 ajustar \u2014 partidas, cronograma, presupuesto.",
+    next: "Programaremos un walk-through de 20 minutos en cuanto hayas tenido tiempo de leerlo.",
+  }),
+};
+
+const LEAD_FOLLOWUP_THANKS: Record<Language, LocalizedTemplate> = {
+  en: makeFollowup("en", {
+    subject: "Thanks for choosing Stratifit \u2014 {{topic}}",
+    preview: "We're kicking off your project.",
+    intro: "Thanks for the green light on {{topic}}. We're kicking off this week and will keep you posted at every milestone.",
+    next: "If anything urgent comes up, just reply to this email \u2014 it lands directly on the project thread.",
+  }),
+  de: makeFollowup("de", {
+    subject: "Danke f\u00fcr dein Vertrauen \u2014 {{topic}}",
+    preview: "Wir starten dein Projekt.",
+    intro: "Danke f\u00fcr das Go zu {{topic}}. Wir legen diese Woche los und halten dich bei jedem Meilenstein auf dem Laufenden.",
+    next: "Falls etwas Dringendes dazwischenkommt, antworte direkt auf diese E-Mail.",
+  }),
+  fr: makeFollowup("fr", {
+    subject: "Merci pour votre confiance \u2014 {{topic}}",
+    preview: "Nous lan\u00e7ons votre projet.",
+    intro: "Merci pour le feu vert sur {{topic}}. Nous d\u00e9marrons cette semaine et vous tiendrons inform\u00e9s \u00e0 chaque jalon.",
+    next: "En cas d'urgence, r\u00e9pondez directement \u00e0 cet e-mail \u2014 il arrive sur le fil du projet.",
+  }),
+  es: makeFollowup("es", {
+    subject: "Gracias por confiar en Stratifit \u2014 {{topic}}",
+    preview: "Arrancamos tu proyecto.",
+    intro: "Gracias por el visto bueno en {{topic}}. Empezamos esta semana y te mantendremos al tanto en cada hito.",
+    next: "Si algo urgente surge, responde directamente a este correo \u2014 cae en el hilo del proyecto.",
+  }),
+};
+
+/* Builder helper \u2014 keeps each 4-lang pair DRY. */
+function makeFollowup(
+  lang: Language,
+  parts: { subject: string; preview: string; intro: string; next: string },
+): LocalizedTemplate {
+  const inner =
+    `<p>${parts.intro}</p>` +
+    `<p>${parts.next}</p>` +
+    `<p style="font-size:13px;color:#888;margin-top:24px;">` +
+    `Topic: <strong style="color:#f5a623;">${parts.subject.includes("{{topic}}") ? parts.subject : "{{topic}}"}</strong><br />` +
+    `Scheduled for: {{scheduled_for}}` +
+    `</p>`;
+  const text =
+    `${stripHtml(parts.intro)}\n\n${stripHtml(parts.next)}\n\n` +
+    `Topic: {{topic}}\nScheduled for: {{scheduled_for}}\n\n\u2014 The Stratifit team`;
+  return {
+    subject: parts.subject,
+    preview: parts.preview,
+    bodyHtml: wrapHtml(lang, inner),
+    bodyText: text,
+  };
+}
+
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+}
+
+export function getLeadFollowupEmail(
+  template: EmailTemplate,
+  lang: Language,
+  vars: FollowupVars,
+): LocalizedTemplate | null {
+  const map: Partial<Record<EmailTemplate, Record<Language, LocalizedTemplate>>> = {
+    lead_followup_welcome: LEAD_FOLLOWUP_WELCOME,
+    lead_followup_checkin: LEAD_FOLLOWUP_CHECKIN,
+    lead_followup_proposal: LEAD_FOLLOWUP_PROPOSAL,
+    lead_followup_thanks: LEAD_FOLLOWUP_THANKS,
+  };
+  const bucket = map[template];
+  if (!bucket) return null;
+  const tpl = bucket[lang] ?? bucket.en;
+  if (!tpl) return null;
+  return {
+    subject: renderVars(tpl.subject, vars),
+    preview: renderVars(tpl.preview, vars),
+    bodyHtml: renderVars(tpl.bodyHtml, vars),
+    bodyText: renderVars(tpl.bodyText, vars),
+  };
+}
+
 export function getNotifyWelcomeEmail(lang: Language): LocalizedTemplate {
   return NOTIFY_WELCOME[lang] ?? NOTIFY_WELCOME.en;
 }

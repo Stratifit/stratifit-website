@@ -1,248 +1,153 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { getSupabaseAdmin } from "@/lib/supabase";
 import {
-  HiMagnifyingGlass,
-  HiChevronDown,
-  HiArrowRight,
+  HiArrowTopRightOnSquare,
+  HiUsers,
+  HiCheckCircle,
+  HiCurrencyDollar,
+  HiSparkles,
 } from "react-icons/hi2";
+import { LeadsTableClient, type LeadRow } from "./LeadsTableClient";
 
 /* ------------------------------------------------------------------ */
-/*  Mock leads (will be replaced by Supabase query later)            */
+/*  Admin Leads \u2014 pulls real leads from Supabase. Server component: */
+/*  AdminGuard in src/app/admin/layout.tsx already gates access.      */
 /* ------------------------------------------------------------------ */
-const mockLeads = [
-  {
-    id: "SAMPLE-1",
-    name: "Sample Lead",
-    email: "lead1@example.com",
-    service: "Brand Design",
-    source: "Website — Contact Form",
-    status: "new",
-    budget: "$1,000 – $3,000",
-    created: "2026-07-09 · 14:32",
-  },
-  {
-    id: "SAMPLE-2",
-    name: "Sample Lead",
-    email: "lead2@example.com",
-    service: "AI Automation",
-    source: "Chatbot Conversation",
-    status: "qualified",
-    budget: "$5,000 – $7,000",
-    created: "2026-07-09 · 09:14",
-  },
-  {
-    id: "SAMPLE-3",
-    name: "Sample Lead",
-    email: "lead3@example.com",
-    service: "Website Development",
-    source: "Coming-soon Notify Form",
-    status: "in-review",
-    budget: "$3,000 – $5,000",
-    created: "2026-07-08 · 21:05",
-  },
-  {
-    id: "SAMPLE-4",
-    name: "Sample Lead",
-    email: "lead4@example.com",
-    service: "Growth Marketing",
-    source: "Website — Contact Form",
-    status: "won",
-    budget: "$7,000 – $10,000",
-    created: "2026-07-08 · 11:48",
-  },
-  {
-    id: "SAMPLE-5",
-    name: "Sample Lead",
-    email: "lead5@example.com",
-    service: "Buy a Business",
-    source: "Buy-page Inquiry",
-    status: "lost",
-    budget: "$15K – $20K",
-    created: "2026-07-07 · 17:22",
-  },
-];
 
-const services = ["All services", "Brand Design", "AI Automation", "Website Development", "Growth Marketing", "Buy a Business", "Funnel Strategy"];
-const statuses = ["All statuses", "new", "qualified", "in-review", "won", "lost"];
-const sources = ["All sources", "Website — Contact Form", "Chatbot Conversation", "Coming-soon Notify Form", "Buy-page Inquiry"];
+const DEFAULT_LIMIT = 200;
 
-export default function AdminLeadsPage() {
-  const [search, setSearch] = useState("");
-  const [serviceFilter, setServiceFilter] = useState(services[0]);
-  const [statusFilter, setStatusFilter] = useState(statuses[0]);
-  const [sourceFilter, setSourceFilter] = useState(sources[0]);
+async function fetchLeads(): Promise<LeadRow[]> {
+  const client = getSupabaseAdmin();
+  if (!client) return [];
+  const { data, error } = await client
+    .from("leads")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(DEFAULT_LIMIT);
+  if (error) {
+    console.error("fetchLeads error:", error);
+    return [];
+  }
+  return (data ?? []) as LeadRow[];
+}
+
+function getSupabaseDashboardUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/);
+  const projectRef = match?.[1];
+  if (!projectRef) return "https://supabase.com/dashboard";
+  return `https://supabase.com/dashboard/project/${projectRef}/editor`;
+}
+
+export default async function AdminLeadsPage() {
+  const [leads, dashboardUrl] = await Promise.all([
+    fetchLeads(),
+    Promise.resolve(getSupabaseDashboardUrl()),
+  ]);
+
+  const total = leads.length;
+  const newly = leads.filter((l) => l.status === "new").length;
+  const qualified = leads.filter((l) => l.status === "qualified").length;
+  const won = leads.filter((l) => l.status === "won").length;
+  const last7d = leads.filter(
+    (l) => Date.now() - new Date(l.created_at).getTime() < 7 * 24 * 60 * 60 * 1000,
+  ).length;
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <header>
-        <p className="text-[10px] font-bold text-amber uppercase tracking-[0.25em] mb-2">
-          CRM
-        </p>
-        <h1 className="font-heading font-black text-3xl sm:text-4xl text-white tracking-tight leading-none">
-          Leads
-        </h1>
-        <p className="text-sm text-gray-400 mt-2">
-          View and filter all incoming leads.
-        </p>
+      <header className="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p className="text-[10px] font-bold text-amber uppercase tracking-[0.25em] mb-2">
+            CRM &amp; Sales
+          </p>
+          <h1 className="font-heading font-black text-3xl sm:text-4xl text-white tracking-tight leading-none">
+            Leads
+          </h1>
+          <p className="text-sm text-gray-400 mt-2">
+            Every captured lead from the contact form, chatbots, and manual
+            entry. Filter by status, service, or free-text search.
+          </p>
+        </div>
+        <a
+          href={dashboardUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-card-dark border border-white/10 rounded-xl text-sm text-gray-300 hover:border-amber/40 hover:text-amber transition-colors"
+        >
+          View in Supabase
+          <HiArrowTopRightOnSquare className="text-base" />
+        </a>
       </header>
 
-      {/* Filters row */}
-      <section className="bg-card-dark rounded-2xl border border-white/5 p-4 flex flex-col lg:flex-row gap-3">
-        <label className="relative flex-1">
-          <HiMagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-base pointer-events-none" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or email"
-            className="w-full bg-black border border-white/10 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:border-amber/50 focus:outline-none transition-colors"
-          />
-        </label>
-        <FilterSelect
-          label="Service" /* {{filter_service_type}} */
-          value={serviceFilter}
-          options={services}
-          onChange={setServiceFilter}
+      {/* Stat cards */}
+      <section className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+        <StatCard label="Total" value={total} icon={HiUsers} accent="text-white" />
+        <StatCard label="New" value={newly} icon={HiSparkles} accent="text-amber" />
+        <StatCard
+          label="Qualified"
+          value={qualified}
+          icon={HiCheckCircle}
+          accent="text-emerald-400"
         />
-        <FilterSelect
-          label="Status" /* {{filter_status}} */
-          value={statusFilter}
-          options={statuses}
-          onChange={setStatusFilter}
+        <StatCard
+          label="Won"
+          value={won}
+          icon={HiCurrencyDollar}
+          accent="text-emerald-300"
         />
-        <FilterSelect
-          label="Source" /* {{filter_source}} */
-          value={sourceFilter}
-          options={sources}
-          onChange={setSourceFilter}
-        />
+        <StatCard label="Last 7 days" value={last7d} icon={HiUsers} accent="text-blue-300" />
       </section>
 
-      {/* Table */}
+      {/* Filterable table (client component) */}
       <section className="bg-card-dark rounded-2xl border border-white/5 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <p className="text-[10px] font-mono text-gray-500">
-            {/* {{lead_name}} · {{lead_email}} · {{lead_service}} · {{lead_status}} · {{lead_created_at}} */}
-            {`{{lead_name}} · {{lead_email}} · {{lead_service}} · {{lead_status}} · {{lead_created_at}}`}
-          </p>
-          <p className="text-xs text-gray-400">
-            <span className="text-white font-bold">{mockLeads.length}</span> results
-          </p>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-[10px] uppercase tracking-wider text-gray-500 border-b border-white/5">
-                <th className="px-6 py-3 font-bold">Lead</th>
-                <th className="px-6 py-3 font-bold hidden md:table-cell">Service</th>
-                <th className="px-6 py-3 font-bold hidden lg:table-cell">Source</th>
-                <th className="px-6 py-3 font-bold">Status</th>
-                <th className="px-6 py-3 font-bold hidden lg:table-cell">Budget</th>
-                <th className="px-6 py-3 font-bold hidden md:table-cell">Created</th>
-                <th className="px-6 py-3 font-bold text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/5">
-              {mockLeads.map((lead, i) => (
-                <motion.tr
-                  key={lead.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.04 }}
-                  className="hover:bg-white/[0.02] transition-colors"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-amber/10 border border-amber/20 flex items-center justify-center font-heading font-black text-amber text-sm">
-                        {lead.name.charAt(0)}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-white truncate">{lead.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{lead.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 hidden md:table-cell text-gray-300">{lead.service}</td>
-                  <td className="px-6 py-4 hidden lg:table-cell text-gray-400 text-xs">{lead.source}</td>
-                  <td className="px-6 py-4">
-                    <span className={statusClasses(lead.status)}>{lead.status}</span>
-                  </td>
-                  <td className="px-6 py-4 hidden lg:table-cell text-gray-300 text-xs font-mono">
-                    {lead.budget}
-                  </td>
-                  <td className="px-6 py-4 hidden md:table-cell text-gray-400 text-xs font-mono">
-                    {lead.created}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link
-                      href={`/admin/leads/${lead.id}`}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-amber hover:gap-2 transition-all"
-                    >
-                      View Lead <HiArrowRight className="text-sm" />
-                    </Link>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <LeadsTableClient leads={leads} />
       </section>
+
+      {/* Helpful footer */}
+      <footer className="text-[10px] font-mono text-gray-600 flex items-center gap-3 flex-wrap">
+        <span>
+          Stored in Supabase table <code className="text-gray-400">leads</code>.
+        </span>
+        <span>
+          Scheduled follow-ups dispatch from{" "}
+          <Link
+            href="/admin/email-log"
+            className="text-gray-400 hover:text-amber underline-offset-2 hover:underline"
+          >
+            Email Log
+          </Link>{" "}
+          via the Vercel cron.
+        </span>
+      </footer>
     </div>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  Filter dropdown (placeholder styling)                            */
+/*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
-function FilterSelect({
+
+function StatCard({
   label,
   value,
-  options,
-  onChange,
+  icon: Icon,
+  accent,
 }: {
   label: string;
-  value: string;
-  options: string[];
-  onChange: (v: string) => void;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: string;
 }) {
   return (
-    <div className="relative lg:min-w-[200px]">
-      <p className="text-[9px] font-mono text-gray-600 mb-0.5 pl-1">{label}</p>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none bg-black border border-white/10 rounded-xl pl-4 pr-10 py-3 text-sm text-white focus:border-amber/50 focus:outline-none transition-colors cursor-pointer"
-        >
-          {options.map((opt) => (
-            <option key={opt} className="bg-black text-white">
-              {opt}
-            </option>
-          ))}
-        </select>
-        <HiChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none text-base" />
+    <div className="bg-card-dark rounded-2xl border border-white/5 p-4 sm:p-5 flex flex-col gap-2">
+      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">
+        <Icon className="text-sm" />
+        {label}
       </div>
+      <p className={`font-heading font-black text-2xl sm:text-3xl tabular-nums ${accent}`}>
+        {value}
+      </p>
     </div>
   );
-}
-
-function statusClasses(s: string) {
-  switch (s) {
-    case "new":
-      return "text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber/15 text-amber border border-amber/20";
-    case "qualified":
-      return "text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-400/10 text-emerald-300 border border-emerald-400/20";
-    case "in-review":
-      return "text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/5 text-gray-300 border border-white/10";
-    case "won":
-      return "text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber text-black";
-    case "lost":
-      return "text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/5 text-gray-500 border border-white/10";
-    default:
-      return "text-[10px] font-bold px-2.5 py-1 rounded-full bg-white/5 text-gray-400 border border-white/10";
-  }
 }
