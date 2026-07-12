@@ -21,6 +21,7 @@ import {
 import { openContactModal } from "@/components/contact/ContactModal";
 import { useLanguage } from "@/lib/LanguageContext";
 import { tLabel } from "@/lib/stratifit-i18n";
+import { askLlm } from "@/lib/chat-llm-client";
 import type { Language } from "@/lib/cms-types";
 
 export type ComingSoonRole = "bot" | "user";
@@ -274,7 +275,27 @@ export function ComingSoonAIChat({
           lower.includes("avance") || lower.includes("vista previa") || lower.includes("ver")
         ) key = "sneakpeek";
       }
-      setMessages((prev) => [...prev, responses[key]]);
+      // No keyword match (or preMatchedId === "fallback") — route to Groq
+      // via /api/chat/llm. Falls back to canned `responses.fallback` if
+      // GROQ_API_KEY is missing or the call fails.
+      if (key === "fallback") {
+        askLlm({ chatbot: "coming_soon", query: q, lang })
+          .then((r) => {
+            if (r.ok && r.text) {
+              setMessages((prev) => [
+                ...prev,
+                { role: "bot", text: r.text as string, intent: "info" },
+              ]);
+            } else {
+              setMessages((prev) => [...prev, responses.fallback]);
+            }
+          })
+          .catch(() => {
+            setMessages((prev) => [...prev, responses.fallback]);
+          });
+      } else {
+        setMessages((prev) => [...prev, responses[key]]);
+      }
     }, 600);
   };
 

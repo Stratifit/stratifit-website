@@ -20,6 +20,7 @@ import {
 import { openContactModal } from "@/components/contact/ContactModal";
 import { useLanguage } from "@/lib/LanguageContext";
 import { tLabel } from "@/lib/stratifit-i18n";
+import { askLlm } from "@/lib/chat-llm-client";
 import type { Language } from "@/lib/cms-types";
 
 type Message = {
@@ -272,9 +273,37 @@ export default function ContactChatbot() {
       response = botResponses.support;
     else response = botResponses.fallback;
 
+    // If the keyword chain landed on the canned fallback, route to Groq
+    // via /api/chat/llm instead so the bot can answer novel questions.
+    // Falls back to canned `botResponses.fallback` if GROQ_API_KEY is
+    // missing or the call fails.
+    const finalResponse = response;
     setTimeout(() => {
-      setIsTyping(false);
-      setMessages((prev) => [...prev, response]);
+      if (finalResponse === botResponses.fallback) {
+        askLlm({ chatbot: "contact", query: text, lang })
+          .then((r) => {
+            setIsTyping(false);
+            if (r.ok && r.text) {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  role: "bot",
+                  text: r.text as string,
+                  quickReplies: botResponses.fallback.quickReplies,
+                },
+              ]);
+            } else {
+              setMessages((prev) => [...prev, botResponses.fallback]);
+            }
+          })
+          .catch(() => {
+            setIsTyping(false);
+            setMessages((prev) => [...prev, botResponses.fallback]);
+          });
+      } else {
+        setIsTyping(false);
+        setMessages((prev) => [...prev, finalResponse]);
+      }
     }, 600);
   };
 
