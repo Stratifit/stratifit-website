@@ -17,6 +17,7 @@ import {
   HiCog6Tooth,
   HiPencilSquare,
   HiLanguage,
+  HiPaperAirplane,
 } from "react-icons/hi2";
 
 export type NavItem = {
@@ -43,6 +44,7 @@ export const navGroups: NavGroup[] = [
       { key: "dashboard", href: "/admin", icon: HiHome, label: "Overview" },
       { key: "leads", href: "/admin/leads", icon: HiUsers, label: "Leads", badge: "12" },
       { key: "subscriptions", href: "/admin/subscriptions", icon: HiEnvelope, label: "Notify Subscribers" },
+      { key: "email-log", href: "/admin/email-log", icon: HiPaperAirplane, label: "Email Log" },
       { key: "services", href: "/admin/services", icon: HiSparkles, label: "Services" },
     ],
   },

@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { getAdminSession } from "@/lib/admin-auth";
+import {
+  sendEmail,
+  getNotifyWelcomeEmail,
+  getNotifyAlreadySubscribedEmail,
+} from "@/lib/email";
+import type { Language } from "@/lib/cms-types";
 
 /* ------------------------------------------------------------------ */
 /*  POST /api/notify                                                  */
 /*  Public endpoint for the Coming Soon "Notify When It's Live" form. */
 /*  Validates email, upserts into notify_subscribers (idempotent on    */
 /*  duplicate emails). Source + lang are tracked for analytics.       */
+/*  After the upsert succeeds, fires a confirmation email via Resend  */
+/*  (welcome template for new subs, "already on list" for dupes).    */
 /* ------------------------------------------------------------------ */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -41,7 +49,9 @@ export async function POST(req: NextRequest) {
   }
 
   const normalizedEmail = email.trim().toLowerCase();
-  const safeLang = typeof lang === "string" && lang.length <= 8 ? lang : "en";
+  const safeLang = (
+    ["en", "de", "fr", "es"].includes(String(lang)) ? lang : "en"
+  ) as Language;
   const safeSource = typeof source === "string" && source.length <= 64 ? source : "coming_soon_page";
 
   // Check whether the email is already on the list so the UI can show a
@@ -56,7 +66,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
   const alreadySubscribed = !!existing;
 
-  const { error } = await client
+  const { data: upserted, error } = await client
     .from("notify_subscribers")
     .upsert(
       {
@@ -66,13 +76,38 @@ export async function POST(req: NextRequest) {
         lang: safeLang,
       },
       { onConflict: "email" },
-    );
+    )
+    .select("id")
+    .maybeSingle();
 
   if (error) {
     return NextResponse.json(
       { error: "Could not save your email. Please try again." },
       { status: 500 },
     );
+  }
+
+  // Fire confirmation email. Errors are logged + recorded in email_log
+  // but do NOT roll back the subscriber upsert: the user's #1 expectation
+  // is to be on the list, the email is a courtesy.
+  const tpl = alreadySubscribed
+    ? getNotifyAlreadySubscribedEmail(safeLang)
+    : getNotifyWelcomeEmail(safeLang);
+  try {
+    await sendEmail({
+      to: normalizedEmail,
+      subject: tpl.subject,
+      template: alreadySubscribed
+        ? "notify_already_subscribed"
+        : "notify_welcome",
+      bodyHtml: tpl.bodyHtml,
+      bodyText: tpl.bodyText,
+      relatedSubscriberId: upserted?.id,
+    });
+  } catch (err) {
+    // sendEmail itself never throws (writes a failed row instead), but
+    // defensively catch so a stray throw can never block the response.
+    console.error("[notify] unexpected sendEmail throw:", err);
   }
 
   return NextResponse.json(

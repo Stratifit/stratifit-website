@@ -409,6 +409,35 @@ CREATE TABLE IF NOT EXISTS section_labels (
 );
 INSERT INTO section_labels (id) VALUES (uuid_generate_v4()) ON CONFLICT DO NOTHING;
 
+/* ============================================================
+   26. email_log (list — Resend send audit trail)
+   Append-only history of every transactional email sent by the
+   app. status transitions queued -> sent | failed. Used by the
+   /admin/email-log viewer. Indexes by created_at DESC (most
+   recent first) and by status (for filtering dashboards).
+   ============================================================ */
+CREATE TABLE IF NOT EXISTS email_log (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  recipient TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  body TEXT NOT NULL,
+  template_name TEXT NOT NULL DEFAULT 'unknown',
+  status TEXT NOT NULL DEFAULT 'queued'
+    CHECK (status IN ('queued', 'sent', 'failed')),
+  resend_id TEXT,
+  error TEXT,
+  attempt_count INTEGER NOT NULL DEFAULT 0,
+  related_subscriber_id UUID REFERENCES notify_subscribers(id) ON DELETE SET NULL,
+  sent_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS email_log_created_at_idx
+  ON email_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS email_log_status_idx
+  ON email_log(status);
+CREATE INDEX IF NOT EXISTS email_log_template_idx
+  ON email_log(template_name);
+
 -- ============================================================
 --  Done. After running this migration, sign in at /admin, go to
 --  /admin/content, and start filling each section in all 4 languages.
