@@ -54,7 +54,7 @@ export default function AdminTeamPage() {
           />
         </label>
         <div className="flex gap-2 items-center">
-          <p className="text-[10px] font-mono text-gray-600">filter.role</p>
+          <p className="text-[10px] font-mono text-gray-600">{"{{filter.role}}"}</p>
           {roles.map((r) => (
             <button
               key={r}
@@ -72,7 +72,7 @@ export default function AdminTeamPage() {
       <section className="bg-card-dark rounded-2xl border border-white/5 overflow-hidden">
         <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
           <p className="text-[10px] font-mono text-gray-500">
-            user.name · user.email · user.role · user.active
+            {"{{user.name}} · {{user.email}} · {{user.role}} · {{user.active}}"}
           </p>
           <p className="text-xs text-gray-400">
             <span className="text-white font-bold">{members.filter((m) => m.active).length}</span> active

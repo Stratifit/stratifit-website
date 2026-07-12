@@ -9,10 +9,10 @@ import {
 } from "react-icons/hi2";
 
 const kpis = [
-  { label: "Pageviews · 7d", value: "1,842", delta: "+22%", positive: true, placeholder: "analytics.pageviews" },
-  { label: "Unique visitors · 7d", value: "642", delta: "+9%", positive: true, placeholder: "analytics.visitors" },
-  { label: "Bounce rate", value: "31.4%", delta: "−4%", positive: true, placeholder: "analytics.bounce" },
-  { label: "Avg. session", value: "3m 12s", delta: "+18s", positive: true, placeholder: "analytics.session" },
+  { label: "Pageviews · 7d", value: "1,842", delta: "+22%", positive: true, placeholder: "{{analytics.pageviews}}" },
+  { label: "Unique visitors · 7d", value: "642", delta: "+9%", positive: true, placeholder: "{{analytics.visitors}}" },
+  { label: "Bounce rate", value: "31.4%", delta: "−4%", positive: true, placeholder: "{{analytics.bounce}}" },
+  { label: "Avg. session", value: "3m 12s", delta: "+18s", positive: true, placeholder: "{{analytics.session}}" },
 ];
 
 const weeklyVisitors = [
@@ -83,7 +83,7 @@ export default function AdminAnalyticsPage() {
           <div className="flex items-center justify-between mb-5">
             <div>
               <p className="text-[10px] font-mono text-gray-500 mb-1">
-                analytics.visitors_by_day
+                {"{{analytics.visitors_by_day}}"}
               </p>
               <h2 className="font-heading font-bold text-base text-white">
                 Weekly Visitors
@@ -115,7 +115,7 @@ export default function AdminAnalyticsPage() {
 
         <div className="bg-card-dark rounded-2xl border border-white/5 p-6">
           <p className="text-[10px] font-mono text-gray-500 mb-1">
-            analytics.traffic_sources
+            {"{{analytics.traffic_sources}}"}
           </p>
           <h2 className="font-heading font-bold text-base text-white mb-4">Traffic Sources</h2>
           <div className="space-y-3">
@@ -142,7 +142,7 @@ export default function AdminAnalyticsPage() {
       <section className="bg-card-dark rounded-2xl border border-white/5 overflow-hidden">
         <div className="px-6 py-4 border-b border-white/5">
           <p className="text-[10px] font-mono text-gray-500">
-            analytics.top_pages — ranked by total views · 7d
+            {"{{analytics.top_pages}}"} — ranked by total views · 7d
           </p>
         </div>
         <ul className="divide-y divide-white/5">
@@ -152,7 +152,7 @@ export default function AdminAnalyticsPage() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-mono text-white truncate">{p.path}</p>
               </div>
-              <span className="text-[10px] font-mono text-gray-500 hidden md:inline">analytics.duration · 4m 02s</span>
+              <span className="text-[10px] font-mono text-gray-500 hidden md:inline">{"{{analytics.duration}}"} 4m 02s</span>
               <span className="text-xs text-gray-300 font-bold w-16 text-right">{p.views}</span>
               <span className="text-[10px] font-mono text-emerald-400 w-12 text-right">{p.rate}</span>
             </li>

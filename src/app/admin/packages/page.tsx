@@ -99,14 +99,14 @@ export default function AdminPackagesPage() {
                   <HiPencil className="text-sm" />
                 </button>
               </div>
-              <p className="text-[9px] font-mono text-gray-600 mb-1">package.name</p>
+              <p className="text-[9px] font-mono text-gray-600 mb-1">{"{{package.name}}"}</p>
               <h3 className="font-heading font-black text-2xl text-white mb-1">{tier.name}</h3>
               <p className="text-[10px] font-mono text-gray-500 mb-3">
-                pkg.price · pkg.period
+                {"{{package.price}}"} · {"{{package.period}}"}
               </p>
               <p className="text-xs text-gray-300 leading-relaxed mb-3">{tier.description}</p>
               <div className="h-px w-full bg-gradient-to-r from-white/10 to-transparent my-3" />
-              <p className="text-[9px] font-mono text-gray-500 mb-2">pkg.features[]</p>
+              <p className="text-[9px] font-mono text-gray-500 mb-2">{"{{package.features[]}}"}</p>
               <ul className="space-y-2 mb-4">
                 {tier.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-xs text-gray-300">
@@ -117,7 +117,7 @@ export default function AdminPackagesPage() {
                   <HiPlus className="text-gray-600 text-[14px] shrink-0 mt-[2px]" /> Add feature
                 </li>
               </ul>
-              <p className="text-[9px] font-mono text-gray-500 mb-1">pkg.cta</p>
+              <p className="text-[9px] font-mono text-gray-500 mb-1">{"{{package.cta}}"}</p>
               <p className="font-heading font-bold text-sm text-amber">{tier.cta}</p>
             </div>
           </motion.div>
@@ -145,11 +145,11 @@ export default function AdminPackagesPage() {
                 </button>
               </div>
               <form onSubmit={(e) => { e.preventDefault(); setEditing(null); }} className="space-y-3">
-                <Field label="pkg.name" defaultValue={editing.name} />
+                <Field label="{{package.name}}" defaultValue={editing.name} />
                 <div className="grid grid-cols-2 gap-3">
-                  <Field label="pkg.price" defaultValue={editing.price} />
+                  <Field label="{{package.price}}" defaultValue={editing.price} />
                   <div>
-                    <p className="text-[9px] font-mono text-gray-600 mb-1 pl-1">pkg.period</p>
+                    <p className="text-[9px] font-mono text-gray-600 mb-1 pl-1">{"{{package.period}}"}</p>
                     <select defaultValue={editing.period} className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer">
                       {["one-time", "starting", "monthly", "quote"].map((p) => (
                         <option key={p} value={p} className="bg-black text-white">{p}</option>
@@ -157,9 +157,9 @@ export default function AdminPackagesPage() {
                     </select>
                   </div>
                 </div>
-                <Field label="pkg.description" defaultValue={editing.description} multiline />
-                <Field label="pkg.features[]" defaultValue={editing.features.join("\n")} multiline />
-                <Field label="pkg.cta" defaultValue={editing.cta} />
+                <Field label="{{package.description}}" defaultValue={editing.description} multiline />
+                <Field label="{{package.features[]}}" defaultValue={editing.features.join("\n")} multiline />
+                <Field label="{{package.cta}}" defaultValue={editing.cta} />
                 <button
                   type="submit"
                   className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.25)] text-sm mt-2"

@@ -90,7 +90,7 @@ export default function AdminFaqPage() {
 
       <section className="bg-card-dark rounded-2xl border border-white/5 overflow-hidden">
         <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-          <p className="text-[10px] font-mono text-gray-500">{'staticfaq.question - staticfaq.answer'}</p>
+          <p className="text-[10px] font-mono text-gray-500">{'{{staticfaq.question}} - {{staticfaq.answer}}'}</p>
           <p className="text-xs text-gray-400">
             <span className="text-white font-bold">{entries.length}</span> entries
           </p>

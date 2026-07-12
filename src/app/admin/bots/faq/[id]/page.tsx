@@ -92,7 +92,7 @@ export default function AdminFaqDetail({ params }: { params: { id: string } }) {
       <section className="grid lg:grid-cols-3 gap-6">
         {/* Main column */}
         <div className="lg:col-span-2 bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5">
-          <Row label="faq.id">
+          <Row label="{{faq.id}}">
             <input
               defaultValue={entry.id}
               readOnly={Boolean(found)}
@@ -107,14 +107,14 @@ export default function AdminFaqDetail({ params }: { params: { id: string } }) {
             )}
           </Row>
 
-          <Row label="faq.question">
+          <Row label="{{faq.question}}">
             <input
               defaultValue={entry.question}
               className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none transition-all"
             />
           </Row>
 
-          <Row label="faq.short_answer">
+          <Row label="{{faq.short_answer}}">
             <textarea
               rows={2}
               defaultValue={entry.shortAnswer}
@@ -123,7 +123,7 @@ export default function AdminFaqDetail({ params }: { params: { id: string } }) {
             />
           </Row>
 
-          <Row label="faq.ai_answer">
+          <Row label="{{faq.ai_answer}}">
             <textarea
               rows={12}
               defaultValue={entry.aiAnswer}
@@ -135,14 +135,14 @@ export default function AdminFaqDetail({ params }: { params: { id: string } }) {
             </p>
           </Row>
 
-          <Row label="faq.related">
+          <Row label="{{faq.related}}">
             <RelatedPicker value={entry.related} excludeId={entry.id} />
           </Row>
         </div>
 
         {/* Side meta */}
         <aside className="bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5 h-fit">
-          <Row label="faq.category">
+          <Row label="{{faq.category}}">
             <select
               defaultValue={entry.category}
               className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer transition-all"
@@ -155,20 +155,20 @@ export default function AdminFaqDetail({ params }: { params: { id: string } }) {
             </select>
           </Row>
 
-          <Row label="faq.keywords">
+          <Row label="{{faq.keywords}}">
             <KeywordInput value={entry.keywords} />
           </Row>
 
           <div className="h-px bg-white/5" />
 
-          <Row label="faq.cta_label">
+          <Row label="{{faq.cta_label}}">
             <input
               defaultValue={entry.cta?.label ?? ""}
               placeholder="Get a tailored estimate"
               className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none transition-all"
             />
           </Row>
-          <Row label="faq.cta_intent">
+          <Row label="{{faq.cta_intent}}">
             <select
               defaultValue={entry.cta?.intent ?? ""}
               className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer transition-all"
