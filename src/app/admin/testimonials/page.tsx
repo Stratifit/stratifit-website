@@ -66,7 +66,7 @@ export default function AdminTestimonialsPage() {
                 </button>
               </div>
               <p className="text-[9px] font-mono text-gray-600 mb-1">
-                {"{{testimonial.author}}"}
+                testimonial.author
               </p>
               <p className="font-bold text-white">{t.name}</p>
               <p className="text-xs text-gray-400 mb-3">{t.role}</p>
@@ -78,12 +78,12 @@ export default function AdminTestimonialsPage() {
                   />
                 ))}
                 <span className="text-[10px] font-mono text-gray-500 ml-2">
-                  {"{{testimonial.rating}}"} = {t.rating}/5
+                  testimonial.rating = {t.rating}/5
                 </span>
               </div>
               <div className="h-px w-full bg-gradient-to-r from-white/10 to-transparent my-3" />
               <p className="text-[9px] font-mono text-gray-600 mb-1">
-                {"{{testimonial.quote}}"}
+                testimonial.quote
               </p>
               <p className="text-sm text-gray-300 leading-relaxed line-clamp-3">
                 &quot;{t.text}&quot;
@@ -140,10 +140,10 @@ export default function AdminTestimonialsPage() {
                 }}
                 className="space-y-3"
               >
-                <Field label="{{testimonial.author}}" defaultValue={editing.name} />
-                <Field label="{{testimonial.role}}" defaultValue={editing.role} />
-                <Field label="{{testimonial.rating}}" defaultValue={String(editing.rating)} />
-                <Field label="{{testimonial.quote}}" defaultValue={editing.text} multiline />
+                <Field label="testimonial.author" defaultValue={editing.name} />
+                <Field label="testimonial.role" defaultValue={editing.role} />
+                <Field label="testimonial.rating" defaultValue={String(editing.rating)} />
+                <Field label="testimonial.quote" defaultValue={editing.text} multiline />
                 <button
                   type="submit"
                   className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber text-black font-bold rounded-xl hover:bg-amber-light transition-all shadow-[0_0_20px_rgba(245,158,11,0.25)] text-sm mt-2"

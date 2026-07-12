@@ -115,7 +115,7 @@ export default function AdminSettingsPage() {
                 </div>
                 <div>
                   <p className="text-[9px] font-mono text-gray-600">
-                    {`{{setting.${section.id}}}`}
+                    {`setting.${section.id}`}
                   </p>
                   <h2 className="font-heading font-bold text-lg text-white">{section.title}</h2>
                 </div>
@@ -125,7 +125,7 @@ export default function AdminSettingsPage() {
                 {section.fields.map((f) => (
                   <div key={f.label}>
                     <p className="text-[9px] font-mono text-gray-600 mb-1 pl-1">
-                      {`{{setting.${section.id}.${f.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}}}`}
+                      {`setting.${section.id}.${f.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`}
                     </p>
                     <input
                       placeholder={f.placeholder}

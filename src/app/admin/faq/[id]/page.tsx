@@ -97,7 +97,7 @@ export default function AdminSlugFaqDetail({ params }: { params: { id: string } 
 
       <section className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5">
-          <Row label="{{staticfaq.id}}">
+          <Row label="staticfaq.id">
             <input
               value={draft.id}
               onChange={(e) => setDraft({ ...draft, id: e.target.value.replace(/\s+/g, '-').toLowerCase() })}
@@ -106,7 +106,7 @@ export default function AdminSlugFaqDetail({ params }: { params: { id: string } 
             <p className="text-[9px] font-mono text-gray-600 pl-1 mt-1">Slug used in the accordion key + /admin/faq/[id] route.</p>
           </Row>
 
-          <Row label="{{staticfaq.question}}">
+          <Row label="staticfaq.question">
             <input
               value={draft.question}
               onChange={(e) => setDraft({ ...draft, question: e.target.value })}
@@ -115,7 +115,7 @@ export default function AdminSlugFaqDetail({ params }: { params: { id: string } 
             />
           </Row>
 
-          <Row label="{{staticfaq.answer}}">
+          <Row label="staticfaq.answer">
             <textarea
               rows={6}
               value={draft.answer}
@@ -127,11 +127,11 @@ export default function AdminSlugFaqDetail({ params }: { params: { id: string } 
         </div>
 
         <aside className="bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5 h-fit">
-          <Row label="{{staticfaq.role}}">
+          <Row label="staticfaq.role">
             <input value="static" readOnly className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-mono opacity-60 cursor-not-allowed" />
           </Row>
 
-          <Row label="{{staticfaq.preview}}">
+          <Row label="staticfaq.preview">
             <div className="bg-black border border-amber/15 rounded-2xl px-5 py-4 shadow-[inset_0_0_24px_rgba(245,158,11,0.05)]">
               <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-amber mb-2 opacity-90">Accent preview</p>
               <p className="text-sm font-bold text-white leading-snug">{draft.question || '(empty question)'}</p>

@@ -88,7 +88,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
       {/* Form grid */}
       <section className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5">
-          <Row label="{{cs.id}}">
+          <Row label="cs.id">
             <input
               defaultValue={entry.id}
               readOnly={Boolean(found)}
@@ -101,7 +101,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
             )}
           </Row>
 
-          <Row label="{{cs.label}}">
+          <Row label="cs.label">
             <input
               defaultValue={entry.label}
               placeholder="Visible chip label, e.g. Pricing preview"
@@ -114,7 +114,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
             )}
           </Row>
 
-          <Row label="{{cs.text}}">
+          <Row label="cs.text">
             <textarea
               rows={12}
               defaultValue={entry.text}
@@ -128,7 +128,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
         </div>
 
         <aside className="bg-card-dark rounded-2xl border border-white/5 p-6 space-y-5 h-fit">
-          <Row label="{{cs.role}}">
+          <Row label="cs.role">
             <input
               defaultValue="bot"
               readOnly
@@ -136,7 +136,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
             />
           </Row>
 
-          <Row label="{{cs.intent_label}}">
+          <Row label="cs.intent_label">
             <div className="bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white">
               {entry.intent ? (
                 <span className="text-amber font-bold">{intentCopy[entry.intent].label}</span>
@@ -149,7 +149,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
             </div>
           </Row>
 
-          <Row label="{{cs.intent}}">
+          <Row label="cs.intent">
             <select
               defaultValue={entry.intent ?? ""}
               className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-l-2 focus:border-l-amber focus:outline-none cursor-pointer transition-all"
@@ -168,7 +168,7 @@ export default function AdminComingSoonDetail({ params }: { params: { id: string
 
           <div className="h-px bg-white/5" />
 
-          <Row label="{{match.triggers}}">
+          <Row label="match.triggers">
             <p className="text-[10px] text-gray-500 leading-relaxed">
               Free-form phrases — the bot matches user input against these to surface this answer (in addition to the chip rail).
             </p>
